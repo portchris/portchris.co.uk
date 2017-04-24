@@ -177,6 +177,16 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        
+        /*
+         * Portchris Added Dependency 
+         */
+        Collective\Html\HtmlServiceProvider::class,
+
+        /*
+         * Laravel 5.4
+         */
+        Laravel\Tinker\TinkerServiceProvider::class
 
     ],
 
@@ -225,6 +235,8 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
+        'Html' => Collective\Html\HtmlFacade::class,
+        'Form' => Collective\Html\FormFacade::class,
 
     ],
 

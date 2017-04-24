@@ -9,7 +9,7 @@ export class BookService {
   constructor(private _http: Http) { }
 
   getBooks():Observable<Book[]>{
-    let url = 'http://localhost:8000/api/book';
+    let url = 'http://portchris.hades.portchris.net:8081/api/book';
     return this._http.get(url)
       .map(res=> res.json())
       .catch(this.handleError)
