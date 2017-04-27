@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUsersTable extends Migration
+class CreateRolesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,24 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('roles', function (Blueprint $table) {
+
+            // Primary key
             $table->increments('id');
+
+            // Name of the role
             $table->string('name');
-            $table->string('firstname');
-            $table->string('lastname');
-            $table->string('email')->unique();
-            $table->string('password');
-            $table->string('lat');
-            $table->string('lng');
+
+            // Describe what this role is allowed to do to refresh my memory
+            $table->string('description');
+
+            // Their clearance level
+            $table->integer('security_level');
+
+            // Soft delete
             $table->boolean('enabled');
-            $table->rememberToken();
+
+            // Created and updated timestamps
             $table->timestamps();
         });
     }
@@ -35,6 +42,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('roles');
     }
 }
