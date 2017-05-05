@@ -73,7 +73,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'name' => 'About me',
 			'title' => 'Lets talk some more, maybe in person sometime?',
 			'content' => '',
-			'slug' => 'contact',
+			'slug' => 'about',
 			'meta_title' => 'About Chris Rogers, Web Application Developer.',
 			'meta_description' => $meta_desc,
 			'meta_image_path' => '',
