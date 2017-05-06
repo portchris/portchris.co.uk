@@ -46,9 +46,35 @@ class MessageStreamController extends Controller
 	* @return 	string 	$question
 	* @since 	1.0.0
 	*/
-	public function store($data) {
+	public function store(App\Http\Requests\StoreUserRequest $data) {
 
-		echo "HERE: " . __FUNCTION__;
+		$return = $this->error("Could not submit answer");
+		$k = $data['key'] ?? false;
+		$c = $data['content'] ?? false;
+		$u = $data['user_id'] ?? false;
+		$p = $data['page_id'] ?? false;
+		$s = $data['stage'] ?? false;
+		$n = $data['name'] ?? '';
+		$t = $data['title'] ?? $n;
+		$lId = $data['id_linked_content_meta'] ?? '';
+
+		if ($k && $c && $u && $p && $s) {
+			$sanitizedData = [
+				'name' => $n,
+				'id_linked_content_meta' => $lId, // This is how the site answers questions
+				'title' => $t,
+				'key' => $k,
+				'stage' => $s,
+				'content'=> $c,
+				'user_id' => $u,
+				'page_id' => $p
+			];
+			$answer = Messages::create($sanitizedData);
+			if ($answer->save()) {
+				$return = response()->json($answer);
+			}
+		}
+		return $return;
 	}
 
 	/**

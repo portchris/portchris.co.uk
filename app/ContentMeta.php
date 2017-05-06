@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 class ContentMeta extends Model
 {
 	protected $fillable = [
-		'id_linked_content_meta', 'name', 'title', 'key', 'content', 'stage'
+		'id_linked_content_meta', 'name', 'title', 'key', 'content', 'stage', 'user_id', 'page_id'
 	];
 
 	/**

@@ -33,12 +33,25 @@ abstract class TestCase extends Illuminate\Foundation\Testing\TestCase
 	}
 
 	/**
+	* Output to the PHPUnit CLI
+	*
+	* @param 	mixed 	$dump
+	* @since 	1.0.0
+	*/
+	public function output($dump) {
+
+		$this->expectOutputString(''); // Tell PHPUnit to expect '' as output
+		fwrite(STDERR, print_r($dump, TRUE));
+	}
+
+	/**
 	* Dumps json result
 	*
 	* @param string $function can be print_r, var_dump or var_export
 	* @param boolean $json_decode 
 	*/
 	public function dump($function = 'var_export', $json_decode = true) {
+		
 		$content = $this->response->getContent();
 		if ($json_decode) {
 			$content = json_decode($content, true);
