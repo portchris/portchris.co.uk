@@ -104,13 +104,53 @@ class PortchrisDatabaseSeeder extends Seeder
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));
+		$meta_q2 = App\ContentMeta::create(array(
+			'name' => 'Q1 Stage 0',
+			'id_linked_content_meta' => 0,
+			'title' => "Let's get started",
+			'key' => "question",
+			'stage' => 0,
+			'content'=> "Is there anything else I can help you with?",
+			'user_id' => $user_portchris->id,
+			'page_id' => $page_home->id
+		));
+		$meta_r = App\ContentMeta::create(array(
+			'name' => 'R1 Stage 1',
+			'id_linked_content_meta' => $meta_q->id, // This is how the site answers questions
+			'title' => "Let's get started",
+			'key' => "response",
+			'stage' => 1,
+			'content'=> "I'd like to know more about you",
+			'user_id' => $user_portchris->id,
+			'page_id' => $page_home->id
+		));
+		$meta_r2 = App\ContentMeta::create(array(
+			'name' => 'R2 Stage 1',
+			'id_linked_content_meta' => $meta_q->id, // This is how the site answers questions
+			'title' => "Let's get started",
+			'key' => "response",
+			'stage' => 1,
+			'content'=> "I'm not saying",
+			'user_id' => $user_portchris->id,
+			'page_id' => $page_home->id
+		));
 		$meta_a = App\ContentMeta::create(array(
 			'name' => 'A1 Stage 1',
-			'id_linked_content_meta' => $meta_q->id, // This is how the site answers questions
+			'id_linked_content_meta' => $meta_r->id, // This is how the site answers questions
 			'title' => "Let's get started",
 			'key' => "answer",
 			'stage' => 1,
 			'content'=> "Great! My name is Chris! But you should already know that :p",
+			'user_id' => $user_portchris->id,
+			'page_id' => $page_home->id
+		));
+		$meta_a2 = App\ContentMeta::create(array(
+			'name' => 'A1 Stage 0',
+			'id_linked_content_meta' => $meta_r2->id, // This is how the site answers questions
+			'title' => "Let's get started",
+			'key' => "answer",
+			'stage' => 0,
+			'content'=> "Gotcha, well then there's no more reason to talk I suppose.",
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));

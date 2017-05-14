@@ -72,7 +72,15 @@ class MessageStreamController extends Controller
 			];
 			$message = Messages::create($sanitizedData);
 			if ($message->save()) {
-				$return = response()->json(Messages::respond($lId, $c));
+				$response = Messages::respond($lId, $c);
+				if (!empty((array)$response)) {
+					$return = response()->json([
+						'answer' => $response->getAnswer(),
+						'question' => $response->getQuestion(),
+						'message' => $response->getMessage(),
+						'response' => $response->getResponse()
+					]);
+				}
 			}
 		}
 		return $return;

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use TestCase;
+use App;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -58,9 +59,13 @@ class MessageStreamControllerTest extends TestCase
 
 		// Session::start();
 		// $msg = factory(App\ContentMeta::class)->make();
+		$q = App\ContentMeta::where([
+			"stage" => 1, 
+			"key" => "question"
+		])->first();
 		$values = array(
 			'name' => 'Text based adventure with Joe Blogs',
-			'id_linked_content_meta' => 1, // This is how the site answers questions
+			'id_linked_content_meta' => $q->id, // This is how the site answers questions
 			'title' => "Joe Blogs - Stage 1",
 			'key' => "answer",
 			'stage' => 1,
@@ -73,7 +78,7 @@ class MessageStreamControllerTest extends TestCase
 			$this->output(strip_tags($response->getContent()));
 		} else {
 			$r = json_decode($response->getContent(), true);
-			$this->output($response->getContent());
+			$this->output($r);
 		}
 		$this->assertDatabaseHas('content_metas', ['title' => 'Joe Blogs - Stage 1']);
 		if (isset($r['name']) && $r['name'] != "error") {

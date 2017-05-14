@@ -10,7 +10,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use \DB;
+// use \DB;
 
 class ContentMeta extends Model
 {
@@ -37,6 +37,12 @@ class ContentMeta extends Model
 	* @var 	object
 	*/
 	private $question;
+
+	/**
+	* How strict the response match;
+	* @var 	int
+	*/
+	private $accuracy;
 
 	
 	/**
@@ -79,10 +85,12 @@ class ContentMeta extends Model
 	* @since 	1.0.0
 	* @param 	int 		$question_id 	
 	* @param 	string 	$users_response
+	* @param 	int 		$accuracy
 	*/
-	public static function respond($question_id, $users_response) {
+	public static function respond($question_id, $users_response, $accuracy = 50) {
 
 		$Message = new self();
+		$Message->setAccuracy($accuracy);
 		$Message->setMessage($users_response);
 		$Message->talk($question_id);
 		return $Message;
@@ -98,36 +106,40 @@ class ContentMeta extends Model
 		
 		// Get all possible responses to linked question from db
 		// $this->message = $users_response;
-		// echo $question_id . " .|. " . $this->getMessage(); die;
-		$staged_responses = DB::table($this->table)->where([
-			['id_linked_content_meta', '=', $question_id],
-			['key', '=', 'response']
+		// var_dump($possible_responses->toSql(), $possible_responses->getBindings()); die;
+		$staged_responses = self::where([
+			'id_linked_content_meta' => $question_id,
+			'key' => 'response'
 		])->get();
-
-		$stageless_responses = DB::table($this->table)->where([
-			["stage", "=", "0"],
-			["key", "=", "response"]
+		$stageless_responses = self::where([
+			'stage' => '0',
+			'key' => 'response'
 		])->get();
-		$possible_responses = array_merge($staged_responses, $stageless_responses);
+		$possible_responses = $staged_responses->merge($stageless_responses);
+		if (!$possible_responses->isEmpty()) {
 
-		// Find the closet matched response from above
-		$closest_response = $this->getClosestResponse($possible_responses);
-
-		// Calculate the validity of our closest response 
-		$percent = $this->calculateResponseMatch($closest_response->content);
-		$this->setResponse($closest_response);
-		if ($percent >= 80) {
+			// Find the closet matched response from above
+			$closest_response = $this->getClosestResponse($possible_responses);
+			$this->setResponse($closest_response);
 			
-			// This seems an appropriate response. Get answer to closest linked response
-			$a = DB::table($this->table)->where([
-				['id_linked_content_meta', '=', $closest->id],
-				['key', '=', 'answer']
-			])->first();
-			$this->setAnswer($a);
+			// Calculate the validity of our closest response against the set accuracy required to pass
+			$percent = $this->calculateResponseMatch($closest_response->content);
+			if ($percent >= $this->getAccuracy()) {
+				
+				// This seems an appropriate response. Get answer to closest linked response
+				$a = self::where([
+					'id_linked_content_meta' => $closest_response->id,
+					'key' => 'answer'
+				])->first();
+				$this->setAnswer($a);
+			} else {
+
+				// Response not accurate enough, explain all possible responses available
+				$this->setAnswer($staged_responses);
+			}
 		} else {
 
-			// Response not accurate enough, explain all possible responses available
-			$this->setAnswer($staged_responses);
+			// No responses... let the user know there has been an error.
 		}
 	}
 
@@ -156,7 +168,7 @@ class ContentMeta extends Model
 			}
 
 			// If distance is less than the next shortest distance OR if a next shortest is not yet found
-			if ($lev <= $shortest || $shortest < 0) {
+			if ($l <= $shortest || $shortest < 0) {
 				
 				// Set the closest match, and shortest distance
 				$closest  = $response;
@@ -171,12 +183,13 @@ class ContentMeta extends Model
 	* Check how close the strings match and return a percentage using the levenshtein algorithm 
 	*
 	* @param 	string 	$response1 
-	* @param 	string 	$response2 
-	* @return 	percentage
+	* @return 	int 		percentage
 	*/
-	private function calculateResponseMatch($response1, $response2) {
+	private function calculateResponseMatch($response1) {
 
-		return 1 - levenshtein($response1, $response2) / max(strlen($response1), strlen($response2));
+		$response2 = $this->getMessage();
+		$accuracy = 1 - levenshtein($response1, $response2) / max(strlen($response1), strlen($response2));
+		return ceil($accuracy * 100);
 	}
 
 	/**
@@ -265,6 +278,26 @@ class ContentMeta extends Model
 	public function getQuestion() {
 
 		return $this->question;
+	}
+
+	/**
+	* Set how strict the response matching should be.
+	*
+	* @param 	int 	$acc;	
+	*/
+	private function setAccuracy($acc) {
+
+		$this->accuracy = $acc;
+	}
+
+	/**
+	* Get how strict the response matching should be.
+	*
+	* @return 	int
+	*/
+	private function getAccuracy() {
+
+		return $this->accuracy;
 	}
 
 	/**

@@ -5,19 +5,29 @@ import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
 import { BookComponent } from './book/book.component';
-import {BookService} from "./book/book.service";
+import { BookService } from "./book/book.service";
+import { MessagesComponent } from './messages/messages.component';
+import { MessagesService } from "./messages/messages.service";
 
 @NgModule({
-  declarations: [
-    AppComponent,
-    BookComponent,
-  ],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    HttpModule
-  ],
-  providers: [BookService],
-  bootstrap: [AppComponent]
+	declarations: [
+		AppComponent,
+		BookComponent,
+		MessagesComponent
+	],
+	imports: [
+		BrowserModule,
+		FormsModule,
+		HttpModule
+	],
+	providers: [BookService, MessagesService],
+	bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule { 
+	
+	url: string;
+	
+	constructor() {
+		this.url = "http://portchris.hades.portchris.net:8081/";
+	}
+}
