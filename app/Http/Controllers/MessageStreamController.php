@@ -11,6 +11,7 @@ use App\User;
 use App\Page;
 use App\ContentMeta as Messages;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreMessageRequest;
 
 class MessageStreamController extends Controller
 {
@@ -46,7 +47,7 @@ class MessageStreamController extends Controller
 	* @return 	string 	$question
 	* @since 	1.0.0
 	*/
-	public function store(App\Http\Requests\StoreUserRequest $data) {
+	public function store(StoreMessageRequest $data) {
 
 		$return = $this->error("Could not submit answer");
 		$k = $data['key'] ?? false;
@@ -61,7 +62,7 @@ class MessageStreamController extends Controller
 		if ($k && $c && $u && $p && $s) {
 			$sanitizedData = [
 				'name' => $n,
-				'id_linked_content_meta' => $lId, // This is how the site answers questions
+				'id_linked_content_meta' => $lId, // This is how portchris can respond
 				'title' => $t,
 				'key' => $k,
 				'stage' => $s,
@@ -69,12 +70,22 @@ class MessageStreamController extends Controller
 				'user_id' => $u,
 				'page_id' => $p
 			];
-			$answer = Messages::create($sanitizedData);
-			if ($answer->save()) {
-				$return = response()->json($answer);
+			$message = Messages::create($sanitizedData);
+			if ($message->save()) {
+				$return = response()->json(Messages::respond($lId, $c));
 			}
 		}
 		return $return;
+	}
+
+	/**
+	* The user has submitted
+	*
+	* @since 	1.0.0
+	*/
+	protected function getResponse() {
+
+
 	}
 
 	/**
@@ -113,7 +124,7 @@ class MessageStreamController extends Controller
 	* @return 	JSON object 	$response
 	* @since 	1.0.0
 	*/
-	private function error($msg) {
+	public function error($msg) {
 
 		return response()->json(["name" => self::RESPONSE_ERROR, "content" => __($msg)]);
 	}
