@@ -44,6 +44,37 @@ class ContentMeta extends Model
 	*/
 	private $accuracy;
 
+	/**
+	* Prefab message template
+	* @var 	array
+	*/
+	public const MESSAGE_TEMPLATE = [	
+		'id' => 0,
+		'user_id' => 0,
+		'page_id' => 0,
+		'id_linked_content_meta' => 0,
+		'name' => "",
+		'title' => "",
+		'key' => "",
+		'stage' => "",
+		'content' => "",
+		'type' => "",
+		'method' => "",
+		'created_at' => "",
+		'updated_at' => ""
+	];
+
+	/**
+	* Prefab message types
+	* @var 	array
+	*/
+	public const TYPES = [	
+		'ContentMeta' => "message",
+		'Page' => "page",
+		'Role' => "role",
+		'User' => "user"
+	];
+
 	
 	/**
 	* The closest response from users message
@@ -71,6 +102,35 @@ class ContentMeta extends Model
 	public function user() {
 
 		return $this->belongsTo('App\User');
+	}
+
+
+	/**
+	* Create and return new message using template constant
+	*
+	* @param 	string 	$content
+	* @param 	string 	$key
+	* @param 	string 	$name
+	* @param 	string 	$title
+	* @param 	int 		$stage
+	* @param 	string 	$type
+	* @param 	string 	$method
+	* @return 	array 	$msg
+	*/
+	public static function create($content, $key, $name, $title, $stage, $type = "", $method = "") {
+
+		$Message = new self();
+		$type = (strlen($type) === 0) ? self::TYPES[__CLASS__] : $type;
+		$method = (method_exists(array_search($type, self::TYPES), $method)) ? $method : "";
+		$msg = $Message::MESSAGE_TEMPLATE;
+		$msg["content"] = $content;
+		$msg["key"] = $key;
+		$msg["name"] = $name;
+		$msg["title"] = $title;
+		$msg["stage"] = $stage;
+		$msg["type"] = $type;
+		$msg["method"] = $method;
+		return array($msg);
 	}
 
 	/**

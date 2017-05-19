@@ -12,7 +12,15 @@
 */
 
 Route::get('/', function () {
+
     return view('welcome');
+});
+
+Route::get('login', 'UserController@authenticate');
+
+Route::get('/register', function() {
+	
+	return Redirect::to('/api/register');
 });
 
 //Route::group(['middleware'=>'cors','prefix'=>'api'], function (){

@@ -75,10 +75,10 @@ class MessageStreamControllerTest extends TestCase
 		);
 		$response = $this->call('POST', 'api/message', $values);
 		if ($response->status() == 500) {
-			$this->output(strip_tags($response->getContent()));
+			// $this->output(strip_tags($response->getContent()));
 		} else {
 			$r = json_decode($response->getContent(), true);
-			$this->output($r);
+			// $this->output($r);
 		}
 		$this->assertDatabaseHas('content_metas', ['title' => 'Joe Blogs - Stage 1']);
 		if (isset($r['name']) && $r['name'] != "error") {

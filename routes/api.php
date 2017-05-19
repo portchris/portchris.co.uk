@@ -13,13 +13,25 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::get('/user', function (Request $request) {
+Route::get('/user', function(Request $request) {
+
 	return $request->user();
 })->middleware('auth:api');
 
-Route::group(['middleware'=>'cors'], function () {
+Route::group(['middleware'=>'cors'], function() {
+
 	Route::resource('book','BookController');
+	
+	// Pages
 	Route::resource('page','PagesController');
+
+	// User, login, registration
+	Route::resource('user', 'UserController', [
+		'except' => [
+			'create', 'edit', 'update', 'destroy'
+		]
+	]);
+	Route::post('/user/identify', 'UserController@authenticate');
 
 	// Text based adventure
 	// Route::get('message/question', 'MessageStreamController@question'); // Create new GET route

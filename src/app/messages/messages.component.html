@@ -1,7 +1,26 @@
 <div class="container">
 	<blockquote *ngFor="let msg of messages" class="blockquote">
-	<pre>{{msg.content}}</pre>
-	<p>{{msg.question}}</p>
-	<p>{{msg.answer}}</p>
+		<small>{{ msg.key }}</small>
+		<p>{{ msg.content }}</p>
 	</blockquote>
+	<form [formGroup]="talkForm" (ngSubmit)="doRespond($event, talkForm.controls['content'].valid)" class="form">
+		<div [ngClass]="{'has-error': !talkForm.controls['content'].valid}" class="form-group">
+			<input formControlName="id_linked_content_meta" type="hidden" name="id_linked_content_meta" [value]="question.id" [pattern]="question.pattern" required>
+			<input formControlName="name" type="hidden" name="name" [value]="question.name">
+			<input formControlName="title" type="hidden" name="title" [value]="question.title">
+			<input formControlName="key" type="hidden" name="key" value="answer">
+			<input formControlName="stage" type="hidden" name="stage" [value]="user.stage">
+			<input formControlName="user_id" type="hidden" name="user_id" [value]="user.id">
+			<input formControlName="page_id" type="hidden" name="page_id" [value]="page.id">
+			<input formControlName="type" type="hidden" name="type" [value]="question.type">
+			<input formControlName="method" type="hidden" name="method" [value]="question.method">
+			<input formControlName="content" type="text" name="content" class="inline" placeholder="Talk to meh">
+			<button type="submit">
+				<small>Talk</small>
+			</button>
+			<div class="alert alert-danger" *ngIf="err">
+				{{ err }}
+			</div>
+		</div>
+	</form>
 </div>

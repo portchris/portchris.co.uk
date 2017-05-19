@@ -8,8 +8,10 @@
 
 namespace App;
 
+use Auth;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\ContentMeta as Messages;
 
 class User extends Authenticatable
 {
@@ -34,11 +36,27 @@ class User extends Authenticatable
     ];
 
     /**
+    * Auth check made available to other calling classes
+    *
+    * @var  boolean 
+    */
+    public $isLoggedIn;
+
+    /**
+    * Set up variables
+    */
+    public function __construct() {
+
+        $this->isLoggedIn = Auth::check();
+    }
+
+    /**
     * Roles can have many users. Equally users can have many roles. This is a many-to-many relationship 
     *
     * @return   object  role
     */
     public function roles() {
+
         return $this->belongsToMany('App\Role', 'users_roles', 'user_id', 'role_id');
     }
 
@@ -48,6 +66,20 @@ class User extends Authenticatable
     * @return   object  Page
     */
     public function pages() {
+
         return $this->hasMany('Page');
+    }
+
+    /**
+    * Check
+    */
+    public static function message($msg) {
+
+        $content = __($msg);
+        $key = "question";
+        $name = "User identification";
+        $title = "Who are you";
+        $stage = 0;
+        return response()->json(Messages::create($content, $key, $name, $title, $stage));
     }
 }

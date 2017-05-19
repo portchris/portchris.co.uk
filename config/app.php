@@ -166,8 +166,8 @@ return [
         /*
          * Package Service Providers...
          */
-
         Barryvdh\Cors\ServiceProvider::class,
+        // Barryvdh\Cors\CorsServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -179,9 +179,10 @@ return [
         App\Providers\RouteServiceProvider::class,
         
         /*
-         * Portchris Added Dependency 
+         * Portchris Added Dependencies: HTML and JSON Web Token providers
          */
         Collective\Html\HtmlServiceProvider::class,
+        Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class,
 
         /*
          * Laravel 5.4
@@ -237,7 +238,7 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
         'Html' => Collective\Html\HtmlFacade::class,
         'Form' => Collective\Html\FormFacade::class,
-
+        'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class
     ],
 
 ];

@@ -10,12 +10,34 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Page;
 use App\ContentMeta as Messages;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreMessageRequest;
+use JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class MessageStreamController extends Controller
 {
 	const RESPONSE_ERROR = 'error';
+
+	public $user;
+
+	public function __construct() {
+
+		// Require the user to be logged in first
+		// Cannot use middleware because it redirects which causes cross domain issues for angular
+		$this->middleware('jwt-auth');
+		$token = JWTAuth::getToken();
+		$this->user = JWTAuth::toUser($token);
+
+		// return Response::json([
+		// 	'data' => [
+		// 	'email' => $user->email,
+		// 	'registered_at' => $user->created_at->toDateTimeString()
+		// 	]
+		// ]);
+		$LoginController = new LoginController();
+	}
 
 	/**
 	* Get current user, progress and current question
@@ -25,7 +47,16 @@ class MessageStreamController extends Controller
 	*/
 	public function index() {
 
-		return Messages::all();
+		// Require the user to be logged in first
+		$UserController = new UserController();
+
+		// The user is logged in...
+		if (Auth::check()) {
+			return Messages::all();
+		} else {
+			return $UserController->identify();
+		}
+		// return Messages::all();
 	}
 
 	/**

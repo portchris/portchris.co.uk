@@ -11,6 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Controllers\MessageStreamController;
 use App\Http\Requests\Request;
 use Illuminate\Contracts\Validation\Validator;
+use App\ContentMeta as Messages;
 
 class StoreMessageRequest extends FormRequest
 {
@@ -35,7 +36,10 @@ class StoreMessageRequest extends FormRequest
 			'key' => 'required|max:255',
 			'content' => 'required',
 			'user_id' => 'required|numeric',
-			'page_id' => 'required|numeric'
+			'page_id' => 'required|numeric',
+			'stage' => 'required|numeric',
+			'method' => 'required',
+			'type' => 'required'
 		];
 	}
 
