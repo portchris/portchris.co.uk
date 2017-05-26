@@ -3,42 +3,77 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Validator;
+use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
-use JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
 use App\ContentMeta as Messages;
+use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Route;
+use JWTAuth;
+use Tymon\JWTAuth\Facades\JWTFactory;
 
 class UserController extends Controller
 {
+	use RegistersUsers;
+
+	/**
+	* Request object
+	* @var 	Request 	$request
+	*/
+	private $request;
+
+	/**
+	* Since I cannot figure out why Reqest isn't being sent, get it manually on construct
+	*/
+	public function __construct() {
+
+		$this->request = app('request');
+		$this->middleware('guest');
+	}
+
 	/**
 	 * Try and identify the user and display a listing of the resource.
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function index()
-	{
+	public function index() {
 		// 
 	}
 
 	/**
-	 * Show the form for creating a new resource. Should not be accessible
+	 * Show the form for creating a new User. Should not be accessible
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function create()
-	{
-		//
+	public function create() {
+
+
 	}
 
 	/**
-	 * Store a newly created resource in storage. Should not be accessible
+	 * Store a newly created User in storage.
 	 *
 	 * @param  \Illuminate\Http\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request)
-	{
-		//
+	public function store(Request $request) {
+		
+		$msg = $code = "";
+		$data = $request->all();
+		try {
+			$user = User::create($data);
+		} catch(\Illuminate\Database\QueryException $e) {
+			$msg = Messages::create([
+				'content' => $e->getMessage(),
+				'type' => Messages::TYPES['User'],
+				'key' => 'answer',
+				'name' => 'error',
+				'title' => 'Error, code: ' . $e->getCode(),
+				'method' => 'authenticate'
+			]);
+			$code = 500;
+		}
+		return response()->json($msg, $code);
 	}
 
 	/**
@@ -89,55 +124,137 @@ class UserController extends Controller
 	/**
 	* Attempt to log the user in using JSON Web Tokens. 
 	* Try catch custom exceptions as opposed to leaving it up to app/Exceptions/Handler
+	* Note: using Illuminate\Support\Facades\Input despite being deprecated as I CANNOT figure out Request!!
 	*
-	* @param 	Request 	$request
+	* @return 	JSON 	$msg
 	*/
-	public function authenticate(Request $request) {
+	public function authenticate() {
 		
-		// Grab credentials from the request
-		$credentials = $request->only('email', 'password');
+		$msg = "";
+		$code = 200;
+		$method = "authenticate";
+		$type = Messages::TYPES["User"];
 		try {
-
-			// Attempt to verify the credentials and create a token for the user
-			if (!$token = JWTAuth::attempt($credentials)) {
-				$msg = Messages::create(
-					__("Sorry, I have no record of that user, perhaps you mis-typed something. Please try again or type 'Forget it' to continue as a guest."), 
-					"answer", 
-					"error", 
-					 "Incorrect credentials. Code: 401", 
-					0, 
-					Messages::TYPES["User"],
-					"authenticate"
-				);
-				return response()->json($msg, 401);
-			}
-		} catch (JWTException $e) {
-			
-			// Something went wrong whilst attempting to encode the token
-			$msg = Messages::create(
-				__("Something went wrong. Please try again or say 'Forget it' to continue as a guest."), 
-				"answer", 
-				"error", 
-				get_class($e) . ", code: 500", 
-				0, 
-				Messages::TYPES["User"],
-				"authenticate"
-			);
-			return response()->json($msg, 500);
+			$data = Input::all();
+			$request = Request::create('api/user/authenticate', 'POST', $data);
+			$msg = Route::dispatch($request);
+			$msg = ($msg->original) ? $msg->original : $msg;
+		} catch (\Exception $e) {
+			$code = $e->getCode();
+			$msg = Messages::create([
+				'content' => __($e->getMessage()), 
+				'key' => "answer", 
+				'name' => Messages::RESPONSE_ERROR,
+				'title' => "Error, code: " . $code,  
+				'code' => $code, 
+				'stage' => 0,
+				'type' => $type,
+				'method' => "authenticate"
+			]);
 		}
 
-		// All good so return the token and relay message back
-		$usr = json_decode($this->getAuthenticatedUser(), true);
-		$msg = Messages::create(
-			__("Welcome back %s.", $usr["name"]), 
-			"answer", 
-			"success", 
-			"User access token grantend code: 200", 
-			0, 
-			Messages::TYPES["ContentMeta"],
-			""
-		);
-		return response()->json($msg);
+		// The token is valid and we have found the user via the sub claim
+		// var_dump(response()->json(compact('user'))); die;
+		return response()->json($msg, $code);
+	}
+
+	/**
+	* Get a validator for an incoming registration request.
+	*
+	* @param  array  $data
+	* @return \Illuminate\Contracts\Validation\Validator
+	*/
+    protected function validator(array $data) {
+
+        return Validator::make($data, [
+            'username' => 'required|max:20',
+            'email' => 'required|email|max:255|unique:users',
+            'password' => 'required|min:6|confirmed',
+        ]);
+    }
+
+	public function createGuestToken() {
+
+		$msg = $key = $title = $name = $code = $stage = $type = $method = "";
+		try {
+			$claims = Input::all();	
+			$payload = $this->createJWTPayload(
+				$claims,
+				$claims["username"],
+				time(),
+				strtotime("+1 day"),
+				time(),
+				Route::current()->getName()
+			);
+			$token = JWTAuth::encode($payload);
+			if (!$token) {
+				$msg = "Could not create guest account please try again";
+				$code = 500;
+				$name = "error";
+				$title = "NO TOKEN";
+				$key = "answer";
+				$stage = 0;
+				$type = Messages::TYPES['User'];
+				$method = "authenticate";
+			} else {
+				$this->request->session()->put('key', $token);
+				$msg = "Welcome {{ user.name }} to the game. Let's begin.";
+				$code = 200;
+				$name = "success";
+				$title = $token->get();
+				$key = "answer";
+				$stage = 1;
+				$type = Messages::TYPES['ContentMeta'];
+				$method = "talk";
+			}
+		} catch (\Exception $e) {
+			$msg = $e->getMessage();
+			$code = ($e->getCode() > 0) ? $e->getCode() : 500;
+			$name = "error";
+			$title = "NO TOKEN";
+			$key = "answer";
+			$stage = 0;
+			$type = Messages::TYPES['User'];
+			$method = "authenticate";
+		}
+		$m = Messages::create([
+			'content' => __($msg),  
+			'key' => "error", 
+			'name' => $name,
+			'title' => $title,
+			'stage' => $stage, 
+			'type' => $type,
+			'method' => $method
+		]);
+		return response()->json($m, $code);
+	}
+
+	/**
+	* Create all required fields for JSON Web Token 
+	* 
+	* @param 	array 		$cus Custom extra payloads
+	* @param 	string 		$sub Subject - This holds the identifier for the token (defaults to user id)
+	* @param 	timestamp 	$iat Issued At - When the token was issued (unix timestamp)
+	* @param  	timestamp 	$exp Expiry - The token expiry date (unix timestamp)
+	* @param  	timestamp 	$nbf Not Before - The earliest point in time that the token can be used (unix timestamp)
+	* @param  	string 		$iss Issuer - The issuer of the token (defaults to the request url)
+	* @param  	string 		$jti JWT Id - A unique identifier for the token (md5 of the sub and iat claims)
+	* @param  	string 		$aud Audience - The intended audience for the token (not required by default)
+	* @return 	array 		payload
+	*/
+	private function createJWTPayload($cus, $sub, $iat, $exp, $nbf, $iss, $jti = "Lucy Wood", $aud = "") {
+
+		$claims = [
+			'sub' => $sub,
+			'iat' => $iat,
+			'exp' => $exp,
+			'nbf' => $nbf,
+			'iss' => $iss,
+			'jti' => $jti,
+			'aud' => $aud
+		];
+		$claims = array_merge($claims, $cus);
+		return JWTFactory::make($claims);
 	}
 
 	/**
@@ -145,25 +262,29 @@ class UserController extends Controller
 	*
 	* @return 	JSON response of user
 	*/
-	public function getAuthenticatedUser() {
+	// public function getAuthenticatedUser() {
 
-		if (!$user = JWTAuth::parseToken()->authenticate()) {
+	// 	$msg = "";
+	// 	$code = 200;
+	// 	try {
+	// 		$msg = User::authenticate();
+	// 	} catch (Exception $e) {
+	// 		$code = $e->getCode();
+	// 		$msg = Messages::create([
+	// 			'content' => __($e->getMessage()), 
+	// 			'key' => "answer", 
+	// 			'name' => "error", 
+	// 			'title' => $e->getCode(), 
+	// 			'stage' => 0,
+	// 			'type' => Messages::TYPES["User"],
+	// 			'method' => "authenticate"
+	// 		]);
+	// 	}
 
-			$msg = Message::create(
-				__("Sorry, I have no record of that user, perhaps you mis-typed something. Please try again or type 'Forget it' to continue as a guest."), 
-				"answer", 
-				"error", 
-				 "Incorrect credentials. Code: 401", 
-				0, 
-				Messages::TYPES["User"],
-				"authenticate"
-			);
-			return response()->json($msg, 404);
-		}
-
-		// The token is valid and we have found the user via the sub claim
-		return response()->json(compact('user'));
-	}
+	// 	// The token is valid and we have found the user via the sub claim
+	// 	var_dump(response()->json(compact('user'))); die;
+	// 	return response()->json($msg, $code);
+	// }
 
 	/**
 	 * Attempt to identify the user.
@@ -182,7 +303,7 @@ class UserController extends Controller
 			$return = Auth::attempt([
 				'username' => $username, 
 				'password' => $password
-				]);
+			]);
 		}
 		return $return;
 	}

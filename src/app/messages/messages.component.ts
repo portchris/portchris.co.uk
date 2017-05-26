@@ -3,6 +3,11 @@ import { FormBuilder, Validators } from '@angular/forms';
 import { MessagesService } from "./messages.service";
 import { Messages } from "./messages";
 
+enum TYPE {
+	USER = 0, 
+	MESSAGE = 1
+}
+
 @Component({
 	selector: 'app-messages',
 	templateUrl: './messages.component.html',
@@ -43,6 +48,72 @@ export class MessagesComponent implements OnInit {
 	errMsg: string;
 
 	/**
+	* Message type and actions
+	* @var 	string
+	*/
+	messageType: string;
+	messageAction: string;
+	input_type: string;
+
+	/**
+	* These constants are used to limit the message types allowed
+	* @const 	object
+	*/
+	static readonly MSG_ACTIONS: any = [
+		{
+			id: "user",
+			actions: [
+				"authenticate",
+				"welcome"
+			]
+		},
+		{
+			id: "message",
+			actions: [
+				"talk"
+			]
+		}
+	];
+
+	/**
+	* This places the enum above into this exported class.
+	* This only maps the iterative position of MSG_ACTIONS 
+	* @const 	enum
+	*/
+	static readonly TYPES = TYPE;
+
+	/**
+	* Magic words that create custom functionality
+	* @const 	object
+	*/
+	static readonly MAGIC_WORDS: any = [
+		{
+			phrase: "Continue as guest",
+			method: "continueAsGuest"
+		},
+		{
+			phrase: "Continue as a guest",
+			method: "continueAsGuest"
+		},
+		{
+			phrase: "Guest",
+			method: "continueAsGuest"
+		},
+		{
+			phrase: "Register",
+			method: "registerAccount"
+		},
+		{
+			phrase: "Create an account",
+			method: "registerAccount"
+		},
+		{
+			phrase: "Create account",
+			method: "registerAccount"
+		}
+	];
+
+	/**
 	* The form builder validator. Handles the form submission of the text-based adventure
 	* @param 	JSON object
 	*/
@@ -57,7 +128,9 @@ export class MessagesComponent implements OnInit {
 		page_id: ["", Validators.pattern("[0-9]")],
 		content: ["", Validators.compose([Validators.required, Validators.minLength(1)])],
 		type: ["", Validators.required],
-		method: ["", Validators.required]
+		method: ["", Validators.required],
+		input_type: ["text", Validators.required],
+		csrf: ["", Validators.required]
 	});
 
 	/**
@@ -67,9 +140,11 @@ export class MessagesComponent implements OnInit {
 	*/
 	constructor(private messagesService: MessagesService, public formBuilder: FormBuilder) {
 
+		this.messages = [];
 		this.user = {
 			id: 0,
 			stage: "1",
+			message: ""
 		};
 		this.page = {
 			id: 0
@@ -85,6 +160,7 @@ export class MessagesComponent implements OnInit {
 			method: "",
 			pattern: ""
 		};
+		this.input_type = "text";
 	}
 
 	/**
@@ -92,20 +168,66 @@ export class MessagesComponent implements OnInit {
 	* @param 	object 	event
 	* @param 	boolean valid
 	*/
-	doRespond(event, valid) {
+	doRespond(event: any, valid: boolean) {
 
 		if (valid) {
 			let data = this.talkForm.value;
-			// let action = eval("this." + data.method + "();");
-			// this.decipherMessageType(data);
-			this.messagesService.getResponse(data).subscribe(
-				(message) => { this.getMessagesSuccess(message) },
-				(error) => { this.getMessagesFail(error) },
-				() => { this.getMessageComplete() }
-			);
+			this.decipherMessageType(data);
+			this.decipherMessageAction(data);
+			this.createUserMessage(data);
+			console.log(this.messageAction);
+			if (this.messageType === MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id) {
+				
+				// User related message
+				try {
+					let magicMethod = this.hasMagicWords(data.content);
+					// let magicMethod = "registerAccount";
+					if (!magicMethod) { 
+						this.executeMethod(this.messageAction);
+					} else {
+						this.executeMethod(magicMethod);
+					}
+				} catch(e) {
+					console.error(e);
+				}
+			} else {
+
+				// Game related message
+				this.messagesService.getResponse(data).subscribe(
+					(message) => { this.getMessagesSuccess(message) },
+					(error) => { this.getMessagesFail(error) },
+					() => { this.getMessagesComplete() }
+				);
+			}
 		} else {
 			console.error(this.talkForm);
 			this.err = this.errMsg;
+		}
+	}
+
+	/**
+	* This adds a layer of security around being able to pass method names.
+	* I'm trying to avoid eval, and window isn't working like expected so am using switch
+	* @param 	method
+	*/
+	executeMethod(method) {
+
+		switch(method) {
+			case 'welcome':
+				this.welcome();
+			break;
+			case 'authenticate':
+				this.authenticate();
+			break;
+			case 'getMessages':
+				this.getMessages();
+			break;
+			case 'registerAccount':
+				this.registerAccount();
+			break;
+			case 'continueAsGuest':
+				this.continueAsGuest();
+			break;
 		}
 	}
 
@@ -114,6 +236,36 @@ export class MessagesComponent implements OnInit {
 	*/
 	ngOnInit() {
 
+		let msg = this.createMessageTemplate();
+		msg.message = "Welcome, what is your name?";
+		msg.answer.name = "Init";
+		msg.answer.title = msg.answer.name;
+		msg.answer.key = "question";
+		msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+		msg.answer.method = "welcome";
+		msg.user.stage = 0;
+		this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
+	}
+
+	welcome() {
+
+		let msg = this.createMessageTemplate();
+		let data = this.talkForm.value;
+		this.user.name = data.content;
+		msg.message = "Welcome " + this.user.name + "!";
+		msg.answer.name = "Init";
+		msg.answer.title = msg.answer.name;
+		msg.answer.key = "answer";
+		msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+		msg.answer.method = "authenticate";
+		msg.user.stage = 0;
+		this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
 		this.getMessages();
 	}
 
@@ -134,69 +286,310 @@ export class MessagesComponent implements OnInit {
 		this.messagesService.getMessages().subscribe(
 			(message) => { this.getMessagesSuccess(message) },
 			(error) => { this.getMessagesFail(error) },
-			() => { this.getMessageComplete() }
+			() => { this.getMessagesComplete() }
 		);
 	}
 
+	/**
+	* Observable / promise success method
+	* @param 	string 	message
+	*/
 	private getMessagesSuccess(message) {
 		
-		this.messages = message;
-		this.user.id = message[0].user_id;
-		this.user.stage = message[0].stage;
-		this.page.id = message[0].page_id;
-		this.question.type = message[0].type;
-		this.question.method = message[0].method;
-		this.question.key = message[0].key;
+		let m = message[message.length - 1];
+		this.messages = this.messages.concat(m);
+		this.user.id = m.user_id;
+		this.user.message = "";
+		this.user.stage = m.stage;
+		this.page.id = m.page_id;
+		this.question.name = m.name;
+		this.question.title = m.title;
+		this.question.type = m.type;
+		this.question.method = m.method;
+		this.question.key = m.key;
+		this.question.csrf = m.csrf;
 		this.err = "";
-		// Check if an authentication message came back response came back. If so we need to add some validation
-		// if (message.type === "user" && message.key === "authenticate" && message.name.includes('email')) {
-		// 	this.errMsg = "Please enter a valid e-mail";
-		// 	this.talkForm.controls['content'].validator = ["", Validators.compose([
-		// 		Validators.minLength(1),
-		// 		Validators.required,
-		// 		Validators.pattern('/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/')
-		// 	])];
-		// } else {
-		// 	this.errMsg = "Your message was invalid";
-		// }
+		this.talkForm.controls['name'].setValue(this.question.name);
+		this.talkForm.controls['title'].setValue(this.question.title);
+		this.talkForm.controls['key'].setValue(this.question.key);
+		this.talkForm.controls['stage'].setValue(this.user.stage);
+		this.talkForm.controls['user_id'].setValue(this.user.id);
+		this.talkForm.controls['page_id'].setValue(this.page.id);
+		this.talkForm.controls['type'].setValue(this.question.type);
+		this.talkForm.controls['method'].setValue(this.question.method);
+		this.talkForm.controls['csrf'].setValue(this.question.csrf);
 	}
 
+	/**
+	* Observable / promise error method
+	* @param 	any 	error
+	*/
 	private getMessagesFail(error: any) {
 		
-		this.err = error;
+		let errMsg = error;
+		console.error(error);
+		if (errMsg instanceof Error) {
+			errMsg = error.message ? error.message : error.toString();
+			errMsg += " File: " + error.fileName + ":" + error.lineNumber;
+		}
+		this.err = errMsg;
 	}
 
-	private getMessageComplete() {
+	/**
+	* Observable / promise final method on completion. Will not fire on error.
+	*/
+	private getMessagesComplete() {
 
+		console.log("Complete");
+		this.user.message = "";
+	}
 
+	/**
+	* Search users input for magic words that fire custom functionality
+	* @param 	string 	content
+	* @return boolean|method
+	*/
+	private hasMagicWords(content) {
+		
+		let r = false;
+		let str1 = content.replace(/\s+/g, '').toLowerCase();
+		for (var i = MessagesComponent.MAGIC_WORDS.length - 1; i >= 0; i--) {
+			let word = MessagesComponent.MAGIC_WORDS[i];
+			let str2 = word.phrase.replace(/\s+/g, '').toLowerCase();
+			if (str1 === str2) {
+				r = word.method;
+				break;	
+			}
+		}
+		return r;
+	}
+
+	/**
+	* User typed message, add it to messages stream
+	* @param 	JSON 	data
+	*/
+	private createUserMessage(data) {
+
+		if (this.input_type !== "password") {
+			let msg = this.createMessageTemplate();
+			msg.message = data.content;
+			msg.answer.name = "User's input";
+			msg.answer.title = this.user.name + " writes message";
+			msg.answer.key = "user";
+			msg.answer.type = data.type;
+			msg.answer.method = data.method;
+			msg.page.id = data.page_id;
+			msg.user.id = this.user.id;
+			msg.user.stage = this.user.stage;
+			this.messagesService.createMessage(msg)
+					.then((message) => { this.getMessagesSuccess(message); })
+					.catch((error) => { this.getMessagesFail(error); })
+					.then(() => { this.getMessagesComplete(); });
+		}
+	}
+
+	/**
+	* Default formate when Creating a message
+	* @return 	JSON 	message object
+	*/
+	private createMessageTemplate() {
+
+		let m: any = {
+			message: "",
+			answer: { 
+				name: "",
+				title: "",
+				key: "",
+				type: MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].id,
+				method: MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].actions[0]
+			},
+			page: { 
+				id: 0
+			},
+			user: {
+				id: 0,
+				stage: 1,
+			}
+		}
+		return m;
 	}
 
 	/**
 	* Since all functionality including login, registration etc is done using the message component
-	* we need to decipher what kind of action this 
+	* we need to decipher what kind of action this is
+	* @param 	object 	data
 	*/
 	private decipherMessageType(data) {
-		
-		let r = false;
-		console.log(data);
-		switch (data.type) {
-			case "user":
-				if (data.key === "authenticate") {
-					if (data.title.includes('email')) {
 
-						// The user just entered their email to login
-						let EMAIL_REGEXP = /^[a-z0-9!#$%&'*+\/=?^_`{|}~.-]+@[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$/i;
-						if (data.content.test(EMAIL_REGEXP)) {
-							// this.messages[] = {
-							// }
-						}
-					} else if (data.title.includes('password')) {
+		for (var i = MessagesComponent.MSG_ACTIONS.length - 1; i >= 0; i--) {
+			let type = MessagesComponent.MSG_ACTIONS[i];
+			if (data.type === type.id) {
+				this.messageType = type.id;
+				break;
+			}
+		}
 
-						// The user just entered their password to login
-					}
-				} 
-			break;
+		// Default to message type "message" if type hasn't been established
+		if (this.messageType == null) {
+			this.messageType = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].id;
 		}
 	}
 
+	/**
+	* Since all functionality including login, registration etc is done using the message component
+	* we need to decipher what kind of action this is
+	* @param 	object 	data
+	*/
+	private decipherMessageAction(data) {
+		
+		for (var i = MessagesComponent.MSG_ACTIONS.length - 1; i >= 0; i--) {
+			let action = MessagesComponent.MSG_ACTIONS[i];
+			if (this.messageType === action.id && action.actions.indexOf(data.method) !== -1) {
+				this.messageAction = data.method;
+				break;
+			}
+		}
+
+		// Default to message type "message" if type hasn't been established
+		if (this.messageAction == null) {
+			this.messageAction = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].actions[0];
+		}
+	}
+
+	/**
+	* Log the user in if credentials are available. Otherwise create message to ask
+	* @return 	JSON 	message
+	*/
+	private authenticate() {
+
+		let data = this.talkForm.value;
+		let msg = this.createMessageTemplate();
+		let emailReqex = new RegExp('/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/');
+		msg.message = "";
+		msg.answer.name = data.name;
+		msg.answer.title = data.title;
+		msg.answer.key = data.key;
+		msg.answer.type = data.type;
+		msg.answer.method = data.method;
+		msg.page.id = data.page_id
+		msg.user.id = data.user_id,
+		msg.user.stage = data.stage;
+		if (data.content.match(emailReqex) !== null || data.content === 'chris@portchris.co.uk') {
+			this.user.email = data.content;
+			msg.message = "Thanks, and your password please.";
+			this.input_type = "password";
+			this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
+		} else if (this.user.email != null) {
+			this.user.password = data.content;
+			this.input_type = "text";
+			let credentials = { 
+				email: this.user.email, 
+				password: this.user.password
+			};
+			this.messagesService.authenticate(credentials).subscribe(
+				(message) => { this.getMessagesSuccess(message) },
+				(error) => { this.getMessagesFail(error) },
+				() => { this.getMessagesComplete() }
+			);
+		} else {
+			msg.message = "Sorry, please provide your email address...";
+			this.input_type = "text";
+			this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); });
+		}
+	}
+
+	/**
+	* User has decided to play an unsaved game, continue as guest
+	*/
+	private continueAsGuest() {
+
+		let data = this.talkForm.value;
+		let msg = this.createMessageTemplate();
+		let params = { username: "Guest", password: "Guest" };
+		this.user.id = 0;
+		this.user.name = "Guest";
+		this.user.stage = 1;
+		msg.message = "No problem, be my guest. But I can't be blamed for not remembering you next time.";
+		msg.answer.name = "Start game";
+		msg.answer.title = "Continue as guest";
+		msg.answer.key = "answer";
+		msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].id;
+		msg.answer.method = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].actions[0];
+		msg.page.id = data.page_id;
+		msg.user.id = data.user_id;
+		msg.user.stage = 1;
+		this.messagesService.createGuestAccount(params).subscribe(
+			(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
+			(error) => { this.getMessagesFail(error) },
+			() => { this.getMessagesComplete() }
+		);
+		this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); });
+	}
+
+	/**
+	* User has decided to create an account and save his/her progress. Fine choice
+	*/
+	private registerAccount() {
+
+		console.log(this.user);
+		if (this.user != null && this.user.email != null && this.user.password != null) {
+			let data = this.talkForm.value;
+			let params = {
+				name: this.user.name,
+				firstname: this.user.name,
+				lastname: this.user.name,
+				email: this.user.email, 
+				username: this.user.email, 
+				password: this.user.password,
+				stage: 1,
+				lat: 0.00,
+				lng: 0.00
+			};
+			this.getCurrentLocation(
+
+				// Success
+				(position) => {
+					this.user.lat = position.coords.latitude; 
+					this.user.lng = position.coords.longitude;
+					params.lat = this.user.lat;
+					params.lng = this.user.lng;
+					this.messagesService.createUserAccount(params).subscribe(
+						(message) => { this.getMessagesSuccess(message); },
+						(error) => { this.getMessagesFail(error) },
+						() => { this.getMessagesComplete() }
+					);
+				},
+
+				// Fail
+				() => {
+					this.messagesService.createUserAccount(params).subscribe(
+						(message) => { this.getMessagesSuccess(message); },
+						(error) => { this.getMessagesFail(error) },
+						() => { this.getMessagesComplete() }
+					);
+				}
+			);
+		} else {
+			this.getMessages();
+		}
+	}
+
+	/**
+	* Call getCurrentPosition with success and failure callbacks
+	* @param 	callback 	success
+	* @param 	callback 	fail
+	*/
+	private getCurrentLocation(success, fail) {
+
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(success, fail);
+		}
+	}
 }

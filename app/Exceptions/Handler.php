@@ -49,19 +49,18 @@ class Handler extends ExceptionHandler
 			$exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException
 			|| $exception instanceof \Tymon\JWTAuth\Exceptions\JWTException
 			|| $exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException
-
 			) {
 			
 			// Token expired they must login again
-			$msg = Messages::create(
-				__("Sorry, I have forgotten who this is again, can you please remind me by giving me your email address?"), 
-				"answer", 
-				"warning", 
-				get_class($exception) . ", code: " . $exception->getStatusCode(), 
-				0, 
-				Messages::TYPES["User"],
-				"authenticate"
-			);
+			$msg = Messages::create([
+				'content' => __("Do I recognise you? Can you remind me by giving me your email address?"), 
+				'key' => "answer", 
+				'name' => "warning", 
+				'title' => get_class($exception) . ", code: " . $exception->getStatusCode(), 
+				'stage' => 0, 
+				'type' => Messages::TYPES["User"],
+				'method' => "authenticate"
+			]);
 			return response()->json($msg, $exception->getStatusCode());
 		} 
 		return parent::render($request, $exception);

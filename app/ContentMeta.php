@@ -10,7 +10,6 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-// use \DB;
 
 class ContentMeta extends Model
 {
@@ -75,6 +74,11 @@ class ContentMeta extends Model
 		'User' => "user"
 	];
 
+	/**
+	* Keyword for error response
+	* @var 	string
+	*/
+	const RESPONSE_ERROR = 'error';
 	
 	/**
 	* The closest response from users message
@@ -115,22 +119,36 @@ class ContentMeta extends Model
 	* @param 	int 		$stage
 	* @param 	string 	$type
 	* @param 	string 	$method
+	* @param 	int 		$user_id
+	* @param 	int 		$page_id
 	* @return 	array 	$msg
 	*/
-	public static function create($content, $key, $name, $title, $stage, $type = "", $method = "") {
+	public static function create() {
 
-		$Message = new self();
-		$type = (strlen($type) === 0) ? self::TYPES[__CLASS__] : $type;
-		$method = (method_exists(array_search($type, self::TYPES), $method)) ? $method : "";
-		$msg = $Message::MESSAGE_TEMPLATE;
-		$msg["content"] = $content;
-		$msg["key"] = $key;
-		$msg["name"] = $name;
-		$msg["title"] = $title;
-		$msg["stage"] = $stage;
-		$msg["type"] = $type;
-		$msg["method"] = $method;
-		return array($msg);
+		$args = func_get_args();
+		// foreach ($args as $a) {
+		// 	if (is_array($a)) {
+		// 		extract($a);
+		// 	}
+		// }
+		// $t = $type ?? self::TYPES['ContentMeta'];
+		// $m = $method ?? "talk";
+		// $method = (method_exists('\App\\' . array_search($t, self::TYPES), $m)) ? $m : "";
+		// $msg = self::MESSAGE_TEMPLATE;
+		// $msg["content"] = $content ?? "";
+		// $msg["key"] = $key ?? "";
+		// $msg["name"] = $name ?? "";
+		// $msg["title"] = $title ?? "";
+		// $msg["stage"] = $stage ?? 0;
+		// $msg["user_id"] = $user_id ?? 0;
+		// $msg["page_id"] = $page_id ?? 0;
+		// $msg["id_linked_content_meta"] = $id_linked_content_meta ?? 0;
+		// $msg["type"] = $t;
+		// $msg["method"] = $method;
+		// $msg["csrf"] = csrf_field()->toHtml();
+		$Message = Message::create($args[0])->toArray();
+		// var_dump((array)$Message);
+		return array((array)$Message);
 	}
 
 	/**
@@ -200,6 +218,7 @@ class ContentMeta extends Model
 		} else {
 
 			// No responses... let the user know there has been an error.
+			$this->setAnswer(["content" => "Sorry, there are no possible responses available"]);
 		}
 	}
 
@@ -370,4 +389,329 @@ class ContentMeta extends Model
 
 	// 	return ($v->stage != 0);
 	// }
+}
+
+class Message extends ContentMeta {
+
+	private $id;
+	private $content;
+	private $id_linked_content_meta;
+	private $key;
+	private $stage;
+	private $title;
+	private $name;
+	private $user_id;
+	private $page_id;
+	private $type;
+	private $method;
+	private $csrf;
+
+	/**
+	* A child object designed to embody the message stream
+	*/
+	public function __construct() {
+
+		$this->id = 0;
+		$this->content = "";
+		$this->title = "";
+		$this->name = "";
+		$this->type = parent::TYPES['ContentMeta'];
+		$this->method = "talk";
+		$this->csrf = csrf_field()->toHtml();
+	}
+
+	/**
+	* Create and return new message using template constant
+	*
+	* @param 	int 		$id
+	* @param 	string 	$content
+	* @param 	string 	$key
+	* @param 	string 	$name
+	* @param 	string 	$title
+	* @param 	int 		$stage
+	* @param 	string 	$type
+	* @param 	string 	$method
+	* @param 	int 		$user_id
+	* @param 	int 		$page_id
+	* @return 	array 	$msg
+	*/
+	public static function create() {
+
+		$args = func_get_args();
+		foreach ($args as $a) {
+			if (is_array($a)) {
+				extract($a);
+			}
+		}
+		$Message = new self();
+		$t = $type ?? parent::TYPES['ContentMeta'];
+		$m = $method ?? "talk";
+		$method = (method_exists('\App\\' . array_search($t, parent::TYPES), $m)) ? $m : "";
+		$msg = parent::MESSAGE_TEMPLATE;
+		$Message->setId($id ?? 0);
+		$Message->setContent($content ?? "");
+		$Message->setKey($key ?? "");
+		$Message->setName($name ?? "");
+		$Message->setTitle($title ?? "");
+		$Message->setStage($stage ?? 0);
+		$Message->setUserId($user_id ?? 0);
+		$Message->setPageId($page_id ?? 0);
+		$Message->setLinkedMessage($id_linked_content_meta ?? 0);
+		$Message->setType($t);
+		$Message->setMethod($method);
+		return $Message;
+	}
+
+	/**
+	* Convert this object to array since there is not PHP magic method available
+	* 
+	* @return 	array 	$this
+	*/
+	public function toArray() {
+
+		return [
+			'id' => $this->getId(),
+			'content' => $this->getContent(),
+			'id_linked_content_meta' => $this->getLinkedMessage(),
+			'key' => $this->getKey(),
+			'stage' => $this->getStage(),
+			'title' => $this->getTitle(),
+			'name' => $this->getName(),
+			'user_id' => $this->getUserId(),
+			'page_id' => $this->getPageId(),
+			'type' => $this->getType(),
+			'method' => $this->getMethod(),
+			'csrf' => $this->getCSRF()
+		];
+	}
+
+	/**
+	* Return message ID if it exists in the database
+	*
+	* @return 	int 	id
+	*/
+	public function getId() {
+
+		return $this->id;
+	}
+
+	/**
+	* Set the ID of this message if it exists in the database
+	* 
+	* @param 	int 	$id
+	*/
+	public function setId($id) {
+
+		$this->id = $id;
+	}
+
+	/**
+	* Return message content
+	*
+	* @return 	string 	content
+	*/
+	public function getContent() {
+
+		return $this->content;
+	}
+
+	/**
+	* Set the content of this message
+	* 
+	* @param 	string 	$content
+	*/
+	public function setContent($content) {
+
+		$this->content = $content;
+	}
+
+	/**
+	* Return message key
+	*
+	* @return 	string 	key
+	*/
+	public function getKey() {
+
+		return $this->key;
+	}
+
+	/**
+	* Set the key of this message
+	* 
+	* @param 	string 	$key
+	*/
+	public function setKey($key) {
+
+		$this->key = $key;
+	}
+
+	/**
+	* Return message name
+	*
+	* @return 	string 	name
+	*/
+	public function getName() {
+
+		return $this->name;
+	}
+
+	/**
+	* Set the name of this message
+	* 
+	* @param 	string 	$name
+	*/
+	public function setName($name) {
+
+		$this->name = $name;
+	}
+
+	/**
+	* Return message title
+	*
+	* @return 	string 	title
+	*/
+	public function getTitle() {
+
+		return $this->title;
+	}
+
+	/**
+	* Set the title of this message
+	* 
+	* @param 	string 	$title
+	*/
+	public function setTitle($title) {
+
+		$this->title = $title;
+	}
+
+	/**
+	* Return message user_id
+	*
+	* @return 	int 	user_id
+	*/
+	public function getUserId() {
+
+		return $this->user_id;
+	}
+
+	/**
+	* Set the user_id of this message
+	* 
+	* @param 	int 	$user_id
+	*/
+	public function setUserId($user_id) {
+
+		$this->user_id = (int)$user_id;
+	}
+
+	/**
+	* Return message page_id
+	*
+	* @return 	int 	page_id
+	*/
+	public function getPageId() {
+
+		return $this->page_id;
+	}
+
+	/**
+	* Set the page_id of this message
+	* 
+	* @param 	int 	$page_id
+	*/
+	public function setPageId($page_id) {
+
+		$this->page_id = (int)$page_id;
+	}
+
+	/**
+	* Return message level
+	*
+	* @return 	int 	stage
+	*/
+	public function getStage() {
+
+		return $this->stage;
+	}
+
+	/**
+	* Set the level required to view this message
+	* 
+	* @param 	int 	$stage
+	*/
+	public function setStage($stage) {
+
+		$this->stage = (int)$stage;
+	}
+
+	/**
+	* Return message type
+	*
+	* @return 	string 	type
+	*/
+	public function getType() {
+
+		return $this->type;
+	}
+
+	/**
+	* Set the type of this message
+	* 
+	* @param 	string 	$type
+	*/
+	public function setType($type) {
+
+		$this->type = $type;
+	}
+
+	/**
+	* Return message method
+	*
+	* @return 	string 	method
+	*/
+	public function getMethod() {
+
+		return $this->method;
+	}
+
+	/**
+	* Set the method of this message
+	* 
+	* @param 	string 	$method
+	*/
+	public function setMethod($method) {
+
+		$this->method = $method;
+	}
+
+	/**
+	* Return the linked message to this
+	*
+	* @return 	int 	id_linked_content_meta
+	*/
+	public function getLinkedMessage() {
+
+		return $this->id_linked_content_meta;
+	}
+
+	/**
+	* Set the linked message to this
+	* 
+	* @param 	int 	$id_linked_content_meta
+	*/
+	public function setLinkedMessage($id_linked_content_meta) {
+
+		$this->id_linked_content_meta = (int)$id_linked_content_meta;
+	}
+
+	/**
+	* Return Cross-Site Request Forgery input HTML
+	*
+	* @return 	string HMTML
+	*/
+	public function getCSRF() {
+
+		return $this->csrf;
+	}
 }

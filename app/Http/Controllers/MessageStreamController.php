@@ -10,7 +10,7 @@ namespace App\Http\Controllers;
 use App\User;
 use App\Page;
 use App\ContentMeta as Messages;
-use App\Http\Controllers\Auth\LoginController;
+// use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreMessageRequest;
 use JWTAuth;
@@ -18,25 +18,35 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 
 class MessageStreamController extends Controller
 {
-	const RESPONSE_ERROR = 'error';
 
 	public $user;
+	private $is_guest;
+	private $token;
+	private $request;
 
 	public function __construct() {
 
-		// Require the user to be logged in first
-		// Cannot use middleware because it redirects which causes cross domain issues for angular
-		$this->middleware('jwt-auth');
-		$token = JWTAuth::getToken();
-		$this->user = JWTAuth::toUser($token);
-
-		// return Response::json([
-		// 	'data' => [
-		// 	'email' => $user->email,
-		// 	'registered_at' => $user->created_at->toDateTimeString()
-		// 	]
-		// ]);
-		$LoginController = new LoginController();
+		// Require the user to be verified first
+		// $this->middleware('jwt-auth');
+		$this->request = app('request');
+		$this->is_guest = false;
+		try { 
+			JWTAuth::parseToken();
+			$this->token = JWTAuth::getToken();
+			$this->user = JWTAuth::toUser($this->token);
+		} catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			if (!$this->isVerifiedGuest()) {
+				throw new \Tymon\JWTAuth\Exceptions\TokenExpiredException($e->getMessage(), $e->getStatusCode());
+			}
+		} catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+			if (!$this->isVerifiedGuest()) {
+				throw new \Tymon\JWTAuth\Exceptions\JWTException($e->getMessage(), $e->getStatusCode());
+			}
+		} catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			if (!$this->isVerifiedGuest()) {
+				throw new \Tymon\JWTAuth\Exceptions\TokenInvalidException($e->getMessage(), $e->getStatusCode());
+			}
+		}
 	}
 
 	/**
@@ -83,14 +93,15 @@ class MessageStreamController extends Controller
 		$return = $this->error("Could not submit answer");
 		$k = $data['key'] ?? false;
 		$c = $data['content'] ?? false;
-		$u = $data['user_id'] ?? false;
-		$p = $data['page_id'] ?? false;
-		$s = $data['stage'] ?? false;
+		$u = (int)$data['user_id'] ?? false;
+		$p = (int)$data['page_id'] ?? false;
+		$s = (int)$data['stage'] ?? 0;
 		$n = $data['name'] ?? '';
 		$t = $data['title'] ?? $n;
 		$lId = $data['id_linked_content_meta'] ?? '';
 
-		if ($k && $c && $u && $p && $s) {
+		// Save message for existing users
+		if (!$this->is_guest && !empty((array)$this->user)) {
 			$sanitizedData = [
 				'name' => $n,
 				'id_linked_content_meta' => $lId, // This is how portchris can respond
@@ -102,18 +113,16 @@ class MessageStreamController extends Controller
 				'page_id' => $p
 			];
 			$message = Messages::create($sanitizedData);
-			if ($message->save()) {
-				$response = Messages::respond($lId, $c);
-				if (!empty((array)$response)) {
-					$return = response()->json([
-						'answer' => $response->getAnswer(),
-						'question' => $response->getQuestion(),
-						'message' => $response->getMessage(),
-						'response' => $response->getResponse()
-					]);
-				}
+			if (!$message->save()) {
+				$sanitizedData['content'] = __('Error: could not save message'); 
+				return response()->json(Messages::create([
+					$sanitizedData
+				]), 500);
 			}
 		}
+
+		// Respond to users message
+		$return = $this->doRespond($data);
 		return $return;
 	}
 
@@ -122,9 +131,38 @@ class MessageStreamController extends Controller
 	*
 	* @since 	1.0.0
 	*/
-	protected function getResponse() {
+	protected function doRespond($data) {
 
-
+		$return = "";
+		extract($data);
+		$response = Messages::respond($lId, $c);
+		if (!empty((array)$response)) {
+			$return = response()->json(Messages::create([
+				'content' => $response->getAnswer(),
+				'question' => $response->getQuestion(),
+				'message' => $response->getMessage(),
+				'response' => $response->getResponse(),
+				'stage' => (int)$stage + 1,
+				'name' => $name,
+				'id_linked_content_meta' => $id_linked_content_meta,
+				'title' => __("Response to: ") . $response->getMessage(),
+				'key' => "answer",
+				'user_id' => $user_id,
+				'page_id' => $page_id
+			]), 200);
+		} else {
+			$return = response()->json(Messages::create([
+				'content' => __("No response, please try again later"),
+				'stage' => $stage,
+				'name' => $name,
+				'id_linked_content_meta' => $id_linked_content_meta,
+				'title' => $title,
+				'key' => "answer",
+				'user_id' => $user_id,
+				'page_id' => $page_id
+			]), 500);
+		}
+		return $return;
 	}
 
 	/**
@@ -165,6 +203,27 @@ class MessageStreamController extends Controller
 	*/
 	public function error($msg) {
 
-		return response()->json(["name" => self::RESPONSE_ERROR, "content" => __($msg)]);
+		return response()->json(Messages::create([
+			'content' => __($msg),
+			'key' => Messages::RESPONSE_ERROR,
+			'name' => Messages::RESPONSE_ERROR,
+			'title' => Messages::RESPONSE_ERROR,
+			'' => Messages::RESPONSE_ERROR,
+			'stage' => 0,
+			0
+		]), 500);
+	}
+
+	/**
+	* If the user typed 'Continue as guest' then a key should be present, else they are not verified
+	*
+	* @return 	boolean
+	*/
+	private function isVerifiedGuest() {
+
+		$t = (string)$this->request->input('token');
+		$k = (string)$this->request->session()->get('key');
+		$this->is_guest = (strlen($t) > 0 && strlen($k) > 0 && $t === $k) ? true : false;
+		return $this->is_guest;
 	}
 }

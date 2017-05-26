@@ -18,7 +18,7 @@ Route::get('/user', function(Request $request) {
 	return $request->user();
 })->middleware('auth:api');
 
-Route::group(['middleware'=>'cors'], function() {
+Route::group(['middleware' => 'cors'], function() {
 
 	Route::resource('book','BookController');
 	
@@ -32,6 +32,8 @@ Route::group(['middleware'=>'cors'], function() {
 		]
 	]);
 	Route::post('/user/identify', 'UserController@authenticate');
+	Route::post('/user/guest', 'UserController@createGuestToken');
+	Route::post('/user/authenticate', '\App\User@authenticate');
 
 	// Text based adventure
 	// Route::get('message/question', 'MessageStreamController@question'); // Create new GET route

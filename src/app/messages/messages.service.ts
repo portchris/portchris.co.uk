@@ -6,7 +6,7 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Http, Response } from "@angular/http";
+import { Http, Response, Headers } from "@angular/http";
 import { Observable } from "rxjs";
 import { AppModule as App } from "../app.module";
 import { Messages } from "./messages";
@@ -15,6 +15,7 @@ import { Messages } from "./messages";
 export class MessagesService {
 
 	uri: string;
+	token: string;
 
 	constructor(private _http: Http) { 
 		
@@ -38,15 +39,97 @@ export class MessagesService {
 	*/
 	getResponse(data):Observable<Messages[]>{
 		
-		let req = this._http.put(this.uri, data).map(res => res.json()).catch(this.handleError);
+		console.log(this.token);
+		if (this.token) {
+			data.token = this.token;
+			this.uri += "?token=" + this.token;
+		}
+		let d = this.serialise(data);
+		let h = new Headers();
+		h.append('Content-Type', 'application/x-www-form-urlencoded');
+		let req = this._http.post(this.uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
 		return req;
 	}
+
+	/**
+	* Manually create a message without API and return it through observable
+	*/
+	createMessage(data) {
+
+		return new Promise((resolve, reject) => {
+			if (data != null && data.answer != null && data.page != null && data.user != null) {
+				let msg = [{
+					name: data.answer.name,
+					title: data.answer.title,
+					key: data.answer.key,
+					stage: data.answer.stage,
+					type: data.answer.type,
+					method: data.answer.method,
+					page_id: data.page.id,
+					user_id: data.user.id,
+					content: data.message
+				}];
+				resolve(msg);
+			} else {
+				reject(new Error("Please provide the data in the correct format"));
+			}
+		});
+	}
+
+	/**
+	* Try to log the user in. Else if user does not exist, ask to register.
+	* @param 	object 	data
+	* @return 	JSON 		req
+	*/
+	authenticate(data) {
+
+		let uri = new App().url + 'api/user/identify';
+		let creds = this.serialise(data);
+		let h = new Headers();
+		h.append('Content-Type', 'application/x-www-form-urlencoded');
+		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	createUserAccount(data) {
+
+		let uri = new App().url + 'api/user';
+		let creds = this.serialise(data);
+		let h = new Headers();
+		h.append('Content-Type', 'application/x-www-form-urlencoded');
+		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Create guest token based on users name 
+	* @param 	JSON 	username
+	* @return 	JSON 	req
+	*/
+	createGuestAccount(username) {
+
+		let uri = new App().url + 'api/user/guest';
+		let creds = this.serialise(username);
+		let h = new Headers();
+		h.append('Content-Type', 'application/x-www-form-urlencoded');
+		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Set the JWT token ready for to play the game
+	* @param 	string	token
+	*/
+	setToken(token: string) {
+		this.token = token
+	}
+
 
 	/**
 	* Custom error handler
 	* @param 	Response | any 	error
 	*/
-	private handleError (error: Response | any) {
+	private handleError(error: Response | any) {
 		
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
@@ -68,6 +151,21 @@ export class MessagesService {
 			// This error is not fatal, let the user know.
 			return JSON.parse("[" + err + "]");
 		}
+	}
+
+	/**
+	* Convert JSON object to query string data
+	* @param 	JSON 	obj
+	* *@return 	string 	str
+	*/
+	private serialise(obj) {
+		var str = [];
+		for (var p in obj) {
+			if (obj.hasOwnProperty(p)) {
+				str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+			}
+		}
+		return str.join("&");
 	}
 
 	/**

@@ -4,4 +4,6 @@ export class Messages {
 	response: any;
 	question: any;
 	answer: any;
+	user: any;
+	page: any;
 }

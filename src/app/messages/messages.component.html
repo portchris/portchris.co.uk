@@ -14,7 +14,10 @@
 			<input formControlName="page_id" type="hidden" name="page_id" [value]="page.id">
 			<input formControlName="type" type="hidden" name="type" [value]="question.type">
 			<input formControlName="method" type="hidden" name="method" [value]="question.method">
-			<input formControlName="content" type="text" name="content" class="inline" placeholder="Talk to meh">
+			<!-- span *ngIf="question.csrf">
+				{{ question.csrf }}
+			</span> -->
+			<input formControlName="content" [type]="input_type" name="content" class="inline" placeholder="Talk to meh" [value]="user.message">
 			<button type="submit">
 				<small>Talk</small>
 			</button>
