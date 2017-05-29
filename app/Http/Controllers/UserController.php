@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
 use JWTAuth;
 use Tymon\JWTAuth\Facades\JWTFactory;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -59,21 +60,52 @@ class UserController extends Controller
 	public function store(Request $request) {
 		
 		$msg = $code = "";
-		$data = $request->all();
+		$credentials = $request->all();
+		$credentials['password'] = Hash::make($credentials['password']);
 		try {
-			$user = User::create($data);
+			$user = User::create($credentials);
+			$token = JWTAuth::fromUser($user);
+			$msg = [
+				'content' => __(sprintf("Welcome %s. Let's begin.", $user->name)),
+				'type' => Messages::TYPES['User'],
+				'key' => 'answer',
+				'name' => 'error',
+				'title' => 'Error, code: ' . $e->getCode(),
+				'method' => 'authenticate'
+			];
+			$code = 200;
 		} catch(\Illuminate\Database\QueryException $e) {
-			$msg = Messages::create([
+			$msg = [
 				'content' => $e->getMessage(),
 				'type' => Messages::TYPES['User'],
 				'key' => 'answer',
 				'name' => 'error',
 				'title' => 'Error, code: ' . $e->getCode(),
 				'method' => 'authenticate'
-			]);
+			];
 			$code = 500;
+		} catch(\Exception $e) {
+			$msg = [
+				'content' => $e->getMessage(),
+				'type' => Messages::TYPES['User'],
+				'key' => 'answer',
+				'name' => 'error',
+				'title' => 'Error, code: ' . Illuminate\Http\Response::HTTP_CONFLICT,
+				'method' => 'authenticate'
+			];
+			$code = Illuminate\Http\Response::HTTP_CONFLICT;
 		}
-		return response()->json($msg, $code);
+		return response()->json(Messages::create($msg), $code);
+	}
+
+	/**
+	* Hash a password, also open to the API
+	*
+	* @return 	string 	Hashed password
+	*/
+	public function hasPassword($password) {
+
+		return Hash::make($password);
 	}
 
 	/**
@@ -198,7 +230,7 @@ class UserController extends Controller
 				$method = "authenticate";
 			} else {
 				$this->request->session()->put('key', $token);
-				$msg = "Welcome {{ user.name }} to the game. Let's begin.";
+				$msg = sprintf("Welcome %s to the game. Let's begin.", $claims["username"]);
 				$code = 200;
 				$name = "success";
 				$title = $token->get();

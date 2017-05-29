@@ -34,6 +34,7 @@ Route::group(['middleware' => 'cors'], function() {
 	Route::post('/user/identify', 'UserController@authenticate');
 	Route::post('/user/guest', 'UserController@createGuestToken');
 	Route::post('/user/authenticate', '\App\User@authenticate');
+	Route::post('/user/password', 'UserController@hashPassword');
 
 	// Text based adventure
 	// Route::get('message/question', 'MessageStreamController@question'); // Create new GET route

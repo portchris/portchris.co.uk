@@ -464,7 +464,6 @@ export class MessagesComponent implements OnInit {
 
 		let data = this.talkForm.value;
 		let msg = this.createMessageTemplate();
-		let emailReqex = new RegExp('/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/');
 		msg.message = "";
 		msg.answer.name = data.name;
 		msg.answer.title = data.title;
@@ -474,7 +473,7 @@ export class MessagesComponent implements OnInit {
 		msg.page.id = data.page_id
 		msg.user.id = data.user_id,
 		msg.user.stage = data.stage;
-		if (data.content.match(emailReqex) !== null || data.content === 'chris@portchris.co.uk') {
+		if (this.validateEmail(data.content) || data.content === 'chris@portchris.co.uk') {
 			this.user.email = data.content;
 			msg.message = "Thanks, and your password please.";
 			this.input_type = "password";
@@ -502,6 +501,11 @@ export class MessagesComponent implements OnInit {
 				.catch((error) => { this.getMessagesFail(error); });
 		}
 	}
+
+	private validateEmail(email) {
+		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		return re.test(email);
+		}
 
 	/**
 	* User has decided to play an unsaved game, continue as guest
@@ -538,7 +542,6 @@ export class MessagesComponent implements OnInit {
 	*/
 	private registerAccount() {
 
-		console.log(this.user);
 		if (this.user != null && this.user.email != null && this.user.password != null) {
 			let data = this.talkForm.value;
 			let params = {

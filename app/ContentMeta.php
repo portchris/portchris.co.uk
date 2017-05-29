@@ -148,7 +148,7 @@ class ContentMeta extends Model
 		// $msg["csrf"] = csrf_field()->toHtml();
 		$Message = Message::create($args[0])->toArray();
 		// var_dump((array)$Message);
-		return array((array)$Message);
+		return array($Message);
 	}
 
 	/**

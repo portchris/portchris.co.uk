@@ -9,6 +9,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use App\Page;
+use App\Message;
 use App\ContentMeta as Messages;
 // use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Http\Request;
@@ -112,7 +113,7 @@ class MessageStreamController extends Controller
 				'user_id' => $u,
 				'page_id' => $p
 			];
-			$message = Messages::create($sanitizedData);
+			$message = Message::create($sanitizedData);
 			if (!$message->save()) {
 				$sanitizedData['content'] = __('Error: could not save message'); 
 				return response()->json(Messages::create([
