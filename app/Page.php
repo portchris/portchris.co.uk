@@ -12,6 +12,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Page extends Model
 {
+	public const PAGE_HOMEPAGE = "homepage";
+
 	protected $fillable = [
 		'name', 'title', 'slug', 'content', 'meta_title', 'meta_description', 'meta_image_path', 'enabled'
 	];
@@ -22,6 +24,7 @@ class Page extends Model
 	* @return 	object 	ContentMeta
 	*/
 	public function contentMetas() {
+
 		return $this->hasMany('App\ContentMeta');
 	}
 
@@ -31,6 +34,7 @@ class Page extends Model
 	* @return 	object 	User
 	*/
 	public function user() {
+		
 		return $this->belongsTo('App\User');
 	}
 }

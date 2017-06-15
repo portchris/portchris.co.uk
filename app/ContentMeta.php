@@ -78,8 +78,16 @@ class ContentMeta extends Model
 	* Keyword for error response
 	* @var 	string
 	*/
-	const RESPONSE_ERROR = 'error';
-	
+	public const RESPONSE_ERROR = 'error';
+	public const KEY_TYPE_ERROR = 'error';
+
+	/**
+	* Message types
+	*
+	*/
+	public const KEY_TYPE_QUESTION = 'question';
+	public const KEY_TYPE_ANSWER = 'answer';
+	public const KEY_TYPE_RESPONSE = 'response';
 	/**
 	* The closest response from users message
 	* @var 	object
@@ -186,12 +194,12 @@ class ContentMeta extends Model
 		// $this->message = $users_response;
 		// var_dump($possible_responses->toSql(), $possible_responses->getBindings()); die;
 		$staged_responses = self::where([
-			'id_linked_content_meta' => $question_id,
-			'key' => 'response'
+			['id_linked_content_meta', '=', $question_id],
+			['key', '=', 'response']
 		])->get();
 		$stageless_responses = self::where([
-			'stage' => '0',
-			'key' => 'response'
+			['stage', '=', '0'],
+			['key', '=', 'response']
 		])->get();
 		$possible_responses = $staged_responses->merge($stageless_responses);
 		if (!$possible_responses->isEmpty()) {
@@ -206,8 +214,8 @@ class ContentMeta extends Model
 				
 				// This seems an appropriate response. Get answer to closest linked response
 				$a = self::where([
-					'id_linked_content_meta' => $closest_response->id,
-					'key' => 'answer'
+					['id_linked_content_meta', '=', $closest_response->id],
+					['key', '=', 'answer']
 				])->first();
 				$this->setAnswer($a);
 			} else {
@@ -218,7 +226,7 @@ class ContentMeta extends Model
 		} else {
 
 			// No responses... let the user know there has been an error.
-			$this->setAnswer(["content" => "Sorry, there are no possible responses available"]);
+			$this->setAnswer("So sorry but I don't understand. Please ask me something else!");
 		}
 	}
 
@@ -357,6 +365,39 @@ class ContentMeta extends Model
 	public function getQuestion() {
 
 		return $this->question;
+	}
+
+	/**
+	* Get the next question in the game from stage
+	*
+	* @param 	int 	$stage
+	* @param 	int 	$page_id
+	* @since 	1.0.0
+	* @return  	string
+	*/
+	public static function getNextQuestion($stage, $page_id = 0) {
+
+		if ($page_id === 0) {
+			$homepage = self::getHomepage();
+			$page_id = $homepage->id;
+		}
+		$q = self::where([
+			["key", "=", self::KEY_TYPE_QUESTION],
+			["page_id", "=", $page_id],
+			["stage", "=", $stage]
+		])->first();
+		return (!$q) ? "" : $q->content;
+	}
+
+	/**
+	* Get the hompage object
+	*
+	* @since 	1.0.0
+	* @return  	object 	\App\Pages
+	*/
+	private static function getHomepage() {
+
+		return Page::where("slug", "=", "/")->first();
 	}
 
 	/**

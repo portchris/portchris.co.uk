@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
+use JWTAuth;
 use Validator;
-use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Http\Request;
+use App\User;
 use App\ContentMeta as Messages;
+use Illuminate\Http\Request;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\AuthenticateUserRequest;
+use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
-use JWTAuth;
 use Tymon\JWTAuth\Facades\JWTFactory;
 use Illuminate\Support\Facades\Hash;
 
@@ -54,31 +56,41 @@ class UserController extends Controller
 	/**
 	 * Store a newly created User in storage.
 	 *
-	 * @param  \Illuminate\Http\Request  $request
+	 * @param  \App\Http\Requests\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(Request $request) {
-		
+	public function store(StoreUserRequest $request) {
+
 		$msg = $code = "";
-		$credentials = $request->all();
-		$credentials['password'] = Hash::make($credentials['password']);
 		try {
-			$user = User::create($credentials);
+			$user = new User;
+			$user->firstname = $request->firstname;
+			$user->lastname = $request->lastname;
+			$user->name = $request->name;
+			$user->email = $request->email;
+			$user->username = $request->username;
+			$user->password = Hash::make($request->password);
+			$user->lat = $request->lat;
+			$user->lng = $request->lng;
+			$user->stage = $request->stage;
+			$user->conversation = "";
+			$user->save();
+			$user = User::find($user->id);
 			$token = JWTAuth::fromUser($user);
 			$msg = [
-				'content' => __(sprintf("Welcome %s. Let's begin.", $user->name)),
-				'type' => Messages::TYPES['User'],
-				'key' => 'answer',
+				'content' => sprintf(__("Welcome %s. Let's begin. %s"), $user->name, Messages::getNextQuestion($user->stage)),
+				'type' => Messages::TYPES['ContentMeta'],
+				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => 'error',
-				'title' => 'Error, code: ' . $e->getCode(),
-				'method' => 'authenticate'
+				'title' => $token,
+				'method' => 'talk'
 			];
 			$code = 200;
 		} catch(\Illuminate\Database\QueryException $e) {
 			$msg = [
 				'content' => $e->getMessage(),
 				'type' => Messages::TYPES['User'],
-				'key' => 'answer',
+				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => 'error',
 				'title' => 'Error, code: ' . $e->getCode(),
 				'method' => 'authenticate'
@@ -88,12 +100,12 @@ class UserController extends Controller
 			$msg = [
 				'content' => $e->getMessage(),
 				'type' => Messages::TYPES['User'],
-				'key' => 'answer',
+				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => 'error',
-				'title' => 'Error, code: ' . Illuminate\Http\Response::HTTP_CONFLICT,
+				'title' => 'Error, code: ' . \Illuminate\Http\Response::HTTP_CONFLICT,
 				'method' => 'authenticate'
 			];
-			$code = Illuminate\Http\Response::HTTP_CONFLICT;
+			$code = \Illuminate\Http\Response::HTTP_CONFLICT;
 		}
 		return response()->json(Messages::create($msg), $code);
 	}
@@ -160,22 +172,22 @@ class UserController extends Controller
 	*
 	* @return 	JSON 	$msg
 	*/
-	public function authenticate() {
+	public function authenticate(AuthenticateUserRequest $request) {
 		
 		$msg = "";
 		$code = 200;
 		$method = "authenticate";
 		$type = Messages::TYPES["User"];
 		try {
-			$data = Input::all();
-			$request = Request::create('api/user/authenticate', 'POST', $data);
-			$msg = Route::dispatch($request);
-			$msg = ($msg->original) ? $msg->original : $msg;
+			$msg = User::authenticate($request);
+			// $request = Request::create('api/user/authenticate', 'POST', $data);
+			// $msg = Route::dispatch($request);
+			// $msg = ($msg->original) ? $msg->original : $msg;
 		} catch (\Exception $e) {
 			$code = $e->getCode();
 			$msg = Messages::create([
 				'content' => __($e->getMessage()), 
-				'key' => "answer", 
+				'key' => Messages::KEY_TYPE_ANSWER, 
 				'name' => Messages::RESPONSE_ERROR,
 				'title' => "Error, code: " . $code,  
 				'code' => $code, 
@@ -220,38 +232,38 @@ class UserController extends Controller
 			);
 			$token = JWTAuth::encode($payload);
 			if (!$token) {
-				$msg = "Could not create guest account please try again";
+				$msg = __("Could not create guest account please try again");
 				$code = 500;
 				$name = "error";
 				$title = "NO TOKEN";
-				$key = "answer";
+				$key = Messages::KEY_TYPE_ANSWER;
 				$stage = 0;
 				$type = Messages::TYPES['User'];
 				$method = "authenticate";
 			} else {
 				$this->request->session()->put('key', $token);
-				$msg = sprintf("Welcome %s to the game. Let's begin.", $claims["username"]);
+				$msg = sprintf(__("Welcome %s to the game. Let's begin. %s"), $claims["username"], Messages::getNextQuestion(0));
 				$code = 200;
 				$name = "success";
 				$title = $token->get();
-				$key = "answer";
+				$key = Messages::KEY_TYPE_ANSWER;
 				$stage = 1;
 				$type = Messages::TYPES['ContentMeta'];
 				$method = "talk";
 			}
 		} catch (\Exception $e) {
-			$msg = $e->getMessage();
+			$msg = __($e->getMessage());
 			$code = ($e->getCode() > 0) ? $e->getCode() : 500;
 			$name = "error";
 			$title = "NO TOKEN";
-			$key = "answer";
+			$key = Messages::KEY_TYPE_ANSWER;
 			$stage = 0;
 			$type = Messages::TYPES['User'];
 			$method = "authenticate";
 		}
 		$m = Messages::create([
-			'content' => __($msg),  
-			'key' => "error", 
+			'content' => $msg,  
+			'key' => Messages::KEY_TYPE_ERROR, 
 			'name' => $name,
 			'title' => $title,
 			'stage' => $stage, 

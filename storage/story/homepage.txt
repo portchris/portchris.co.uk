@@ -1,0 +1,82 @@
+You have just stepped into the office of a digital agency, a code dwellers home. Welcome to my world. I am Chris Rogers, a developer fluent in modern web technologies both front-end and back-end. Now then, what do you want? Everyones looking at you. Who do you want to approach?
+*choice
+	#The designer
+		The designer is optimisitic and will most likely agree to all your requests without considering the work involved. The result will look fabulous, but will it function well? What is it you want to make?
+		*choice
+			#I want to make a social network
+				Wow now you're talking business ${name}, The designer is already way ahead of you and has created some mockups whilst in their spare time. They are very excited, and you are as well. You take one look at them and are so dazzled by the beauty you find yourself handing over tens of thousands of pounds whilst screaming "make it make it!". The designs are handed over to the developer. But there's a problem, lots of the crazy ideas you visioned are not available within your budget. How shall we tackle this?
+				*choice
+					#Cut down, on the crazy functionality and keep it simple.
+						Okay now you're talking
+						*finish
+					#Re-mortgage your house and pay. These ideas might be crazy to some, but it only takes 1 maverick like yourself to trailblaze.
+						I respect you
+						*finish
+					#Scrap the idea, you've had your fun and got a working prototype. Put it to bed for now and perhaps look for investment in the future.
+						Not to worry ${name}, almost all business' fail in their first year. Best to know when to quit rather than take the game too far right!? I hope you've enjoyed playing the game and experiencing a small taster of agency life. Feel free to <a href="/portfolio" title="Learn more about Chris Rogers">read more about me here</a>. Or if you'd rather cut to the point and <a href="/contact" title="Contact Chris Rogers">contact me</a>, then please go right ahead! I would appreciate some feedback.
+						*finish
+			#I want to make a media sharing service
+				A picture can paint a 1000 words, and enabling your users to spread this wealth of information is amicable. The designer has secretly always wanted to make a media sharing service. Now that you've approached them with this idea, you've unloacked a hidden demon. The designer buddies up with you and sucks up uncontrollably. He offers you the chance to take this outside the agency so you can partner up together and share the profit. How do you feel about this?
+				*choice
+					#Uncomfortable, I've had enough. There's only so much creepiness I can take.
+						Okay okay, it was only it bit of fun!
+						*finish
+					#Let's do it! Since we will no longer be going through an agency we will save loads of money. Plus I fancy the designer anyway.
+						If you really want to impress the designer get some chocolates next time you meet.
+						*finish
+					#No no, I will stick to the agency, I prefer the to know my project is going through the right channels.
+						Safe choice
+						*finish
+			#I want to make an app that will guarantee me millions!
+				Well ${name} you're in luck. Apples App Store is the perfect platform to make your millions and you've approached the right person for the job. This designer is crazy about Apple. They even bought the "Designed by Apple in California" book for $300 and doesn't even regret the decision.
+	#The developer
+		Good choice ${name}, the developer is tough but fair. Letting you know what you can achieve within your budget. Now what do you want to make?
+		*choice
+			#I want you to create a social network
+				There are lots of those
+				*finish
+			#I want to make a media sharing service
+				Okay, to start you'll need a hosting service that can handle lots of disk space. Giving your users the ability to upload media of any size will also require optimising. 
+				*finish
+			#I want to make an app that will make me millions!
+				Everyone and their dog has an app idea, what makes yours so special?
+				*choice
+					#My idea comes with a threat in the shape of this knife, make my millions or else!
+						You've taken this too far, the police have been contacted and are on their way. It's only a matter of time now. In the meantime what do you want to do?
+						*choice
+							#Attempt to escape, RUN!
+								Good news, you actually escaped. All those hours spent on the track during your school years served you well. But a criminal life is hard and eventually you will grow tired living life on the run. Was this really the outcome you were expecting by entering my site?
+								*finish
+							#Give in, apologise.
+								Very good, you just about managed to pull it together before something terrible happened. You get arrested but are only given 120 hours of community service. Not bad really.
+								*finish
+							#Mutilate the developer, hide the body.
+								Get off my site!!
+								*finish
+					#I've got backing. All you have to worry about is making it. Let me handle the success.
+						Can't argue with that. I look forward to bringing your dream into a reality.
+						*finish
+	#The manager
+		The manager oversees the whole operation, not likely to offer help with smaller tasks, but will help keep turning over profit. But what idea do you want to pitch to him?
+		*choice
+			#I want pitch a social network idea
+				Yeah that can be done, what budget do you have?
+				*finish
+			#I want pitch a media sharing service idea
+				Yeah that can be done, what budget do you have?
+				*finish
+			#I want pitch an app idea that will make millions!
+				Haha yeah that can be done, what budget do you have?
+				*finish
+	#Sales representative
+		Not afraid to sugar-coat the truth. Mostly there to keep you happy, but anything to put a smile on your face. Consider the sales representative as moral support. What do you need support with?
+		*choice
+			#I want support making a social network
+				Go for it.
+				*finish
+			#I want support making a media sharing service
+				Go for it.
+				*finish
+			#I want support making an app idea that will make me millions! 
+				Got for it
+				*finish

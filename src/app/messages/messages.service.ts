@@ -20,6 +20,7 @@ export class MessagesService {
 	constructor(private _http: Http) { 
 		
 		this.uri = new App().url + 'api/message';
+		this.token = "";
 	}
 
 	/**
@@ -39,15 +40,10 @@ export class MessagesService {
 	*/
 	getResponse(data):Observable<Messages[]>{
 		
-		console.log(this.token);
-		if (this.token) {
-			data.token = this.token;
-			this.uri += "?token=" + this.token;
-		}
-		let d = this.serialise(data);
+		let d = JSON.stringify(data);
 		let h = new Headers();
-		h.append('Content-Type', 'application/x-www-form-urlencoded');
-		let req = this._http.post(this.uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		h.append('Content-Type', 'application/json');
+		let req = this._http.post(this.uri + "?token=" + this.token, d, { headers: h }).map(res => res.json()).catch(this.handleError);
 		return req;
 	}
 
@@ -84,9 +80,9 @@ export class MessagesService {
 	authenticate(data) {
 
 		let uri = new App().url + 'api/user/identify';
-		let creds = this.serialise(data);
+		let creds = JSON.stringify(data);
 		let h = new Headers();
-		h.append('Content-Type', 'application/x-www-form-urlencoded');
+		h.append('Content-Type', 'application/json');
 		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
 		return req;
 	}
@@ -94,9 +90,9 @@ export class MessagesService {
 	createUserAccount(data) {
 
 		let uri = new App().url + 'api/user';
-		let creds = this.serialise(data);
+		let creds = JSON.stringify(data);
 		let h = new Headers();
-		h.append('Content-Type', 'application/x-www-form-urlencoded');
+		h.append('Content-Type', 'application/json');
 		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
 		return req;
 	}

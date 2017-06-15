@@ -58,16 +58,12 @@ class MessageStreamController extends Controller
 	*/
 	public function index() {
 
-		// Require the user to be logged in first
-		$UserController = new UserController();
-
-		// The user is logged in...
-		if (Auth::check()) {
-			return Messages::all();
-		} else {
-			return $UserController->identify();
-		}
-		// return Messages::all();
+		return response()->json(Messages::create([
+			"content" => Messages::getNextQuestion($this->user->stage),
+			"user_id" => $this->user->id,
+			"stage" => $this->user->stage,
+			"key" => Messages::KEY_TYPE_QUESTION
+		]));
 	}
 
 	/**
@@ -84,14 +80,14 @@ class MessageStreamController extends Controller
 	/**
 	* Submit answer to question the current question based on progress (stage)
 	*
-	* @param 	string 	$answer 	
-	* @param 	int 		$question_id
-	* @return 	string 	$question
+	* @param 	StoreMessageRequest 	$request 	
+	* @return 	JSON 	$return
 	* @since 	1.0.0
 	*/
-	public function store(StoreMessageRequest $data) {
+	public function store(StoreMessageRequest $request) {
 
 		$return = $this->error("Could not submit answer");
+		$data = (array)$request->all();
 		$k = $data['key'] ?? false;
 		$c = $data['content'] ?? false;
 		$u = (int)$data['user_id'] ?? false;
@@ -103,23 +99,28 @@ class MessageStreamController extends Controller
 
 		// Save message for existing users
 		if (!$this->is_guest && !empty((array)$this->user)) {
-			$sanitizedData = [
-				'name' => $n,
-				'id_linked_content_meta' => $lId, // This is how portchris can respond
-				'title' => $t,
-				'key' => $k,
-				'stage' => $s,
-				'content'=> $c,
-				'user_id' => $u,
-				'page_id' => $p
-			];
-			$message = Message::create($sanitizedData);
-			if (!$message->save()) {
-				$sanitizedData['content'] = __('Error: could not save message'); 
-				return response()->json(Messages::create([
-					$sanitizedData
-				]), 500);
-			}
+			$message = new Messages;
+			$message->name = $n;
+			$message->id_linked_content_meta = $lId; // This is how portchris can respond
+			$message->title = $t;
+			$message->key = $k;
+			$message->stage = $s;
+			$message->content = $c;
+			$message->user_id = $u;
+			$message->page_id = $p;
+			// if (!$message->save()) {
+			// 	$sanitizedData['content'] = __('Error: could not save message'); 
+			// 	return response()->json(Messages::create([
+			// 		'name' => $n,
+			// 		'id_linked_content_meta' => $lId, // This is how portchris can respond
+			// 		'title' => $t,
+			// 		'key' => $k,
+			// 		'stage' => $s,
+			// 		'content'=> $c,
+			// 		'user_id' => $u,
+			// 		'page_id' => $p
+			// 	]), 500);
+			// }
 		}
 
 		// Respond to users message
@@ -136,7 +137,7 @@ class MessageStreamController extends Controller
 
 		$return = "";
 		extract($data);
-		$response = Messages::respond($lId, $c);
+		$response = Messages::respond($id_linked_content_meta, $content);
 		if (!empty((array)$response)) {
 			$return = response()->json(Messages::create([
 				'content' => $response->getAnswer(),
@@ -147,7 +148,7 @@ class MessageStreamController extends Controller
 				'name' => $name,
 				'id_linked_content_meta' => $id_linked_content_meta,
 				'title' => __("Response to: ") . $response->getMessage(),
-				'key' => "answer",
+				'key' => Messages::KEY_TYPE_ANSWER,
 				'user_id' => $user_id,
 				'page_id' => $page_id
 			]), 200);
@@ -158,7 +159,7 @@ class MessageStreamController extends Controller
 				'name' => $name,
 				'id_linked_content_meta' => $id_linked_content_meta,
 				'title' => $title,
-				'key' => "answer",
+				'key' => Messages::KEY_TYPE_ANSWER,
 				'user_id' => $user_id,
 				'page_id' => $page_id
 			]), 500);
@@ -206,7 +207,7 @@ class MessageStreamController extends Controller
 
 		return response()->json(Messages::create([
 			'content' => __($msg),
-			'key' => Messages::RESPONSE_ERROR,
+			'key' => Messages::KEY_TYPE_ERROR,
 			'name' => Messages::RESPONSE_ERROR,
 			'title' => Messages::RESPONSE_ERROR,
 			'' => Messages::RESPONSE_ERROR,

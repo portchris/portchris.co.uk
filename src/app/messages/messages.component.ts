@@ -54,6 +54,7 @@ export class MessagesComponent implements OnInit {
 	messageType: string;
 	messageAction: string;
 	input_type: string;
+	class_selector: string;
 
 	/**
 	* These constants are used to limit the message types allowed
@@ -130,6 +131,7 @@ export class MessagesComponent implements OnInit {
 		type: ["", Validators.required],
 		method: ["", Validators.required],
 		input_type: ["text", Validators.required],
+		class_selector: ["col-xs-9 offset-xs-3", Validators.required],
 		csrf: ["", Validators.required]
 	});
 
@@ -161,6 +163,7 @@ export class MessagesComponent implements OnInit {
 			pattern: ""
 		};
 		this.input_type = "text";
+		this.class_selector = "col-xs-9 offset-xs-3";
 	}
 
 	/**
@@ -175,7 +178,6 @@ export class MessagesComponent implements OnInit {
 			this.decipherMessageType(data);
 			this.decipherMessageAction(data);
 			this.createUserMessage(data);
-			console.log(this.messageAction);
 			if (this.messageType === MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id) {
 				
 				// User related message
@@ -255,6 +257,14 @@ export class MessagesComponent implements OnInit {
 		let msg = this.createMessageTemplate();
 		let data = this.talkForm.value;
 		this.user.name = data.content;
+		this.user.firstname = data.content;
+		this.user.lastname = data.content;
+		if (this.user.name.indexOf(" ") !== -1) {
+			let split = this.user.name.split(" ");
+			this.user.firstname = split[0];
+			split.splice(0, 1);
+			this.user.lastname = split.join(" ");
+		}
 		msg.message = "Welcome " + this.user.name + "!";
 		msg.answer.name = "Init";
 		msg.answer.title = msg.answer.name;
@@ -308,6 +318,7 @@ export class MessagesComponent implements OnInit {
 		this.question.method = m.method;
 		this.question.key = m.key;
 		this.question.csrf = m.csrf;
+		this.class_selector = (m.key === "user") ? "col-xs-9 offset-xs-3" : "offset-xs-3 col-xs-9";
 		this.err = "";
 		this.talkForm.controls['name'].setValue(this.question.name);
 		this.talkForm.controls['title'].setValue(this.question.title);
@@ -318,6 +329,7 @@ export class MessagesComponent implements OnInit {
 		this.talkForm.controls['type'].setValue(this.question.type);
 		this.talkForm.controls['method'].setValue(this.question.method);
 		this.talkForm.controls['csrf'].setValue(this.question.csrf);
+		this.talkForm.controls['content'].setValue("");
 	}
 
 	/**
@@ -458,6 +470,7 @@ export class MessagesComponent implements OnInit {
 
 	/**
 	* Log the user in if credentials are available. Otherwise create message to ask
+	* @todo 	Transfer the responses to the API so Laravel can localize strings.
 	* @return 	JSON 	message
 	*/
 	private authenticate() {
@@ -473,7 +486,14 @@ export class MessagesComponent implements OnInit {
 		msg.page.id = data.page_id
 		msg.user.id = data.user_id,
 		msg.user.stage = data.stage;
-		if (this.validateEmail(data.content) || data.content === 'chris@portchris.co.uk') {
+		if (this.user.name == null) {
+			msg.message = "Hold on, I don't even know your name yet. Who are you?";
+			msg.answer.method = "welcome";
+			this.input_type = "text";
+			this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); });
+		} else if (this.validateEmail(data.content)) {
 			this.user.email = data.content;
 			msg.message = "Thanks, and your password please.";
 			this.input_type = "password";
@@ -489,9 +509,9 @@ export class MessagesComponent implements OnInit {
 				password: this.user.password
 			};
 			this.messagesService.authenticate(credentials).subscribe(
-				(message) => { this.getMessagesSuccess(message) },
-				(error) => { this.getMessagesFail(error) },
-				() => { this.getMessagesComplete() }
+				(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
+				(error) => { this.getMessagesFail(error); },
+				() => { this.getMessagesComplete(); }
 			);
 		} else {
 			msg.message = "Sorry, please provide your email address...";
@@ -505,7 +525,7 @@ export class MessagesComponent implements OnInit {
 	private validateEmail(email) {
 		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		return re.test(email);
-		}
+	}
 
 	/**
 	* User has decided to play an unsaved game, continue as guest
@@ -517,6 +537,8 @@ export class MessagesComponent implements OnInit {
 		let params = { username: "Guest", password: "Guest" };
 		this.user.id = 0;
 		this.user.name = "Guest";
+		this.user.firstname = "Joe";
+		this.user.lastname = "Bloggs";
 		this.user.stage = 1;
 		msg.message = "No problem, be my guest. But I can't be blamed for not remembering you next time.";
 		msg.answer.name = "Start game";
@@ -546,8 +568,8 @@ export class MessagesComponent implements OnInit {
 			let data = this.talkForm.value;
 			let params = {
 				name: this.user.name,
-				firstname: this.user.name,
-				lastname: this.user.name,
+				firstname: this.user.firstname,
+				lastname: this.user.lastname,
 				email: this.user.email, 
 				username: this.user.email, 
 				password: this.user.password,
@@ -557,23 +579,23 @@ export class MessagesComponent implements OnInit {
 			};
 			this.getCurrentLocation(
 
-				// Success
+				// Allowed access to location
 				(position) => {
 					this.user.lat = position.coords.latitude; 
 					this.user.lng = position.coords.longitude;
 					params.lat = this.user.lat;
 					params.lng = this.user.lng;
 					this.messagesService.createUserAccount(params).subscribe(
-						(message) => { this.getMessagesSuccess(message); },
+						(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
 						(error) => { this.getMessagesFail(error) },
 						() => { this.getMessagesComplete() }
 					);
 				},
 
-				// Fail
+				// Not allowed access to location
 				() => {
 					this.messagesService.createUserAccount(params).subscribe(
-						(message) => { this.getMessagesSuccess(message); },
+						(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
 						(error) => { this.getMessagesFail(error) },
 						() => { this.getMessagesComplete() }
 					);

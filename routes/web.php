@@ -16,12 +16,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('login', 'UserController@authenticate');
-
-Route::get('/register', function() {
-	
-	return Redirect::to('/api/register');
-});
+// User, login, registration
+Route::get('import/{id}', 'ImportStoryController');
 
 //Route::group(['middleware'=>'cors','prefix'=>'api'], function (){
 //    Route::get('book', 'BookController@index');

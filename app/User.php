@@ -21,61 +21,9 @@ class User extends Authenticatable
 	use Notifiable;
 
 	/**
-	* The user's full name
-	*
-	* @var 	string
+	* My game so I'm admin :)
 	*/
-
-	public $name;
-
-	/**
-	* The user's first name
-	*
-	* @var 	string
-	*/
-
-	public $firstname;
-	/**
-	* The user's last name
-	*
-	* @var 	string
-	*/
-	public $lastname;
-	
-	/**
-	* The user's email
-	*
-	* @var 	string
-	*/
-	public $email;
-
-	/**
-	* The user's username (typically the email address)
-	*
-	* @var 	string
-	*/
-	public $username;
-
-	/**
-	* The user's location latititude
-	*
-	* @var 	string
-	*/
-	public $lat;
-
-	/**
-	* The user's location longitude
-	*
-	* @var 	string
-	*/
-	public $lng;
-	
-	/**
-	* The user's checkpoint or level in the game
-	*
-	* @var 	string
-	*/
-	public $stage;
+	public const ADMIN_EMAIL = "chris@portchris.co.uk";
 
 	/**
 	* The attributes that are mass assignable.
@@ -83,7 +31,16 @@ class User extends Authenticatable
 	* @var array
 	*/
 	protected $fillable = [
-		'name', 'firstname', 'lastname', 'email', 'username', 'password', 'lat', 'lng', 'stage'
+		'name', 
+		'firstname', 
+		'lastname', 
+		'email', 
+		'username', 
+		'password', 
+		'lat', 
+		'lng', 
+		'stage', 
+		'conversation'
 	];
 
 	/**
@@ -92,7 +49,9 @@ class User extends Authenticatable
 	* @var array
 	*/
 	protected $hidden = [
-		'password', 'remember_token', 'enabled'
+		'password', 
+		'remember_token', 
+		'enabled'
 	];
 
 	/**
@@ -142,17 +101,28 @@ class User extends Authenticatable
 		$credentials = $request->only('email', 'password');
 		$msg = $title = $token = "";
 		$code = 200;
+		$stage = 1;
 		$type = Messages::TYPES["ContentMeta"];
 		$method = "talk";
+		$key = Messages::KEY_TYPE_ANSWER;
+		$title = $code;
 		try {
 
 			// Attempt to verify the credentials and create a token for the user
-			if (!$token = JWTAuth::attempt($credentials)) {
-				$msg = "Sorry, don't recognise you. Want to create a new account? Type 'Create an account' if you'd like to save your progress. Or else type 'Continue as guest' to continue as a guest.";
+			$User = new self();
+			$token = JWTAuth::attempt($credentials);
+			$user = (!$token) ? false : $User->getAuthenticatedUser($token);
+			if (!$user) {
+				$msg = __("Sorry, don't recognise you. Want to create a new account? Type 'Create an account' if you'd like to save your progress. Or else type 'Continue as guest' to continue as a guest.");
 				$code = 401;
-				$title = "user not found";
+				$title = "User not found";
 				$type = Messages::TYPES['User'];
-				$method = "authenticate";		
+				$key = Messages::KEY_TYPE_ERROR;
+				$method = "authenticate";	
+			} else {
+				$title = $token;
+				$stage = $user->stage;
+				$msg = sprintf(__("Welcome back %s. Let's pick up where you left off at level %s. %s"), $user->name, $user->stage, Messages::getNextQuestion($user->stage));
 			}
 		} catch (JWTException $e) {
 			
@@ -160,47 +130,27 @@ class User extends Authenticatable
 			$msg = "Something went wrong. Please try again or say 'Continue as guest' to continue as a guest.";
 			$code = 500;
 		}
-
-		if ($token) {
-			
-			// All good so return the token and relay message back
-			$usr = json_decode(self::getAuthenticatedUser(), true);
-			$msg = sprintf("Welcome back %s.", $usr["name"]);
-			$title = "success";
-		}
 		return Messages::create([
-			'content' => __($msg), 
-			'key' => "answer", 
-			'name' => "success", 
-			'title' => $code, 
-			'stage' => 0, 
+			'content' => __($msg),
+			'key' => $key,
+			'name' => $code,
+			'title' => $title,
+			'stage' => $stage,
 			'type' => $type,
 			'method' => $method
 		]);
 	}
 
 	/**
-	* Get the logged in user
+	* Get the logged in user via token
 	* 
+	* @param 	string 	$token
 	* @return 	
 	*/
-	public static function getAuthenticatedUser() {
+	public function getAuthenticatedUser(string $token) {
 
-		$user = JWTAuth::parseToken()->authenticate();
-		if (!$user) {
-			$msg = "Sorry, don't recognise you. Want to create a new account? Type 'Create an account' if you'd like to save your progress. Or else type 'Continue as guest' to continue as a guest.";
-			Messages::create([
-				'content' => __($msg),
-				'key' => "answer",
-				'name' => "user not found", 
-				'title' => 401,
-				'stage' => 0,
-				'type' => Messages::TYPES["User"],
-				'method' => 'authenticate'
-			]);
-		} else {
-			return $user;
-		}
+		$user = JWTAuth::authenticate($token);
+		return $user;
 	}
 
 	/**
@@ -209,7 +159,7 @@ class User extends Authenticatable
 	public static function message($msg) {
 
 		$content = __($msg);
-		$key = "question";
+		$key = Messages::KEY_TYPE_QUESTION;
 		$name = "User identification";
 		$title = "Who are you";
 		$stage = 0;

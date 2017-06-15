@@ -13,6 +13,8 @@ import { UserComponent } from "./user/user.component";
 import { UserService } from "./user/user.service";
 import { ColumnLayoutComponent } from "./html/column-layout.component";
 import { PageNotFoundComponent } from "./html/page-not-found/page-not-found.component";
+import { ParticlesComponent } from "./particles/particles.component";
+
 
 const appRoutes: Routes = [
 // {
@@ -44,7 +46,8 @@ const appRoutes: Routes = [
 		AppComponent,
 		BookComponent,
 		UserComponent,
-		MessagesComponent
+		MessagesComponent,
+		ParticlesComponent
 	],
 	imports: [
 		BrowserModule,
