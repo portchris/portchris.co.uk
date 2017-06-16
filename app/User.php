@@ -101,6 +101,7 @@ class User extends Authenticatable
 		$credentials = $request->only('email', 'password');
 		$msg = $title = $token = "";
 		$code = 200;
+		$id = 0;
 		$stage = 1;
 		$type = Messages::TYPES["ContentMeta"];
 		$method = "talk";
@@ -122,7 +123,12 @@ class User extends Authenticatable
 			} else {
 				$title = $token;
 				$stage = $user->stage;
-				$msg = sprintf(__("Welcome back %s. Let's pick up where you left off at level %s. %s"), $user->name, $user->stage, Messages::getNextQuestion($user->stage));
+				$nextQ = ($stage === 1) ? Messages::getNextQuestion(0) : Messages::find($stage);
+				if (!$nextQ) {
+					throw new \Exception("Error: could not get next question.", 500);
+				}
+				$id = $nextQ->id;
+				$msg = sprintf(__("Welcome back %s. Let's pick up where you left off at level %s.%s%s"), $user->name, $stage, "<br>" . PHP_EOL, $nextQ->content);
 			}
 		} catch (JWTException $e) {
 			
@@ -131,6 +137,7 @@ class User extends Authenticatable
 			$code = 500;
 		}
 		return Messages::create([
+			'id' => $id,
 			'content' => __($msg),
 			'key' => $key,
 			'name' => $code,
@@ -156,21 +163,21 @@ class User extends Authenticatable
 	/**
 	* Check
 	*/
-	public static function message($msg) {
+	// public static function message($msg) {
 
-		$content = __($msg);
-		$key = Messages::KEY_TYPE_QUESTION;
-		$name = "User identification";
-		$title = "Who are you";
-		$stage = 0;
-		return response()->json(
-			Messages::create([
-				'content' => $content, 
-				'key' => $key, 
-				'name' => $name, 
-				'title' => $title, 
-				'stage' => $stage
-			]
-		));
-	}
+	// 	$content = __($msg);
+	// 	$key = Messages::KEY_TYPE_QUESTION;
+	// 	$name = "User identification";
+	// 	$title = "Who are you";
+	// 	$stage = 0;
+	// 	return response()->json(
+	// 		Messages::create([
+	// 			'content' => $content, 
+	// 			'key' => $key, 
+	// 			'name' => $name, 
+	// 			'title' => $title, 
+	// 			'stage' => $stage
+	// 		]
+	// 	));
+	// }
 }

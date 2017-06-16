@@ -134,28 +134,7 @@ class ContentMeta extends Model
 	public static function create() {
 
 		$args = func_get_args();
-		// foreach ($args as $a) {
-		// 	if (is_array($a)) {
-		// 		extract($a);
-		// 	}
-		// }
-		// $t = $type ?? self::TYPES['ContentMeta'];
-		// $m = $method ?? "talk";
-		// $method = (method_exists('\App\\' . array_search($t, self::TYPES), $m)) ? $m : "";
-		// $msg = self::MESSAGE_TEMPLATE;
-		// $msg["content"] = $content ?? "";
-		// $msg["key"] = $key ?? "";
-		// $msg["name"] = $name ?? "";
-		// $msg["title"] = $title ?? "";
-		// $msg["stage"] = $stage ?? 0;
-		// $msg["user_id"] = $user_id ?? 0;
-		// $msg["page_id"] = $page_id ?? 0;
-		// $msg["id_linked_content_meta"] = $id_linked_content_meta ?? 0;
-		// $msg["type"] = $t;
-		// $msg["method"] = $method;
-		// $msg["csrf"] = csrf_field()->toHtml();
 		$Message = Message::create($args[0])->toArray();
-		// var_dump((array)$Message);
 		return array($Message);
 	}
 
@@ -169,16 +148,16 @@ class ContentMeta extends Model
 	* Stage 0 responses are stage-less and therefore can be used at any point during the game. 
 	*
 	* @since 	1.0.0
-	* @param 	int 		$question_id 	
-	* @param 	string 	$users_response
+	* @param 	int 		$questionId 	
+	* @param 	string 	$usersResponse
 	* @param 	int 		$accuracy
 	*/
-	public static function respond($question_id, $users_response, $accuracy = 50) {
+	public static function respond($questionId, $usersResponse, $accuracy = 50) {
 
 		$Message = new self();
 		$Message->setAccuracy($accuracy);
-		$Message->setMessage($users_response);
-		$Message->talk($question_id);
+		$Message->setMessage($usersResponse);
+		$Message->talk($questionId);
 		return $Message;
 	}
 
@@ -186,42 +165,40 @@ class ContentMeta extends Model
 	* The main bulk logic for the portchris engine text-based adventure
 	*
 	* @since 	1.0.0
-	* @param 	int 		$question_id 	
+	* @param 	int 		$questionId 	
 	*/
-	public function talk($question_id) {
+	public function talk($questionId) {
 		
 		// Get all possible responses to linked question from db
-		// $this->message = $users_response;
-		// var_dump($possible_responses->toSql(), $possible_responses->getBindings()); die;
-		$staged_responses = self::where([
-			['id_linked_content_meta', '=', $question_id],
-			['key', '=', 'response']
+		$stagedResponses = self::where([
+			['id_linked_content_meta', '=', $questionId],
+			['key', '=', self::KEY_TYPE_RESPONSE]
 		])->get();
-		$stageless_responses = self::where([
+		$stagelessResponses = self::where([
 			['stage', '=', '0'],
-			['key', '=', 'response']
+			['key', '=', self::KEY_TYPE_RESPONSE]
 		])->get();
-		$possible_responses = $staged_responses->merge($stageless_responses);
-		if (!$possible_responses->isEmpty()) {
+		$possibleResponses = $stagedResponses->merge($stagelessResponses);
+		if (!$possibleResponses->isEmpty()) {
 
 			// Find the closet matched response from above
-			$closest_response = $this->getClosestResponse($possible_responses);
-			$this->setResponse($closest_response);
+			$closestResponse = $this->getClosestResponse($possibleResponses);
+			$this->setResponse($closestResponse);
 			
 			// Calculate the validity of our closest response against the set accuracy required to pass
-			$percent = $this->calculateResponseMatch($closest_response->content);
+			$percent = $this->calculateResponseMatch($closestResponse->content);
 			if ($percent >= $this->getAccuracy()) {
 				
-				// This seems an appropriate response. Get answer to closest linked response
-				$a = self::where([
-					['id_linked_content_meta', '=', $closest_response->id],
-					['key', '=', 'answer']
-				])->first();
+				// This seems an appropriate response. Get next question to closest linked response
+				$a = self::getNextQuestion($closestResponse->id);
+				if (!$a) {
+					throw new \Exception("Error: Could not get answer to response", 500);
+				}
 				$this->setAnswer($a);
 			} else {
 
 				// Response not accurate enough, explain all possible responses available
-				$this->setAnswer($staged_responses);
+				$this->setAnswer($stagedResponses);
 			}
 		} else {
 
@@ -233,15 +210,15 @@ class ContentMeta extends Model
 	/**
 	* Calculate what the user has said and find the closet matched response.
 	*
-	* @param 	array 	$possible_responses.
+	* @param 	array 	$possibleResponses.
 	* @return 	obj 		
 	*/
-	private function getClosestResponse($possible_responses) {
+	private function getClosestResponse($possibleResponses) {
 
 		$shortest = -1; // No shortest distance found, yet
 		$closest = "";
 		$ur_phoneme = metaphone($this->getMessage());
-		foreach ($possible_responses as $response) {
+		foreach ($possibleResponses as $response) {
 			$r_phoneme = metaphone($response->content);
 			$l = levenshtein($ur_phoneme, $r_phoneme);
 			
@@ -277,6 +254,18 @@ class ContentMeta extends Model
 		$response2 = $this->getMessage();
 		$accuracy = 1 - levenshtein($response1, $response2) / max(strlen($response1), strlen($response2));
 		return ceil($accuracy * 100);
+	}
+
+	/**
+	* Return the final message before the game ends. 
+	*
+	* @return 	string
+	*/
+	public function getFinalMessage() {
+
+		$aboutLink = '<a href="/portfolio" title="' . __('Learn more about Chris Rogers') . '">' . __('read more about me here') . '</a>';
+		$contactLink = '<a href="/contact" title="' . __('Contact Chris Rogers') . '">' . __('contact me') . '</a>';
+		return sprintf(__("I hope you've enjoyed playing the game and experiencing a small taster of agency life. Feel free to %s. Or if you'd rather cut to the point and %s, then please go right ahead! I would appreciate some feedback."), $aboutLink, $contactLink);
 	}
 
 	/**
@@ -368,25 +357,56 @@ class ContentMeta extends Model
 	}
 
 	/**
-	* Get the next question in the game from stage
+	* Get the next question in the game from last response
 	*
-	* @param 	int 	$stage
-	* @param 	int 	$page_id
+	* @param 	int 	$responseId
+	* @param 	int 	$pageId
 	* @since 	1.0.0
 	* @return  	string
 	*/
-	public static function getNextQuestion($stage, $page_id = 0) {
+	public static function getNextQuestion($responseId = 0, $pageId = 0) {
 
-		if ($page_id === 0) {
+		$r = false;
+		if ($pageId === 0) {
 			$homepage = self::getHomepage();
-			$page_id = $homepage->id;
+			$pageId = $homepage->id;
 		}
 		$q = self::where([
 			["key", "=", self::KEY_TYPE_QUESTION],
-			["page_id", "=", $page_id],
-			["stage", "=", $stage]
+			["page_id", "=", $pageId],
+			["id_linked_content_meta", "=", $responseId]
 		])->first();
-		return (!$q) ? "" : $q->content;
+		if (!is_null($q)) {
+			$responses = self::getResponsesToQuestion($q->id, $pageId);
+			if (!is_null($responses)) {
+				foreach ($responses as $r) {
+					$q->content .= PHP_EOL . "> " . $r->content;
+				}
+				$r = $q;
+			}
+		}
+		return $r;
+	}
+
+	/**
+	* Return all the list of responses
+	*
+	* @param 	int 	$questionId
+	* @param 	int 	$pageId
+	* @return 	array $responses
+	*/
+	public static function getResponsesToQuestion($questionId, $pageId = 0) {
+
+		if ($pageId === 0) {
+			$homepage = self::getHomepage();
+			$pageId = $homepage->id;
+		}
+		$responses = self::where([
+			["key", "=", self::KEY_TYPE_RESPONSE],
+			["page_id", "=", $pageId],
+			["id_linked_content_meta", "=", $questionId]
+		])->get();
+		return $responses;
 	}
 
 	/**

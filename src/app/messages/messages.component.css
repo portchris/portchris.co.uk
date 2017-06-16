@@ -10,3 +10,6 @@
 blockquote {
 	border-radius: 5px;
 }
+blockquote p {
+	white-space: pre-wrap;
+}

@@ -205,6 +205,7 @@ export class MessagesComponent implements OnInit {
 			console.error(this.talkForm);
 			this.err = this.errMsg;
 		}
+		this.talkForm.controls['content'].setValue("");
 	}
 
 	/**
@@ -214,7 +215,11 @@ export class MessagesComponent implements OnInit {
 	*/
 	executeMethod(method) {
 
+		console.log(method);
 		switch(method) {
+			case 'toSaveOrNotToSave':
+				this.toSaveOrNotToSave();
+			break;
 			case 'welcome':
 				this.welcome();
 			break;
@@ -252,6 +257,9 @@ export class MessagesComponent implements OnInit {
 				.then(() => { this.getMessagesComplete(); });
 	}
 
+	/**
+	* User introduces themselves, the game presents the opportunity to track their progress
+	*/
 	welcome() {
 
 		let msg = this.createMessageTemplate();
@@ -265,27 +273,56 @@ export class MessagesComponent implements OnInit {
 			split.splice(0, 1);
 			this.user.lastname = split.join(" ");
 		}
-		msg.message = "Welcome " + this.user.name + "!";
+		msg.message = "Welcome " + this.user.name + "! Before we begin, have you previously had saved progress? If not then would you like to save you progress for next time?";
 		msg.answer.name = "Init";
 		msg.answer.title = msg.answer.name;
-		msg.answer.key = "answer";
+		msg.answer.key = "question";
 		msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
-		msg.answer.method = "authenticate";
+		msg.answer.method = "toSaveOrNotToSave";
+		this.messageAction = msg.answer.method;
 		msg.user.stage = 0;
 		this.messagesService.createMessage(msg)
 				.then((message) => { this.getMessagesSuccess(message); })
 				.catch((error) => { this.getMessagesFail(error); })
 				.then(() => { this.getMessagesComplete(); });
-		this.getMessages();
 	}
 
 	/**
 	* Attempt to identify the user via session in order to retrieve their previous conversations. 
 	* Else require them to login and assign as guest
 	*/
-	getUser() {
+	toSaveOrNotToSave() {
 
-		
+		let msg = this.createMessageTemplate();
+		let answer = this.talkForm.value.content.toLowerCase();
+		if (answer.indexOf("no") !== -1) {
+			this.continueAsGuest();
+		} else if (answer.indexOf("yes") !== -1) {
+			msg.message = "Excellent choice " + this.user.firstname + ". By tracking your progress you can come back whenever you like and pick up where you left off! In order to track your progress I will require you to create an account or login. Please may I have your email address?";
+			msg.answer.name = "Init";
+			msg.answer.title = msg.answer.name;
+			msg.answer.key = "question";
+			msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+			msg.answer.method = "authenticate";
+			msg.user.stage = 0;
+			this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
+			// this.getMessages();
+		} else {
+			msg.message = "Sorry, did you want to track your progress? Answer 'Yes' or 'No'";
+			msg.answer.name = "Init";
+			msg.answer.title = msg.answer.name;
+			msg.answer.key = "question";
+			msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+			msg.answer.method = "toSaveOrNotToSave";
+			msg.user.stage = 0;
+			this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
+		}
 	}
 
 	/**
@@ -307,11 +344,12 @@ export class MessagesComponent implements OnInit {
 	private getMessagesSuccess(message) {
 		
 		let m = message[message.length - 1];
+		// m.content = this.convertChoiceScriptTemplate(m.content);
 		this.messages = this.messages.concat(m);
 		this.user.id = m.user_id;
-		this.user.message = "";
 		this.user.stage = m.stage;
 		this.page.id = m.page_id;
+		this.question.id = m.id;
 		this.question.name = m.name;
 		this.question.title = m.title;
 		this.question.type = m.type;
@@ -320,6 +358,7 @@ export class MessagesComponent implements OnInit {
 		this.question.csrf = m.csrf;
 		this.class_selector = (m.key === "user") ? "col-xs-9 offset-xs-3" : "offset-xs-3 col-xs-9";
 		this.err = "";
+		this.talkForm.controls['id_linked_content_meta'].setValue(this.question.id);
 		this.talkForm.controls['name'].setValue(this.question.name);
 		this.talkForm.controls['title'].setValue(this.question.title);
 		this.talkForm.controls['key'].setValue(this.question.key);
@@ -329,7 +368,6 @@ export class MessagesComponent implements OnInit {
 		this.talkForm.controls['type'].setValue(this.question.type);
 		this.talkForm.controls['method'].setValue(this.question.method);
 		this.talkForm.controls['csrf'].setValue(this.question.csrf);
-		this.talkForm.controls['content'].setValue("");
 	}
 
 	/**
@@ -522,9 +560,48 @@ export class MessagesComponent implements OnInit {
 		}
 	}
 
+	/**
+	* Massively complex email reqex which I totally made myself...
+	* @param 		string 	email
+	* @return 	boolean
+	*/
 	private validateEmail(email) {
+
 		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		return re.test(email);
+	}
+
+	/**
+	* Convert any line breaks in valid HTML break tags
+	* @param 	string 	str
+	* @param 	boolean isXhtml
+	* @see 		https://stackoverflow.com/questions/2919337/jquery-convert-line-breaks-to-br-nl2br-equivalent
+	* @return string 
+	*/
+	private nl2br(str, isXhtml) {
+
+		var breakTag = (isXhtml || typeof isXhtml === 'undefined') ? '<br />' : '<br>';    
+		return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
+	}
+
+	/**
+	* To import my story I have chosen the popular ChoiceScript templating format which
+	* uses ${} for their variables. This will convert that to useful user info.   
+	* @param 	string 	str
+	*/
+	private convertChoiceScriptTemplate(str) {
+		
+		let re = /\${(.*?)\}/;
+		let i = 0;
+		do {
+			var m = re.exec(str);
+			if (m) {
+				let info = eval("this.user." + m[1]);
+				str = (info) ? str.replace(m[0], info) : str.replace(m[0], "");
+				console.log(m);
+			}
+		} while (m);
+		return str;
 	}
 
 	/**
@@ -534,7 +611,10 @@ export class MessagesComponent implements OnInit {
 
 		let data = this.talkForm.value;
 		let msg = this.createMessageTemplate();
-		let params = { username: "Guest", password: "Guest" };
+		let params = { 
+			username: (this.user.name != null) ? this.user.name : "Guest", 
+			password: "Guest" 
+		};
 		this.user.id = 0;
 		this.user.name = "Guest";
 		this.user.firstname = "Joe";

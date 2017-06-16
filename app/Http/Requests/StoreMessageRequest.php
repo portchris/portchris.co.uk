@@ -10,6 +10,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\Request;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Validation\ValidationException;
 use App\ContentMeta as Messages;
 
 class StoreMessageRequest extends FormRequest

@@ -86,20 +86,9 @@ class ImportStoryController extends Controller
 					"Found %d messages: %d questions, %d responses.", 
 					count($this->messages["questions"]) + count($this->messages["responses"]), 
 					count($this->messages["questions"]),
-					count($this->messages["responses"])
+					count($this->messages["responses"]),
+					true
 				);
-
-				// Save questions
-				$saveQ = $this->linkAndSaveMessages(Messages::KEY_TYPE_QUESTION);
-				if (!$saveQ) {
-					$return .= " " . $this->output("ERROR: Could not save questions to database.", true);
-				}
-
-				// Save responses
-				$saveR = $this->linkAndSaveMessages(Messages::KEY_TYPE_RESPONSE);
-				if (!$saveR) {
-					$return .= " " . $this->output("ERROR: Could not save responses to database.", true);
-				}
 				$this->vardump($this->getMessages());
 			} catch (Exception $e) {
 				$return .= " " . $this->output($e->getMessage());
@@ -111,116 +100,14 @@ class ImportStoryController extends Controller
 	}
 
 	/**
-	* Save all questions first to create an ID then tie the responses to each question of the same stage
-	*
-	* @param 	string 	$type 	Message key type
-	* @return 	boolean 
+	* The formula to work out what stage this message is
+	* 
+	* @param 	string 	$line
+	* @return 	int 		$stage
 	*/
-	private function linkAndSaveMessages(string $type) {
+	private function calcStage(string $line) {
 
-		$r = false;
-		$typeId = strtoupper(substr($type, 0, 1));
-		$opp = ($type === Messages::KEY_TYPE_RESPONSE) ? Messages::KEY_TYPE_QUESTION : Messages::KEY_TYPE_RESPONSE;
-		$linkedTypeId = strtoupper(substr($opp, 0, 1));
-		$linkedKey = $opp . "s";
-		$messages = &$this->messages[$type . "s"];
-		foreach ($messages as &$msg) {
-			$stage = $msg["stage"];
-			$lId = $this->findLinkedMessage($msg, $linkedKey, $linkedTypeId);
-			if ($lId === false) {
-				$r = false;
-				break;
-			}
-			$msg["name"] = $this->output("Next %s on from ID: %d", $type, $lId);
-			$msg["id_linked_content_meta"] = $lId;
-			if ((int)$msg["id"] === 0) {
-				$msg = $this->saveMessage($msg);
-				if (!$msg) {
-					$r = false;
-					break;
-				} else {
-					$r = true;
-				}
-			} else {
-				$m = Messages::find((int)$msg["id"]);
-				$m->id_linked_content_meta = $lId;
-				if (!$m->save()) {
-					$r = false;
-					break; 
-				} else {
-					$r = true;
-				}
-			}
-		}
-		return $r;
-	}
-
-	/**
-	* Identify the previous question this
-	*
-	* @param 	array 	$msg
-	* @param 	string 	$key
-	* @param 	string 	$typeId
-	* @return 	int 	
-	*/
-	private function findLinkedMessage(array $msg, string $key, string $typeId) {
-
-		$r = 0;
-		$messages = &$this->messages[$key];
-		$position = preg_replace("/[^0-9]/", "", $msg["title"]);
-		$id = $this->calcLinkedStage($msg["title"], $typeId);
-
-		// The first possible position is 11 which cannot be linked
-		if ($position !== "11") {
-			foreach ($messages as &$q) {
-				if ($q['title'] === $id) {
-					if ((int)$q["id"] === 0) {
-
-						// We found a link but it is not yet available in the db
-						$this->output("%s looking for %s. CONTENT = %s", $msg["title"], $id, $msg["content"], true);
-
-						// $q["id_linked_content_meta"] = $msg["id"];
-						// $q["name"] = $this->output("Next %s on from %sID: %d", $key, $typeId, $msg["id"]);
-						$q = $this->saveMessage($q);
-						if (!$q) { 
-							$r = false;
-							break;
-						} else {
-							$r = (int)$q["id"];
-						} 
-					} else {
-
-						// We found a link available in the db
-						$this->output("%s looking for %s. CONTENT = %s", $msg["title"], $id, $msg["content"], true);
-						$r = (int)$q["id"];
-					}
-					break;
-				}
-			}
-		} else if ($typeId === "Q") {
-			$r = $messages[0]["id"];
-		}
-		return $r;
-	}
-
-	/**
-	* Questions and responses always link to the message of the previous stage.
-	* This is the logic to calculate it.
-	*
-	* @param 	string 	$title 	Current message title
-	* @param 	string 	$typeId 	Response or Question
-	* @param 	string 	The title to search for
-	*/
-	private function calcLinkedStage($title, $typeId) {
-
-		$position = preg_replace("/[^0-9]/", "", $title);
-		$msgNo = intval(substr($position, 0, 1)); 
-		$stage = intval(substr($position, 1));
-		if ($typeId === "Q") {
-			$noOfR = $this->findResponsesAtStage($stage);
-			$this->output("Num of responses %s", $noOfR, true);
-		}
-		return $typeId . $msgNo . " Stage " . ($stage - 1);
+		return (int)floor((substr_count($line, "\t") / 2) + 1);
 	}
 
 	/**
@@ -249,18 +136,6 @@ class ImportStoryController extends Controller
 			$r = $msg;
 		}
 		return $r;
-	}
-
-	private function findResponsesAtStage($stage) {
-
-		$responses = 0;
-		$messages = $this->getMessages();
-		foreach ($messages["responses"] as $r) {
-			if (strpos($r["title"], "Stage " . $stage) !== false) {
-				$responses++;
-			}
-		}
-		return $responses;
 	}
 
 	/**
@@ -296,8 +171,7 @@ class ImportStoryController extends Controller
 		$stagedResponses = [];
 		for ($i = 0; $i < $c; $i++) {
 			$newline = str_replace(["\r", "\n"], "", $explosion[$i]);
-			$stage = (substr_count($newline, "\t") + 1) - $choices;
-			// $stage = ($stage <= 0) ? 1 : $stage;
+			$stage = $this->calcStage($newline);
 			$delimiter = substr(str_replace(["\t"], "", $newline), 0, 1);
 			switch ($delimiter) {
 				case self::DELIMITER_ACTION:
@@ -309,122 +183,81 @@ class ImportStoryController extends Controller
 							$currentStage = substr_count($newline, "\t");
 							if ($nextStage < $currentStage) { 
 								$choices = $nextStage;
-								$stagedResponses = [];
+								// $stagedResponses["S" . $stage] = 0;
 							}
 						break;
 						case self::ACTION_CHOICE:
-							// $choices = substr_count($newline, "\t");
-							$choices++;
-							$this->vardump($choices);
+							$choices = substr_count($newline, "\t");
 						break;
 					}
 				break;
 				case self::DELIMITER_OPTION:
 
 					// This is a response
-					// $stage--;
 					$stagedResponses["S" . $stage] = (isset($stagedResponses["S" . $stage])) ? $stagedResponses["S" . $stage] += 1 : 1;
-					$pos = $this->output("R%d Stage %d", $stagedResponses["S" . $stage], $stage);
-					$m = Messages::create([
+
+					// Traverse backward through the array until we find the nearest question that matches our stage
+					$title = "";
+					$lId = 0;
+					$x = $i - 1;
+					while (strlen($title) === 0) {
+						$lastMsg = $explosion[$x];
+						$delimiter = substr(str_replace(["\t"], "", $lastMsg), 0, 1);
+						if ($delimiter !== self::ACTION_CHOICE && $delimiter !== self::ACTION_FINISH) {
+							$qs = $this->calcStage($lastMsg);
+							if ($qs === ($stage)) {
+								foreach ($stagedQuestions["S" . $stage] as $q) {
+									if ($q["pos"] === $x) {
+										$title = $q["t"];
+										$lId = $q["id"];
+										break;
+									}
+								}
+							}
+						}
+						$x--;
+					}
+					$m = $this->saveMessage([
 						"content" => substr(str_replace([PHP_EOL, "\t"], "", $newline), 1),
 						"key" => Messages::KEY_TYPE_RESPONSE,
 						"page_id" => $this->getPageId(),
 						"user_id" => $this->getUserId(),
 						"stage" => $stage,
-						"title" => $pos
+						"title" => $title,
+						"name" => $this->output("Available response to question: %d", $lId),
+						"id_linked_content_meta" => $lId
 					]);
-					$return = array_merge($return, $m);
+					if (!$m) {
+						throw new Exception("Error saving response to database.");
+					} else {
+						$return[] = $m;
+					}
 				break;
 				default:
 
 					// This is a question
-					$stagedQuestions["S" . $stage] = (isset($stagedQuestions["S" . $stage])) ? $stagedQuestions["S" . $stage] += 1 : 1;
-					$pos = $this->output("Q%d Stage %d", $stagedQuestions["S" . $stage], $stage);
-					$m = Messages::create([
+					$lId = ($stage > 1 && isset($return[(count($return) - 1)])) ? $return[(count($return) - 1)]["id"] : 0;
+					$stagedQuestions["S" . $stage] = (!isset($stagedQuestions["S" . $stage])) ? [] : $stagedQuestions["S" . $stage];
+					$title = $this->output("Q%d Stage %d", count($stagedQuestions["S" . $stage]) + 1, $stage);
+					$m = $this->saveMessage([
 						"content" => str_replace([PHP_EOL, "\t"], "", $newline),
 						"key" => Messages::KEY_TYPE_QUESTION,
 						"page_id" => $this->getPageId(),
 						"user_id" => $this->getUserId(),
 						"stage" => $stage,
-						"title" => $pos,
-					]);
-					// if (isset($explosion[$i+1])) {
-					// 	$nextR = (isset($stagedResponses["S" . ($stage + 1)])) ? $stagedResponses["S" . ($stage + 1)] + 1 : 1;
-					// 	$rNo = $this->findResponsesAtStage($stage);
-					// 	$m[0]["lId"] = $this->output("R%d Stage %d", $nextR, $stage);
-					// }
-					$return = array_merge($return, $m);
+						"title" => $title,
+						"name" => $this->output("Next question on from response: %d", $lId),
+						"id_linked_content_meta" => $lId
+					]); 
+					if (!$m) {
+						throw new Exception("Error saving question to database");
+					} else {
+						$stagedQuestions["S" . $stage][] = ["pos" => $i, "t" => $title, "id" => $m["id"]];
+						$return[] = $m;
+					}
 				break;
 			}
 		}
-		// $this->vardump($return); die;
-		// for ($i = 0; $i < $c; $i++) {
-		// 	$action = "";
-		// 	$messages = [];
-		// 	$x = $i;
-		// 	$choices = 0;
-		// 	$this->vardump(str_replace(["\r", "\n"], "", $explosion[$x]), $stagedQuestions, $stagedResponses);
-		// 	do {
-		// 		$newline = str_replace(["\r", "\n"], "", $explosion[$x]);
-		// 		$stage = (substr_count($newline, "\t") + 1) - $choices;
-		// 		$delimiter = substr(str_replace(["\t"], "", $newline), 0, 1);
-		// 		switch ($delimiter) {
-		// 			case self::DELIMITER_ACTION:
-
-		// 				// This is an action
-		// 				$actions = explode(" ", $newline);
-		// 				$action = str_replace([PHP_EOL, "\t", $delimiter], "", $actions[0]);
-		// 				switch ($action) {
-		// 					case self::ACTION_FINISH:
-		// 						$return = array_merge($return, $messages);
-		// 						$i = $x;
-		// 						continue 2;
-		// 					break;
-		// 					case self::ACTION_CHOICE:
-		// 						$x++;
-		// 						$choices++;
-		// 						continue;
-		// 					break;
-		// 				}
-		// 			break;
-		// 			case self::DELIMITER_OPTION:
-
-		// 				// This is a new response
-		// 				$stagedResponses["S" . $stage] = (isset($stagedResponses["S" . $stage])) ? $stagedResponses["S" . $stage] += 1 : 1;
-		// 				$pos = $this->output("R%d Stage %d", $stagedResponses["S" . $stage], $stage);
-		// 				$m = Messages::create([
-		// 					"content" => substr(str_replace([PHP_EOL, "\t"], "", $newline), 1),
-		// 					"key" => Messages::KEY_TYPE_RESPONSE,
-		// 					"page_id" => $this->getPageId(),
-		// 					"user_id" => $this->getUserId(),
-		// 					"stage" => $stage,
-		// 					"title" => $pos,
-		// 				]);
-		// 				$messages = array_merge($messages, $m);
-		// 				$x++;
-		// 				continue;
-		// 			break;
-		// 			default:
-
-		// 				// This is a new question
-		// 				$stagedQuestions["S" . $stage] = (isset($stagedQuestions["S" . $stage])) ? $stagedQuestions["S" . $stage] += 1 : 1;
-		// 				$pos = $this->output("Q%d Stage %d", $stagedQuestions["S" . $stage], $stage);
-		// 				$m = Messages::create([
-		// 					"content" => str_replace([PHP_EOL, "\t"], "", $newline),
-		// 					"key" => Messages::KEY_TYPE_QUESTION,
-		// 					"page_id" => $this->getPageId(),
-		// 					"user_id" => $this->getUserId(),
-		// 					"stage" => $stage,
-		// 					"title" => $pos,
-		// 				]);
-		// 				$messages = array_merge($messages, $m);
-		// 				$x++;
-		// 				continue;
-		// 			break;
-		// 		}
-		// 	} while ($action !== self::ACTION_FINISH);
-		// }
-		// $this->vardump($return);
 		return $return;
 	}
 
@@ -547,6 +380,8 @@ class ImportStoryController extends Controller
 
 	/**
 	*	Quick pretty print var dump
+	*
+	* @param 	array 	$args
 	*/
 	private function vardump() {
 

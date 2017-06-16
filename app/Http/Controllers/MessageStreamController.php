@@ -11,7 +11,6 @@ use App\User;
 use App\Page;
 use App\Message;
 use App\ContentMeta as Messages;
-// use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreMessageRequest;
 use JWTAuth;
@@ -58,8 +57,9 @@ class MessageStreamController extends Controller
 	*/
 	public function index() {
 
+		$q = Messages::getNextQuestion($this->user->stage);
 		return response()->json(Messages::create([
-			"content" => Messages::getNextQuestion($this->user->stage),
+			"content" => (!$q) ? "" : $q->content,
 			"user_id" => $this->user->id,
 			"stage" => $this->user->stage,
 			"key" => Messages::KEY_TYPE_QUESTION
@@ -78,7 +78,7 @@ class MessageStreamController extends Controller
 	}
 
 	/**
-	* Submit answer to question the current question based on progress (stage)
+	* Submit answer to question and update users progress (stage)
 	*
 	* @param 	StoreMessageRequest 	$request 	
 	* @return 	JSON 	$return
@@ -95,7 +95,10 @@ class MessageStreamController extends Controller
 		$s = (int)$data['stage'] ?? 0;
 		$n = $data['name'] ?? '';
 		$t = $data['title'] ?? $n;
-		$lId = $data['id_linked_content_meta'] ?? '';
+		$lId = $data['id_linked_content_meta'] ?? 0;
+
+		// Respond to users message
+		$return = $this->doRespond($data);
 
 		// Save message for existing users
 		if (!$this->is_guest && !empty((array)$this->user)) {
@@ -108,6 +111,9 @@ class MessageStreamController extends Controller
 			$message->content = $c;
 			$message->user_id = $u;
 			$message->page_id = $p;
+
+			// Update users stage
+
 			// if (!$message->save()) {
 			// 	$sanitizedData['content'] = __('Error: could not save message'); 
 			// 	return response()->json(Messages::create([
@@ -123,8 +129,6 @@ class MessageStreamController extends Controller
 			// }
 		}
 
-		// Respond to users message
-		$return = $this->doRespond($data);
 		return $return;
 	}
 
@@ -135,12 +139,31 @@ class MessageStreamController extends Controller
 	*/
 	protected function doRespond($data) {
 
-		$return = "";
+		$return = [];
 		extract($data);
 		$response = Messages::respond($id_linked_content_meta, $content);
 		if (!empty((array)$response)) {
+			$content = "";
+			$a = $response->getAnswer();
+			if (is_array($a)) {
+
+				// The users input wasn't an exact match we need to inform them
+				$answers = "";
+				$c = count($a);
+				for ($i = 0; $i < $c; $i++) {
+					$an = $a[$i];
+					if (is_object($an)) {
+						$answers .= '"' . $this->convertChoiceScriptTemplate($an->content) . '"';
+						$answers .= ($i === ($c - 1)) ? "" : ", ";
+					}
+				}
+				$content = sprintf(__("Sorry, I can't find the appropriate response to your message. The available answers to this question are %s"), $answers);
+			} else {
+				$content = $this->convertChoiceScriptTemplate($a->content);
+			}
 			$return = response()->json(Messages::create([
-				'content' => $response->getAnswer(),
+				'id' => $response->getAnswer()->id,
+				'content' => $content,
 				'question' => $response->getQuestion(),
 				'message' => $response->getMessage(),
 				'response' => $response->getResponse(),
@@ -227,5 +250,27 @@ class MessageStreamController extends Controller
 		$k = (string)$this->request->session()->get('key');
 		$this->is_guest = (strlen($t) > 0 && strlen($k) > 0 && $t === $k) ? true : false;
 		return $this->is_guest;
+	}
+
+	/**
+	* To import my story I have chosen the popular ChoiceScript templating format which
+	* uses ${} for their variables. This will convert that to useful user info.   
+	*
+	* @param 	string 	$str
+	* @return 	string 	$str
+	*/
+	public static function convertChoiceScriptTemplate(string $str) {
+		
+		$re = '/\${(.*?)\}/';
+		$res = (array)$this->user;
+		$res['finish'] = Messages::getFinalMessage();
+		do {
+			preg_match($re, $str, $m);
+			if ($m) {
+				$info = (isset($res[$m[0][1]])) ? $res[$m[0][1]] : "";
+				$str = str_replace($m[0][0], $info, $str);
+			}
+		} while ($m);
+		return $str;
 	}
 }

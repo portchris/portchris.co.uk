@@ -61,6 +61,7 @@ class UserController extends Controller
 	 */
 	public function store(StoreUserRequest $request) {
 
+		$id = 0;
 		$msg = $code = "";
 		try {
 			$user = new User;
@@ -77,8 +78,14 @@ class UserController extends Controller
 			$user->save();
 			$user = User::find($user->id);
 			$token = JWTAuth::fromUser($user);
+			$q = Messages::getNextQuestion(0);
+			if (!$q) {
+				throw new \Illuminate\Database\QueryException("Error: could not find next question.");
+			} 
+			$id = $q->id;
 			$msg = [
-				'content' => sprintf(__("Welcome %s. Let's begin. %s"), $user->name, Messages::getNextQuestion($user->stage)),
+				'id' => $id,
+				'content' => sprintf(__("Welcome %s. Let's begin.%s%s"), $user->name, "<br>" . PHP_EOL, $q->content),
 				'type' => Messages::TYPES['ContentMeta'],
 				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => 'error',
@@ -184,9 +191,9 @@ class UserController extends Controller
 			// $msg = Route::dispatch($request);
 			// $msg = ($msg->original) ? $msg->original : $msg;
 		} catch (\Exception $e) {
-			$code = $e->getCode();
+			$code = ($e->getCode() !== 0) ? $e->getCode() : 401;
 			$msg = Messages::create([
-				'content' => __($e->getMessage()), 
+				'content' => __($e->getMessage()) . " " . $e->getFile() . "::" . $e->getLine(), 
 				'key' => Messages::KEY_TYPE_ANSWER, 
 				'name' => Messages::RESPONSE_ERROR,
 				'title' => "Error, code: " . $code,  
@@ -198,7 +205,6 @@ class UserController extends Controller
 		}
 
 		// The token is valid and we have found the user via the sub claim
-		// var_dump(response()->json(compact('user'))); die;
 		return response()->json($msg, $code);
 	}
 
@@ -219,6 +225,7 @@ class UserController extends Controller
 
 	public function createGuestToken() {
 
+		$id = 0;
 		$msg = $key = $title = $name = $code = $stage = $type = $method = "";
 		try {
 			$claims = Input::all();	
@@ -241,8 +248,13 @@ class UserController extends Controller
 				$type = Messages::TYPES['User'];
 				$method = "authenticate";
 			} else {
+				$q = Messages::getNextQuestion(0);
 				$this->request->session()->put('key', $token);
-				$msg = sprintf(__("Welcome %s to the game. Let's begin. %s"), $claims["username"], Messages::getNextQuestion(0));
+				if (!$q) {
+					throw new \Illuminate\Database\QueryException("Error: could not find next question.");
+				}
+				$id = $q->id;
+				$msg = sprintf(__("Welcome %s to the game. Let's begin. %s"), $claims["username"], $q->content);
 				$code = 200;
 				$name = "success";
 				$title = $token->get();
@@ -262,6 +274,7 @@ class UserController extends Controller
 			$method = "authenticate";
 		}
 		$m = Messages::create([
+			'id' => $id,
 			'content' => $msg,  
 			'key' => Messages::KEY_TYPE_ERROR, 
 			'name' => $name,
