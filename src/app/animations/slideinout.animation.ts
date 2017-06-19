@@ -14,13 +14,13 @@ trigger('slideInOutAnimation', [
 
 	// End state styles for route container (host)
 	state('*', style({
-		// The view covers the whole screen with a semi tranparent background
-		position: 'fixed',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		backgroundColor: 'rgba(0, 0, 0, 0.8)'
+		position: 'absolute',
+		// display: 'inline-block',
+		transform: 'translateX(0)',
+		transition: '0.2s 100ms ease-out',
+		opacity: '1',
+		width: "100%",
+		height: "100%"
 	})),
 
 	// Route 'enter' transition
@@ -30,21 +30,22 @@ trigger('slideInOutAnimation', [
 		style({
 
 			// Start with the content positioned off the right of the screen,
-			// -400% is required instead of -100% because the negative position adds to the width of the element
-			right: '-400%',
+			transform: 'translateX(150%)',
+			transition: '0.2s 100ms ease-out',
 
 			// Start with background opacity set to 0 (invisible)
-			backgroundColor: 'rgba(0, 0, 0, 0)'
+			opacity: '0'
 		}),
 
 		// Animation and styles at end of transition
 		animate('.5s ease-in-out', style({
 			
 			// Transition the right position to 0 which slides the content into view
-			right: 0,
+			transform: 'translateX(0)',
+			transition: '0.2s 100ms ease-out',
 
 			// Transition the background opacity to 0.8 to fade it in
-			backgroundColor: 'rgba(0, 0, 0, 0.8)'
+			opacity: '1'
 		}))
 	]),
 
@@ -55,10 +56,11 @@ trigger('slideInOutAnimation', [
 		animate('.5s ease-in-out', style({
 			
 			// Transition the right position to -400% which slides the content out of view
-			right: '-400%',
-
+			transform: 'translateX(150%)',
+			transition: '0.2s 100ms ease-out',
+			
 			// Transition the background opacity to 0 to fade it out
-			backgroundColor: 'rgba(0, 0, 0, 0)'
+			opacity: '0'
 		}))
 	])
 ]);

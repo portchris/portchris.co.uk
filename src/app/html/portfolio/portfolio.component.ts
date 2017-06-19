@@ -5,10 +5,13 @@
 import { Component, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Portfolio } from "./portfolio";
+import { slideInOutAnimation } from '../../animations/slideinout.animation';
 
 @Component({
 	selector: 'portfolio',
-	templateUrl: './portfolio.html'
+	templateUrl: './portfolio.html',
+	animations: [slideInOutAnimation],
+	host: { '[@slideInOutAnimation]': '' }
 })
 export class PortfolioComponent implements OnInit, OnChanges, OnDestroy {
 
@@ -20,24 +23,39 @@ export class PortfolioComponent implements OnInit, OnChanges, OnDestroy {
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
-	constructor(private route: ActivatedRoute) { 
+	public constructor(private route: ActivatedRoute) { 
 
 		this.router = route;
 	}
 
-	ngOnInit() {
+	/**
+	* When view is initialised
+	*/
+	public ngOnInit() {
 	
-		this.sub = this.router.data.subscribe((v) => {
-			console.log(v);
-		});	
+		this.sub = this.router.data.subscribe((v) => { this.subscriber(v) });	
+	}
+	
+	/**
+	* When view updates
+	*/
+	public ngOnChanges() {
+
 	}
 
-	ngOnChanges() {
-
-	}
-
-	ngOnDestroy() {
+	/**
+	* When view is destroyed
+	*/
+	public ngOnDestroy() {
 
 		this.sub.unsubscribe();
+	}
+
+	/**
+	* Router information observable
+	* @param 	Observable 	v
+	*/
+	subscriber(v) {
+
 	}
 }

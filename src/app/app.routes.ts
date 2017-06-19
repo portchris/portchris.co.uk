@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { DataStorageService } from './app.storage.service';
 import { HomeComponent } from "./html/home/home.component";
 import { ContactComponent } from "./html/contact/contact.component";
 import { PageNotFoundComponent } from "./html/page-not-found/page-not-found.component";
@@ -22,29 +21,24 @@ const Router: Routes = [
 					width: "col-md-9",
 					content: ""
 				}
-			],
-			storage: DataStorageService
+			]
 		},
 		children: [
 			{
 				path: "",
-				component: HomeComponent,
-				data: { storage: DataStorageService }
+				component: HomeComponent
 			},
 			{
 				path: "portfolio",
-				component: PortfolioComponent,
-				data: { storage: DataStorageService }
+				component: PortfolioComponent
 			},
 			{
 				path: "contact",
-				component: ContactComponent,
-				data: { storage: DataStorageService }
+				component: ContactComponent
 			},
 			{ 
 				path: '**', 
-				component: PageNotFoundComponent ,
-				data: { storage: DataStorageService }
+				component: PageNotFoundComponent
 			}
 		]
 	}

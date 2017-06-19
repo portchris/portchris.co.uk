@@ -461,7 +461,21 @@ export class MessagesComponent implements OnInit {
 		};
 		this.messagesService.logOut(data).subscribe(
 			(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
-			(error) => { this.getMessagesFail(error) },
+			(error) => { 
+				let msg = this.createMessageTemplate();
+				console.error(error);
+				msg.message = "Wow, something really bad happened. I cannot even make a request. Error reads: " + error;
+				msg.answer.name = "error";
+				msg.answer.title = msg.answer.name;
+				msg.answer.key = msg.answer.name;
+				msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+				msg.answer.method = "authenticate";
+				msg.user.stage = 0;
+				this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { console.error(error) })
+				.then(() => { this.getMessagesComplete(); });
+			},
 			() => { this.getMessagesComplete() }
 		);
 	}

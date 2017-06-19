@@ -4,6 +4,7 @@ body, html {
 	background-color: transparent;
 	color: #FFF;
 	height: 100%;
+	overflow-x: hidden;
 }
 /*blockquote.blockquote {
 	background-color: #fff;

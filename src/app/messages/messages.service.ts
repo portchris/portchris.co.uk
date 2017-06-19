@@ -7,7 +7,10 @@
 
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers } from "@angular/http";
-import { Observable } from "rxjs";
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+// import { Observable } from "rxjs";
 import { AppModule as App } from "../app.module";
 import { Messages } from "./messages";
 import { DataStorageService } from '../app.storage.service';
@@ -17,9 +20,8 @@ export class MessagesService {
 
 	uri: string;
 	token: string;
-	storage: any;
 
-	public constructor(private _http: Http) { 
+	public constructor(private _http: Http, public storage: DataStorageService) { 
 		
 		this.uri = new App().url + 'api/message';
 		this.token = "";
@@ -195,7 +197,7 @@ export class MessagesService {
 	*/
 	public storeUserInfo(info: any) {
 		
-		localStorage.setItem('currentUser', JSON.stringify({ 
+		this.storage.setItem('currentUser', JSON.stringify({ 
 			token: info.token, 
 			user: info.user 
 		}));
@@ -207,7 +209,7 @@ export class MessagesService {
 	*/
 	public getStoredUserInfo() {
 
-		let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+		let currentUser = JSON.parse(this.storage.getItem('currentUser'));
 		if (currentUser != null && currentUser.token != null) {
 			this.setToken(currentUser.token);
 		}

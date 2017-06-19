@@ -46,4 +46,7 @@ Route::group(['middleware' => ['web', 'cors']], function() {
 			'create', 'edit', 'update', 'destroy'
 		]
 	]);
+
+	// Send enquiry form
+	Route::post('enquiry', 'SendEnquiryController');
 });

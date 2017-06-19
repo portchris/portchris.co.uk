@@ -6,10 +6,13 @@ import { Component, AfterViewInit, OnChanges, OnDestroy, ViewChild } from '@angu
 import { ActivatedRoute } from '@angular/router';
 import { Home } from './home';
 import { MessagesComponent } from '../../messages/messages.component';
+import { slideInOutAnimation } from '../../animations/slideinout.animation';
 
 @Component({
 	selector: 'home',
-	templateUrl: './home.html'
+	templateUrl: './home.html',
+	animations: [slideInOutAnimation], // Make  animation available to this component
+	host: { '[@slideInOutAnimation]': '' } // Attach the fade in animation to the host (root) element of this component
 })
 export class HomeComponent implements AfterViewInit, OnChanges, OnDestroy {
 
@@ -24,25 +27,39 @@ export class HomeComponent implements AfterViewInit, OnChanges, OnDestroy {
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
-	constructor(private route: ActivatedRoute) { 
+	public constructor(private route: ActivatedRoute) { 
 
 		this.router = route;
 	}
 
-	ngAfterViewInit() {
-		console.log(this.messages);
-		this.sub = this.router.data.subscribe((v) => {
-			this.storage = v.storage;
-			this.messages.setStorage(v.storage);
-		});
+	/**
+	* After view initialises
+	*/
+	public ngAfterViewInit() {
+
+		this.sub = this.router.data.subscribe((v) => { this.subscriber(v) });
 	}
 
-	ngOnChanges() {
+	/**
+	* When view updates
+	*/
+	public ngOnChanges() {
 
 	}
 
-	ngOnDestroy() {
+	/**
+	* When view is destroyed
+	*/
+	public ngOnDestroy() {
 
 		this.sub.unsubscribe();
+	}
+
+	/**
+	* Router information observable
+	* @param 	Observable 	v
+	*/
+	public subscriber(v) {
+
 	}
 }
