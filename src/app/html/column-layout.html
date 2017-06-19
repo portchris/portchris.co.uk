@@ -1,7 +1,17 @@
-<div class="container">
-	<div *ngFor="let column of columns">
-		<div class="{{column.class}}">
-			{{ columns.content }}
+<div class="container vpadding">
+	<div class="row">
+		<div class="col-md-3">
+			<app-header></app-header>
+		</div>
+		<div class="col-md-9">
+			<router-outlet></router-outlet>
+		</div>
+	</div>
+	
+	<!-- Main content passed in via app.routes.ts -->
+	<div class="row">
+		<div *ngFor="let column of columns" class="{{column.width}}">
+			<p>{{ column.content }}</p>
 		</div>
 	</div>
 </div>

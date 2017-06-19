@@ -29,6 +29,7 @@ You have just stepped into the office of a digital agency, a code dwellers home.
 						*finish
 			#I want to make an app that will guarantee me millions!
 				Well ${name} you're in luck. Apples App Store is the perfect platform to make your millions and you've approached the right person for the job. This designer is crazy about Apple. They even bought the "Designed by Apple in California" book for $300 and doesn't even regret the decision.
+				*finish
 	#The developer
 		Good choice ${name}, the developer is tough but fair. Letting you know what you can achieve within your budget. Now what do you want to make?
 		*choice

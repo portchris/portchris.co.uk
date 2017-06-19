@@ -9,3 +9,19 @@ body, html {
 	background-color: #fff;
 	border-left-color: #B5DBA3;
 }*/
+.hpadding {
+	padding-left: 25px;
+	padding-right: 25px; 
+}
+.vpadding {
+	padding-top: 25px;
+	padding-bottom: 25px; 
+}
+.hspace {
+	margin-left: 25px;
+	margin-right: 25px; 
+}
+.vspace {
+	margin-top: 25px;
+	margin-bottom: 25px; 
+}

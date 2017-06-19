@@ -28,12 +28,16 @@ class MessageStreamController extends Controller
 
 		// Require the user to be verified first
 		// $this->middleware('jwt-auth');
+		// $this->middleware('web');
 		$this->request = app('request');
 		$this->is_guest = false;
 		try { 
 			JWTAuth::parseToken();
-			$this->token = JWTAuth::getToken();
-			$this->user = JWTAuth::toUser($this->token);
+			$this->token = JWTAuth::getToken()->get();
+			$this->user = JWTAuth::authenticate($this->token);
+			if (!$this->user && $this->isVerifiedGuest() && $this->request->input('user')) {
+				$this->setUser((array)$this->request->input('user'));
+			}
 		} catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
 			if (!$this->isVerifiedGuest()) {
 				throw new \Tymon\JWTAuth\Exceptions\TokenExpiredException($e->getMessage(), $e->getStatusCode());
@@ -88,46 +92,43 @@ class MessageStreamController extends Controller
 
 		$return = $this->error("Could not submit answer");
 		$data = (array)$request->all();
-		$k = $data['key'] ?? false;
-		$c = $data['content'] ?? false;
-		$u = (int)$data['user_id'] ?? false;
-		$p = (int)$data['page_id'] ?? false;
-		$s = (int)$data['stage'] ?? 0;
-		$n = $data['name'] ?? '';
-		$t = $data['title'] ?? $n;
-		$lId = $data['id_linked_content_meta'] ?? 0;
 
 		// Respond to users message
 		$return = $this->doRespond($data);
 
-		// Save message for existing users
-		if (!$this->is_guest && !empty((array)$this->user)) {
-			$message = new Messages;
-			$message->name = $n;
-			$message->id_linked_content_meta = $lId; // This is how portchris can respond
-			$message->title = $t;
-			$message->key = $k;
-			$message->stage = $s;
-			$message->content = $c;
-			$message->user_id = $u;
-			$message->page_id = $p;
-
-			// Update users stage
-
-			// if (!$message->save()) {
-			// 	$sanitizedData['content'] = __('Error: could not save message'); 
-			// 	return response()->json(Messages::create([
-			// 		'name' => $n,
-			// 		'id_linked_content_meta' => $lId, // This is how portchris can respond
-			// 		'title' => $t,
-			// 		'key' => $k,
-			// 		'stage' => $s,
-			// 		'content'=> $c,
-			// 		'user_id' => $u,
-			// 		'page_id' => $p
-			// 	]), 500);
-			// }
-		}
+		// Save message for existing users - NOTE: removed this, might delete in future...
+		// if (!$this->is_guest && !empty((array)$this->user)) {
+		// 	$k = $data['key'] ?? false;
+		// 	$c = $data['content'] ?? false;
+		// 	$u = (int)$data['user_id'] ?? false;
+		// 	$p = (int)$data['page_id'] ?? false;
+		// 	$s = (int)$data['stage'] ?? 0;
+		// 	$n = $data['name'] ?? '';
+		// 	$t = $data['title'] ?? $n;
+		// 	$lId = $data['id_linked_content_meta'] ?? 0;
+		// 	$message = new Messages;
+		// 	$message->name = $n;
+		// 	$message->id_linked_content_meta = $lId; // This is how portchris can respond
+		// 	$message->title = $t;
+		// 	$message->key = $k;
+		// 	$message->stage = $s;
+		// 	$message->content = $c;
+		// 	$message->user_id = $u;
+		// 	$message->page_id = $p;
+		// 	if (!$message->save()) {
+		// 		$sanitizedData['content'] = __('Error: could not save message'); 
+		// 		return response()->json(Messages::create([
+		// 			'name' => $n,
+		// 			'id_linked_content_meta' => $lId, // This is how portchris can respond
+		// 			'title' => $t,
+		// 			'key' => $k,
+		// 			'stage' => $s,
+		// 			'content'=> $c,
+		// 			'user_id' => $u,
+		// 			'page_id' => $p
+		// 		]), 500);
+		// 	}
+		// }
 
 		return $return;
 	}
@@ -145,44 +146,40 @@ class MessageStreamController extends Controller
 		if (!empty((array)$response)) {
 			$content = "";
 			$a = $response->getAnswer();
-			if (is_array($a)) {
-
-				// The users input wasn't an exact match we need to inform them
-				$answers = "";
-				$c = count($a);
-				for ($i = 0; $i < $c; $i++) {
-					$an = $a[$i];
-					if (is_object($an)) {
-						$answers .= '"' . $this->convertChoiceScriptTemplate($an->content) . '"';
-						$answers .= ($i === ($c - 1)) ? "" : ", ";
-					}
-				}
-				$content = sprintf(__("Sorry, I can't find the appropriate response to your message. The available answers to this question are %s"), $answers);
+			if (!$a) {
+				$return = $this->error("Error: the answer is unknown.");
 			} else {
+
+				// Convert ChoiceScript variables 
 				$content = $this->convertChoiceScriptTemplate($a->content);
+				
+				// Update the users progress
+				User::where("id", $user["id"])->update(["stage" => $a->id]);
+
+				// Set the response JSON
+				$return = response()->json(Messages::create([
+					'id' => $a->id,
+					'content' => $content,
+					'question' => $response->getQuestion(),
+					'message' => $response->getMessage(),
+					'response' => $response->getResponse(),
+					'stage' => $a->stage,
+					'name' => $a->name,
+					'id_linked_content_meta' => $a->id_linked_content_meta,
+					'title' => $a->title,
+					'key' => Messages::KEY_TYPE_QUESTION,
+					'user_id' => $user["id"],
+					'page_id' => $a->page_id
+				]), 200);
 			}
-			$return = response()->json(Messages::create([
-				'id' => $response->getAnswer()->id,
-				'content' => $content,
-				'question' => $response->getQuestion(),
-				'message' => $response->getMessage(),
-				'response' => $response->getResponse(),
-				'stage' => (int)$stage + 1,
-				'name' => $name,
-				'id_linked_content_meta' => $id_linked_content_meta,
-				'title' => __("Response to: ") . $response->getMessage(),
-				'key' => Messages::KEY_TYPE_ANSWER,
-				'user_id' => $user_id,
-				'page_id' => $page_id
-			]), 200);
 		} else {
 			$return = response()->json(Messages::create([
 				'content' => __("No response, please try again later"),
 				'stage' => $stage,
-				'name' => $name,
+				'name' => "Error",
 				'id_linked_content_meta' => $id_linked_content_meta,
 				'title' => $title,
-				'key' => Messages::KEY_TYPE_ANSWER,
+				'key' => Messages::KEY_TYPE_ERROR,
 				'user_id' => $user_id,
 				'page_id' => $page_id
 			]), 500);
@@ -217,7 +214,25 @@ class MessageStreamController extends Controller
 	* @since 	1.0.0
 	*/
 	private function getUser() {
-		
+
+		return $this->user;
+	}
+
+	/**
+	* Set a new user object for guests if request has user data
+	*
+	* @param 	array 	$data
+	*/
+	private function setUser(array $data) {
+
+		$this->user = new User;
+		$this->user->id = $data['id'] ?? 0;
+		$this->user->name = $data['name'] ?? __("Guest");
+		$this->user->firstname = $data['firstname'] ?? __("Guest");
+		$this->user->lastname = $data['lastname'] ?? __("");
+		$this->user->email = $data['email'] ?? "";
+		$this->user->username = $data['username'] ?? $this->user->email;
+		$this->user->stage = $data['stage'] ?? 1;
 	}
 
 	/**
@@ -233,7 +248,6 @@ class MessageStreamController extends Controller
 			'key' => Messages::KEY_TYPE_ERROR,
 			'name' => Messages::RESPONSE_ERROR,
 			'title' => Messages::RESPONSE_ERROR,
-			'' => Messages::RESPONSE_ERROR,
 			'stage' => 0,
 			0
 		]), 500);
@@ -241,14 +255,16 @@ class MessageStreamController extends Controller
 
 	/**
 	* If the user typed 'Continue as guest' then a key should be present, else they are not verified
+	* NOTE: session is not working so frontend uses HTML local storage instead
 	*
 	* @return 	boolean
 	*/
 	private function isVerifiedGuest() {
 
-		$t = (string)$this->request->input('token');
-		$k = (string)$this->request->session()->get('key');
-		$this->is_guest = (strlen($t) > 0 && strlen($k) > 0 && $t === $k) ? true : false;
+		$t = (string)$this->token ?? (string)$this->request->input('token');
+		// $k = (string)session('key');
+		// $this->is_guest = (strlen($t) > 0 && strlen($k) > 0 && $t === $k) ? true : false;
+		$this->is_guest = (strlen($t) > 0) ? true : false;
 		return $this->is_guest;
 	}
 
@@ -259,16 +275,20 @@ class MessageStreamController extends Controller
 	* @param 	string 	$str
 	* @return 	string 	$str
 	*/
-	public static function convertChoiceScriptTemplate(string $str) {
+	public function convertChoiceScriptTemplate(string $str) {
 		
 		$re = '/\${(.*?)\}/';
-		$res = (array)$this->user;
-		$res['finish'] = Messages::getFinalMessage();
+		$res = [
+			"name" => (isset($this->user->name)) ? $this->user->name : __("Guest"),
+			"firstname" => (isset($this->user->firstname)) ? $this->user->firstname : __("Guest"),
+			"lastname" => (isset($this->user->lastname)) ? $this->user->lastname : __("Guest"),
+			"finish" => Messages::getFinalMessage()
+		];
 		do {
 			preg_match($re, $str, $m);
 			if ($m) {
-				$info = (isset($res[$m[0][1]])) ? $res[$m[0][1]] : "";
-				$str = str_replace($m[0][0], $info, $str);
+				$info = (isset($res[$m[1]])) ? $res[$m[1]] : "";
+				$str = str_replace($m[0], $info, $str);
 			}
 		} while ($m);
 		return $str;

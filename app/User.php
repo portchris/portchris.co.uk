@@ -59,14 +59,14 @@ class User extends Authenticatable
 	*
 	* @var  boolean 
 	*/
-	public $isLoggedIn;
+	// public $isLoggedIn;
 
 	/**
 	* Set up variables
 	*/
 	public function __construct() {
 
-		$this->isLoggedIn = Auth::check();
+		// $this->isLoggedIn = Auth::check();
 	}
 
 	/**
@@ -100,13 +100,10 @@ class User extends Authenticatable
 		// Grab credentials from the request
 		$credentials = $request->only('email', 'password');
 		$msg = $title = $token = "";
-		$code = 200;
-		$id = 0;
-		$stage = 1;
+		$id = $user_id = $code = $stage = $title = 0;
 		$type = Messages::TYPES["ContentMeta"];
 		$method = "talk";
 		$key = Messages::KEY_TYPE_ANSWER;
-		$title = $code;
 		try {
 
 			// Attempt to verify the credentials and create a token for the user
@@ -114,21 +111,34 @@ class User extends Authenticatable
 			$token = JWTAuth::attempt($credentials);
 			$user = (!$token) ? false : $User->getAuthenticatedUser($token);
 			if (!$user) {
-				$msg = __("Sorry, don't recognise you. Want to create a new account? Type 'Create an account' if you'd like to save your progress. Or else type 'Continue as guest' to continue as a guest.");
+				$msg = $User->messageUserNotFound();
 				$code = 401;
-				$title = "User not found";
+				$title = __("User not found");
 				$type = Messages::TYPES['User'];
-				$key = Messages::KEY_TYPE_ERROR;
+				$key = Messages::KEY_TYPE_QUESTION;
 				$method = "authenticate";	
 			} else {
+				$user_id = $user->id;
 				$title = $token;
 				$stage = $user->stage;
-				$nextQ = ($stage === 1) ? Messages::getNextQuestion(0) : Messages::find($stage);
+				$code = 200;
+				$nextQ = ($stage == 1) ? Messages::getNextQuestion() : Messages::find($stage);
 				if (!$nextQ) {
-					throw new \Exception("Error: could not get next question.", 500);
+					throw new \Exception(__("Error: could not get next question."), 500);
 				}
 				$id = $nextQ->id;
-				$msg = sprintf(__("Welcome back %s. Let's pick up where you left off at level %s.%s%s"), $user->name, $stage, "<br>" . PHP_EOL, $nextQ->content);
+				if ($stage != 1) {
+					$responses = Messages::getResponsesToQuestion($nextQ->id);
+					if (!is_null($responses)) {
+						$nextQ->content .= PHP_EOL;
+						foreach ($responses as $r) {
+							$nextQ->content .= PHP_EOL . "> " . $r->content;
+						}
+					} else {
+						$nextQ->content .= PHP_EOL . Messages::getFinalMessage();
+					}
+				}
+				$msg = $User->messageUserAuthorised($user->name, $nextQ->stage, $nextQ->content);
 			}
 		} catch (JWTException $e) {
 			
@@ -140,12 +150,33 @@ class User extends Authenticatable
 			'id' => $id,
 			'content' => __($msg),
 			'key' => $key,
-			'name' => $code,
+			'name' => sprintf(__("Response: %s"), $code),
 			'title' => $title,
 			'stage' => $stage,
+			'user_id' => $user_id,
 			'type' => $type,
 			'method' => $method
 		]);
+	}
+
+	/**
+	* Message to display when user is not verified
+	*
+	* @return 	string
+	*/
+	public function messageUserNotFound() {
+
+		return sprintf(__("Sorry, I don't recognise you. You must be new around here:%s> If you want to create a new account? Type 'Create an account'. This way you I track your progress for next time.%s> Don't want me to track your progress? No biggie, type 'Continue as guest' to continue as a guest.%s> Or perhaps you simply mis-typed your email address or password try entering another address if this is the case."), PHP_EOL . PHP_EOL, PHP_EOL, PHP_EOL);
+	}
+
+	/**
+	* Message to display when user has been succesfully verified
+	*
+	* @return 	string
+	*/
+	public function messageUserAuthorised($name, $stage, $content) {
+
+		return sprintf(__("Welcome back %s. Let's pick up where you left off at level %s.%s%s"), $name, $stage, PHP_EOL, $content);
 	}
 
 	/**
@@ -159,25 +190,4 @@ class User extends Authenticatable
 		$user = JWTAuth::authenticate($token);
 		return $user;
 	}
-
-	/**
-	* Check
-	*/
-	// public static function message($msg) {
-
-	// 	$content = __($msg);
-	// 	$key = Messages::KEY_TYPE_QUESTION;
-	// 	$name = "User identification";
-	// 	$title = "Who are you";
-	// 	$stage = 0;
-	// 	return response()->json(
-	// 		Messages::create([
-	// 			'content' => $content, 
-	// 			'key' => $key, 
-	// 			'name' => $name, 
-	// 			'title' => $title, 
-	// 			'stage' => $stage
-	// 		]
-	// 	));
-	// }
 }

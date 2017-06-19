@@ -1,68 +1,51 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Http, HttpModule } from '@angular/http';
-import { RouterModule, Routes } from '@angular/router';
-
+import { RouterModule } from '@angular/router';
+import { AppRoutingModule } from './app.routes';
 import { AppComponent } from './app.component';
-import { BookComponent } from './book/book.component';
-import { BookService } from "./book/book.service";
+import { DataStorageService } from './app.storage.service';
 import { MessagesComponent } from './messages/messages.component';
 import { MessagesService } from "./messages/messages.service";
 import { UserComponent } from "./user/user.component";
-import { UserService } from "./user/user.service";
-import { ColumnLayoutComponent } from "./html/column-layout.component";
-import { PageNotFoundComponent } from "./html/page-not-found/page-not-found.component";
 import { ParticlesComponent } from "./particles/particles.component";
-
-
-const appRoutes: Routes = [
-// {
-// 	path: '/',
-// 	component: ColumnLayoutComponent,
-// 	data: {
-// 		columns: [{
-// 			width: "col-md-12",
-// 			content: "Blah"
-// 		}]
-// 	}
-// }, 
-{ 
-	path: 'portfolio',
-	component: ColumnLayoutComponent,
-	data: {
-		title: 'About myself and my portfolio'
-	}
-}, { 
-	path: 'contact' 
-},
-{ 
-	path: '**', 
-	component: PageNotFoundComponent 
-}];
+import { HeaderComponent } from "./html/header/header.component";
+import { HomeComponent } from "./html/home/home.component";
+import { ColumnLayoutComponent } from "./html/column-layout.component";
+import { ContactComponent } from "./html/contact/contact.component";
+import { PageNotFoundComponent } from "./html/page-not-found/page-not-found.component";
+import { PortfolioComponent } from "./html/portfolio/portfolio.component";
 
 @NgModule({
 	declarations: [
 		AppComponent,
-		BookComponent,
 		UserComponent,
 		MessagesComponent,
-		ParticlesComponent
+		ParticlesComponent,
+		HomeComponent,
+		HeaderComponent,
+		ColumnLayoutComponent,
+		ContactComponent,
+		PageNotFoundComponent,
+		PortfolioComponent
 	],
 	imports: [
 		BrowserModule,
 		ReactiveFormsModule,
 		FormsModule,
 		HttpModule,
-		// RouterModule.forRoot(appRoutes)
+		AppRoutingModule
 	],
 	providers: [
-		BookService, 
-		UserService, 
-		MessagesService
+		MessagesService,
+		DataStorageService
 	],
 	bootstrap: [
 		AppComponent
+	],
+	schemas: [
+		CUSTOM_ELEMENTS_SCHEMA
 	]
 })
 export class AppModule { 
@@ -76,15 +59,5 @@ export class AppModule {
 
 	ngOnInit() {
 
-		this.getUser();
-	}
-
-	/**
-	* Attempt to identify the user via session in order to retrieve their previous conversations. 
-	* Else require them to login and assign as guest
-	*/
-	getUser() {
-
-		// var User = new UserService(new Http()).getUser();
 	}
 }

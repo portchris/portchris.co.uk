@@ -10,14 +10,16 @@ import { Http, Response, Headers } from "@angular/http";
 import { Observable } from "rxjs";
 import { AppModule as App } from "../app.module";
 import { Messages } from "./messages";
+import { DataStorageService } from '../app.storage.service';
 
 @Injectable()
 export class MessagesService {
 
 	uri: string;
 	token: string;
+	storage: any;
 
-	constructor(private _http: Http) { 
+	public constructor(private _http: Http) { 
 		
 		this.uri = new App().url + 'api/message';
 		this.token = "";
@@ -27,7 +29,7 @@ export class MessagesService {
 	* Get all the messages from users stream
 	* @return 	Response 	req
 	*/
-	getMessages():Observable<Messages[]>{
+	public getMessages():Observable<Messages[]>{
 
 		let req = this._http.get(this.uri).map(res => res.json()).catch(this.handleError);
 		return req;
@@ -38,19 +40,106 @@ export class MessagesService {
 	* @param 	object 	data
 	* @param 	Response 	req
 	*/
-	getResponse(data):Observable<Messages[]>{
+	public getResponse(data):Observable<Messages[]>{
 		
 		let d = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(this.uri + "?token=" + this.token, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(this.uri + "?token=" + this.getToken(), d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Try to log the user in. Else if user does not exist, ask to register.
+	* @param 	object 	data
+	* @return 	JSON 		req
+	*/
+	public authenticate(data) {
+
+		let uri = new App().url + 'api/user/identify';
+		let creds = JSON.stringify(data);
+		let h = new Headers();
+		h.append('Content-Type', 'application/json');
+		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Try to log the user in. Else if user does not exist, ask to register.
+	* @param 	object 	data
+	* @return 	JSON 		req
+	*/
+	public login(userId) {
+
+		let uri = new App().url + 'api/user/' + userId + "?token=" + this.getToken();
+		let h = new Headers();
+		h.append('Content-Type', 'application/json');
+		let req = this._http.get(uri, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	public createUserAccount(data) {
+
+		let uri = new App().url + 'api/user';
+		let creds = JSON.stringify(data);
+		let h = new Headers();
+		h.append('Content-Type', 'application/json');
+		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Create guest token based on users name 
+	* @param 	JSON 	username
+	* @return 	JSON 	req
+	*/
+	public createGuestAccount(username) {
+
+		let uri = new App().url + 'api/user/guest';
+		let creds = JSON.stringify(username);
+		let h = new Headers();
+		h.append('Content-Type', 'application/json');
+		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Destroy the JWT token client and server side.
+	* @return 	JSON 	req
+	*/
+	public logOut(data):Observable<Messages[]> {
+
+		let uri = new App().url + 'api/user/logout';
+		let d = JSON.stringify(data);
+		let h = new Headers();
+		this.token = "";
+		this.storeUserInfo({
+			user: null,
+			token: null
+		});
+		h.append('Content-Type', 'application/json');
+		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Destroy the JWT token client and server side.
+	* @return 	JSON 	req
+	*/
+	public reset(data):Observable<Messages[]> {
+
+		let uri = new App().url + 'api/user/reset';
+		let d = JSON.stringify(data);
+		let h = new Headers();
+		h.append('Content-Type', 'application/json');
+		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
 		return req;
 	}
 
 	/**
 	* Manually create a message without API and return it through observable
 	*/
-	createMessage(data) {
+	public createMessage(data) {
 
 		return new Promise((resolve, reject) => {
 			if (data != null && data.answer != null && data.page != null && data.user != null) {
@@ -72,43 +161,13 @@ export class MessagesService {
 		});
 	}
 
-	/**
-	* Try to log the user in. Else if user does not exist, ask to register.
-	* @param 	object 	data
-	* @return 	JSON 		req
-	*/
-	authenticate(data) {
+	public hashPassword(password) {
 
-		let uri = new App().url + 'api/user/identify';
-		let creds = JSON.stringify(data);
+		let uri = new App().url + 'api/user/password';
+		let d = JSON.stringify({ password: password });
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
-		return req;
-	}
-
-	createUserAccount(data) {
-
-		let uri = new App().url + 'api/user';
-		let creds = JSON.stringify(data);
-		let h = new Headers();
-		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
-		return req;
-	}
-
-	/**
-	* Create guest token based on users name 
-	* @param 	JSON 	username
-	* @return 	JSON 	req
-	*/
-	createGuestAccount(username) {
-
-		let uri = new App().url + 'api/user/guest';
-		let creds = this.serialise(username);
-		let h = new Headers();
-		h.append('Content-Type', 'application/x-www-form-urlencoded');
-		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
 		return req;
 	}
 
@@ -116,10 +175,44 @@ export class MessagesService {
 	* Set the JWT token ready for to play the game
 	* @param 	string	token
 	*/
-	setToken(token: string) {
-		this.token = token
+	public setToken(token: string) {
+
+		this.token = token;
 	}
 
+	/**
+	* Get the JWT token ready for to play the game
+	* @return 	string	token
+	*/
+	public getToken() {
+
+		return this.token;
+	}
+
+	/**
+	* Use the HTML5 local storage to save information about the user for next time
+	* @param 	array 	info
+	*/
+	public storeUserInfo(info: any) {
+		
+		localStorage.setItem('currentUser', JSON.stringify({ 
+			token: info.token, 
+			user: info.user 
+		}));
+	}
+
+	/**
+	* Get information from previous storage
+	* @return 	array 	currentUser
+	*/
+	public getStoredUserInfo() {
+
+		let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+		if (currentUser != null && currentUser.token != null) {
+			this.setToken(currentUser.token);
+		}
+		return currentUser;
+	}
 
 	/**
 	* Custom error handler

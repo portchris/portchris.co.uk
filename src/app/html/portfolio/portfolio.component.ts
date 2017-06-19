@@ -1,16 +1,16 @@
 /**
-* 404 component.
+* Portfolio / about component.
 * @since   1.0.0 <2017-05-15>
 */
 import { Component, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PageNotFound } from "./page-not-found";
+import { Portfolio } from "./portfolio";
 
 @Component({
-	selector: 'page-not-found',
-	templateUrl: './page-not-found.html'
+	selector: 'portfolio',
+	templateUrl: './portfolio.html'
 })
-export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
+export class PortfolioComponent implements OnInit, OnChanges, OnDestroy {
 
 	router: any;
 	sub: any;

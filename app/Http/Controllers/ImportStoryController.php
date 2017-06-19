@@ -179,12 +179,22 @@ class ImportStoryController extends Controller
 					$action = str_replace([PHP_EOL, "\t", $delimiter], "", $actions[0]);
 					switch ($action) {
 						case self::ACTION_FINISH:
-							$nextStage = (isset($explosion[$i+1])) ? (substr_count($explosion[$i+1], "\t") + 1) : 0;
-							$currentStage = substr_count($newline, "\t");
-							if ($nextStage < $currentStage) { 
-								$choices = $nextStage;
-								// $stagedResponses["S" . $stage] = 0;
-							}
+							// $nextStage = (isset($explosion[$i+1])) ? (substr_count($explosion[$i+1], "\t") + 1) : 0;
+							// $currentStage = substr_count($newline, "\t");
+							// if ($nextStage < $currentStage) { 
+							// 	$choices = $nextStage;
+							// 	// $stagedResponses["S" . $stage] = 0;
+							// }
+
+							// Append this as a variable on the end of the last question
+							// for ($x = $i; $x > 0; $x--) {
+							// 	$lastMsg = &$explosion[$x];
+							// 	$delimiter = substr(str_replace(["\t"], "", $lastMsg), 0, 1);
+							// 	if ($delimiter !== self::ACTION_CHOICE && $delimiter !== self::ACTION_FINISH) {
+							// 		$lastMsg["content"] .= " " . substr(str_replace([PHP_EOL, "\t"], "", $newline), 1);	
+							// 		break;
+							// 	}
+							// }
 						break;
 						case self::ACTION_CHOICE:
 							$choices = substr_count($newline, "\t");

@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\AuthenticateUserRequest;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Input;
+// use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Route;
 use Tymon\JWTAuth\Facades\JWTFactory;
 use Illuminate\Support\Facades\Hash;
@@ -31,7 +31,6 @@ class UserController extends Controller
 	public function __construct() {
 
 		$this->request = app('request');
-		$this->middleware('guest');
 	}
 
 	/**
@@ -70,7 +69,7 @@ class UserController extends Controller
 			$user->name = $request->name;
 			$user->email = $request->email;
 			$user->username = $request->username;
-			$user->password = Hash::make($request->password);
+			$user->password = $request->password; // Password should already be hashed with $this->hashPassword
 			$user->lat = $request->lat;
 			$user->lng = $request->lng;
 			$user->stage = $request->stage;
@@ -85,10 +84,11 @@ class UserController extends Controller
 			$id = $q->id;
 			$msg = [
 				'id' => $id,
-				'content' => sprintf(__("Welcome %s. Let's begin.%s%s"), $user->name, "<br>" . PHP_EOL, $q->content),
+				'content' => sprintf(__("Welcome %s. Let's begin.%s%s"), $user->name, PHP_EOL . PHP_EOL, $q->content),
 				'type' => Messages::TYPES['ContentMeta'],
 				'key' => Messages::KEY_TYPE_ANSWER,
-				'name' => 'error',
+				'name' => sprintf(__("New user: %s"), $user->id),
+				'user_id' => $user->id,
 				'title' => $token,
 				'method' => 'talk'
 			];
@@ -97,9 +97,9 @@ class UserController extends Controller
 			$msg = [
 				'content' => $e->getMessage(),
 				'type' => Messages::TYPES['User'],
-				'key' => Messages::KEY_TYPE_ANSWER,
-				'name' => 'error',
-				'title' => 'Error, code: ' . $e->getCode(),
+				'key' => Messages::KEY_TYPE_ERROR,
+				'name' => Messages::KEY_TYPE_ERROR,
+				'title' => sprintf(__("Error: %s"), $e->getCode()),
 				'method' => 'authenticate'
 			];
 			$code = 500;
@@ -108,8 +108,8 @@ class UserController extends Controller
 				'content' => $e->getMessage(),
 				'type' => Messages::TYPES['User'],
 				'key' => Messages::KEY_TYPE_ANSWER,
-				'name' => 'error',
-				'title' => 'Error, code: ' . \Illuminate\Http\Response::HTTP_CONFLICT,
+				'name' => Messages::KEY_TYPE_ERROR,
+				'title' => sprintf(__("Error: %s"), \Illuminate\Http\Response::HTTP_CONFLICT),
 				'method' => 'authenticate'
 			];
 			$code = \Illuminate\Http\Response::HTTP_CONFLICT;
@@ -118,24 +118,119 @@ class UserController extends Controller
 	}
 
 	/**
-	* Hash a password, also open to the API
+	* Hash a password for subsequent requests, also open to the API
 	*
-	* @return 	string 	Hashed password
+	* @return 	Request 	$request
 	*/
-	public function hasPassword($password) {
+	public function hashPassword(Request $request) {
 
-		return Hash::make($password);
+		$p = ["password" => Hash::make($request->input("password"))];
+		return response()->json($p);
 	}
 
 	/**
-	 * Display the specified resource.
+	* Log the user out. Simple right.
+	*
+	* @return 	Response 	JSON
+	*/
+	public function logOut(Request $request) {
+
+		$msg = "";
+		try {
+			$token = (JWTAuth::getToken()) ? JWTAuth::getToken()->get() : false;
+			$msg = (JWTAuth::invalidate($token)) ? __("Successfully logged off, as if we never met.") : __("Sorry, we couldn't log you out, looks like you're stuck with me for now...");
+		} catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+
+			// Even if it errors, then JWT Auth has successfully forgotten the token.
+			$msg = __("You are now logged out, as if we never met.");
+		}
+		return response()->json(Messages::create([
+			'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : $msg,
+			'type' => Messages::TYPES['User'],
+			'key' => Messages::KEY_TYPE_ANSWER,
+			'name' => 'Log out',
+			'title' => 'Log out',
+			'method' => 'welcome'
+		]));
+	}
+
+	/**
+	 * Reset the users progress back to thr first stage.
+	 *
+	 * @param  Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function reset(Request $request) {
+		
+		$msg = "Cannot reset, this user does not exist!";
+		$r = $this->error($msg);
+		$userId = $request->input("user_id");
+		if ($userId && (int)$userId > 0 && is_numeric($userId)) {
+			User::where("id", $userId)->update(["stage" => 1]);
+			$msg = "Users progress successfully reset.";
+			$r = response()->json(Messages::create([
+				'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : __($msg),
+				'type' => Messages::TYPES['User'],
+				'key' => Messages::KEY_TYPE_ANSWER,
+				'name' => __('Reset'),
+				'title' => __('Reset'),
+				'method' => 'welcome',
+				'user_id' => $userId
+			]));
+		}
+		return $r;
+	}
+
+	/**
+	 * Return user information and next question in the game if the token is valid.
 	 *
 	 * @param  \App\User  $user
 	 * @return \Illuminate\Http\Response
 	 */
 	public function show(User $user) {
 		
-		//
+		$r = [];
+		JWTAuth::parseToken();
+		$token = JWTAuth::getToken()->get();
+		$user = JWTAuth::authenticate($token);
+		if (!$user) {
+			$r = $this->error("Error: user was not authorised from credentials provided.", 500);
+		} else {
+			$User = new User();
+			$userId = $user->id;
+			$title = $token;
+			$stage = $user->stage;
+			$code = 200;
+			$nextQ = ($stage == 1) ? Messages::getNextQuestion() : Messages::find($stage);
+			if (!$nextQ) {
+				$this->error("Error: could not get next question.", 500);
+			} else {
+				$id = $nextQ->id;
+				if ($stage != 1) {
+					$responses = Messages::getResponsesToQuestion($nextQ->id);
+					if (!is_null($responses)) {
+						$nextQ->content .= PHP_EOL;
+						foreach ($responses as $r) {
+							$nextQ->content .= PHP_EOL . "> " . $r->content;
+						}
+					} else {
+						$nextQ->content .= PHP_EOL . Messages::getFinalMessage();
+					}
+				}
+				$msg = $User->messageUserAuthorised($user->name, $nextQ->stage, $nextQ->content);
+				$r = Messages::create([
+					'id' => $id,
+					'content' => $msg,
+					'key' => Messages::KEY_TYPE_QUESTION,
+					'name' => sprintf(__("Response: %s"), $code),
+					'title' => $title,
+					'stage' => $stage,
+					'user_id' => $userId
+				]);
+			}
+		}
+
+		return $r;
 	}
 
 	/**
@@ -175,7 +270,6 @@ class UserController extends Controller
 	/**
 	* Attempt to log the user in using JSON Web Tokens. 
 	* Try catch custom exceptions as opposed to leaving it up to app/Exceptions/Handler
-	* Note: using Illuminate\Support\Facades\Input despite being deprecated as I CANNOT figure out Request!!
 	*
 	* @return 	JSON 	$msg
 	*/
@@ -223,12 +317,19 @@ class UserController extends Controller
         ]);
     }
 
-	public function createGuestToken() {
+    /**
+    * Silly, the user has opted out of creating an account. Oh well, they can still play on a guest token.
+    *
+    * @param 	Request 	$request
+    * @return 	JSON
+    */
+	public function createGuestToken(Request $request) {
 
 		$id = 0;
+		$cookie = false;
 		$msg = $key = $title = $name = $code = $stage = $type = $method = "";
 		try {
-			$claims = Input::all();	
+			$claims = $request->all();	
 			$payload = $this->createJWTPayload(
 				$claims,
 				$claims["username"],
@@ -249,7 +350,6 @@ class UserController extends Controller
 				$method = "authenticate";
 			} else {
 				$q = Messages::getNextQuestion(0);
-				$this->request->session()->put('key', $token);
 				if (!$q) {
 					throw new \Illuminate\Database\QueryException("Error: could not find next question.");
 				}
@@ -262,6 +362,7 @@ class UserController extends Controller
 				$stage = 1;
 				$type = Messages::TYPES['ContentMeta'];
 				$method = "talk";
+				session(['key' => $token->get()]);
 			}
 		} catch (\Exception $e) {
 			$msg = __($e->getMessage());
@@ -315,6 +416,24 @@ class UserController extends Controller
 	}
 
 	/**
+	* Create JSON error response 
+	*
+	* @return 	JSON object 	$response
+	* @since 	1.0.0
+	*/
+	public function error($msg, $errCode = 500) {
+
+		return response()->json(Messages::create([
+			'content' => __($msg),
+			'key' => Messages::KEY_TYPE_ERROR,
+			'name' => Messages::RESPONSE_ERROR,
+			'title' => Messages::RESPONSE_ERROR,
+			'stage' => 0,
+			0
+		]), $errCode);
+	}
+
+	/**
 	* Get the logged in user
 	*
 	* @return 	JSON response of user
@@ -349,19 +468,19 @@ class UserController extends Controller
 	 * @param  array 	$data
 	 * @return \Illuminate\Http\Response 	JSON
 	 */
-	public function identify($data) {
+	// public function identify($data) {
 		
-		$return = User::message("Welcome, with whom is it I speak?");
-		$username = $data["username"] ?? false;
-		$password = $data["password"] ?? false;
-		if (Auth::check()) {
-			$return = Auth::user();		
-		} else if ($username && $password) {
-			$return = Auth::attempt([
-				'username' => $username, 
-				'password' => $password
-			]);
-		}
-		return $return;
-	}
+	// 	$return = User::message("Welcome, with whom is it I speak?");
+	// 	$username = $data["username"] ?? false;
+	// 	$password = $data["password"] ?? false;
+	// 	if (Auth::check()) {
+	// 		$return = Auth::user();		
+	// 	} else if ($username && $password) {
+	// 		$return = Auth::attempt([
+	// 			'username' => $username, 
+	// 			'password' => $password
+	// 		]);
+	// 	}
+	// 	return $return;
+	// }
 }

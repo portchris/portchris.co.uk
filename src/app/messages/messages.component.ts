@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MessagesService } from "./messages.service";
 import { Messages } from "./messages";
+import { DataStorageService } from '../app.storage.service';
 
 enum TYPE {
 	USER = 0, 
@@ -11,7 +12,8 @@ enum TYPE {
 @Component({
 	selector: 'app-messages',
 	templateUrl: './messages.component.html',
-	styleUrls: ['./messages.component.css']
+	styleUrls: ['./messages.component.css'],
+	inputs: ['storage']
 })
 
 export class MessagesComponent implements OnInit {
@@ -111,6 +113,22 @@ export class MessagesComponent implements OnInit {
 		{
 			phrase: "Create account",
 			method: "registerAccount"
+		},
+		{
+			phrase: "Log out",
+			method: "logOut"
+		},
+		{
+			phrase: "Log off",
+			method: "logOut"
+		},
+		{
+			phrase: "Start over",
+			method: "startOver"
+		},
+		{
+			phrase: "Reset",
+			method: "reset"
 		}
 	];
 
@@ -137,10 +155,10 @@ export class MessagesComponent implements OnInit {
 
 	/**
 	* The class constructor, used to instantiate necessary variables
-	* @param 	object 	MessageService
+	* @param 	object 	MessagesService
 	* @param 	object 	FormBuilder
 	*/
-	constructor(private messagesService: MessagesService, public formBuilder: FormBuilder) {
+	public constructor(private messagesService: MessagesService, public formBuilder: FormBuilder) {
 
 		this.messages = [];
 		this.user = {
@@ -171,35 +189,35 @@ export class MessagesComponent implements OnInit {
 	* @param 	object 	event
 	* @param 	boolean valid
 	*/
-	doRespond(event: any, valid: boolean) {
+	public doRespond(event: any, valid: boolean) {
 
 		if (valid) {
 			let data = this.talkForm.value;
+			data.user = (this.user != null) ? this.user : {};
 			this.decipherMessageType(data);
 			this.decipherMessageAction(data);
 			this.createUserMessage(data);
-			if (this.messageType === MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id) {
-				
-				// User related message
-				try {
-					let magicMethod = this.hasMagicWords(data.content);
-					// let magicMethod = "registerAccount";
-					if (!magicMethod) { 
-						this.executeMethod(this.messageAction);
-					} else {
-						this.executeMethod(magicMethod);
-					}
-				} catch(e) {
-					console.error(e);
-				}
-			} else {
+			try {
+				let magicMethod = this.hasMagicWords(data.content);
+				if (!magicMethod) { 
+						if (this.messageType === MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id) {
 
-				// Game related message
-				this.messagesService.getResponse(data).subscribe(
-					(message) => { this.getMessagesSuccess(message) },
-					(error) => { this.getMessagesFail(error) },
-					() => { this.getMessagesComplete() }
-				);
+							// User related message
+							this.executeMethod(this.messageAction);
+						} else {
+
+							// Game related message
+							this.messagesService.getResponse(data).subscribe(
+								(message) => { this.getMessagesSuccess(message) },
+								(error) => { this.getMessagesFail(error) },
+								() => { this.getMessagesComplete() }
+							);
+						}
+				} else {
+					this.executeMethod(magicMethod);
+				}
+			} catch(e) {
+				console.error(e);
 			}
 		} else {
 			console.error(this.talkForm);
@@ -213,9 +231,8 @@ export class MessagesComponent implements OnInit {
 	* I'm trying to avoid eval, and window isn't working like expected so am using switch
 	* @param 	method
 	*/
-	executeMethod(method) {
+	public executeMethod(method) {
 
-		console.log(method);
 		switch(method) {
 			case 'toSaveOrNotToSave':
 				this.toSaveOrNotToSave();
@@ -235,32 +252,51 @@ export class MessagesComponent implements OnInit {
 			case 'continueAsGuest':
 				this.continueAsGuest();
 			break;
+			case 'logOut':
+				this.logOut();
+			break;
+			case 'startOver':
+				this.startOver("Okay I'm logging you out and starting over. Don't worry if you have an account, your progress will be safe.");
+			break;
+			case 'reset':
+				this.reset("Starting a new game and logging you off.");
+			break;
 		}
 	}
 
 	/**
 	* Angular event. When Angualr is ready and loaded, contruct the basis for our component
 	*/
-	ngOnInit() {
+	public ngOnInit() {
 
-		let msg = this.createMessageTemplate();
-		msg.message = "Welcome, what is your name?";
-		msg.answer.name = "Init";
-		msg.answer.title = msg.answer.name;
-		msg.answer.key = "question";
-		msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
-		msg.answer.method = "welcome";
-		msg.user.stage = 0;
-		this.messagesService.createMessage(msg)
-				.then((message) => { this.getMessagesSuccess(message); })
-				.catch((error) => { this.getMessagesFail(error); })
-				.then(() => { this.getMessagesComplete(); });
+		let storage = this.messagesService.getStoredUserInfo();
+		if (storage != null && storage.user != null && storage.user.id != null && storage.user.id !== 0 && storage.token.length) {
+			this.user = storage.user;
+			this.messagesService.login(this.user.id).subscribe(
+				(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
+				(error) => { this.getMessagesFail(error); },
+				() => { this.getMessagesComplete(); }
+			);
+		} else {
+			let msg = this.createMessageTemplate();
+			msg.message = "Welcome, what is your name?";
+			msg.answer.name = "Init";
+			msg.answer.title = msg.answer.name;
+			msg.answer.key = "question";
+			msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+			msg.answer.method = "welcome";
+			msg.user.stage = 0;
+			this.messagesService.createMessage(msg)
+					.then((message) => { this.getMessagesSuccess(message); })
+					.catch((error) => { this.getMessagesFail(error); })
+					.then(() => { this.getMessagesComplete(); });
+		}
 	}
 
 	/**
 	* User introduces themselves, the game presents the opportunity to track their progress
 	*/
-	welcome() {
+	public welcome() {
 
 		let msg = this.createMessageTemplate();
 		let data = this.talkForm.value;
@@ -291,7 +327,7 @@ export class MessagesComponent implements OnInit {
 	* Attempt to identify the user via session in order to retrieve their previous conversations. 
 	* Else require them to login and assign as guest
 	*/
-	toSaveOrNotToSave() {
+	public toSaveOrNotToSave() {
 
 		let msg = this.createMessageTemplate();
 		let answer = this.talkForm.value.content.toLowerCase();
@@ -328,7 +364,7 @@ export class MessagesComponent implements OnInit {
 	/**
 	* Get the users messages, if user exists and previous conversation exists
 	*/
-	getMessages() {
+	public getMessages() {
 		
 		this.messagesService.getMessages().subscribe(
 			(message) => { this.getMessagesSuccess(message) },
@@ -344,30 +380,32 @@ export class MessagesComponent implements OnInit {
 	private getMessagesSuccess(message) {
 		
 		let m = message[message.length - 1];
-		// m.content = this.convertChoiceScriptTemplate(m.content);
-		this.messages = this.messages.concat(m);
-		this.user.id = m.user_id;
-		this.user.stage = m.stage;
-		this.page.id = m.page_id;
-		this.question.id = m.id;
-		this.question.name = m.name;
-		this.question.title = m.title;
-		this.question.type = m.type;
-		this.question.method = m.method;
-		this.question.key = m.key;
-		this.question.csrf = m.csrf;
-		this.class_selector = (m.key === "user") ? "col-xs-9 offset-xs-3" : "offset-xs-3 col-xs-9";
-		this.err = "";
-		this.talkForm.controls['id_linked_content_meta'].setValue(this.question.id);
-		this.talkForm.controls['name'].setValue(this.question.name);
-		this.talkForm.controls['title'].setValue(this.question.title);
-		this.talkForm.controls['key'].setValue(this.question.key);
-		this.talkForm.controls['stage'].setValue(this.user.stage);
-		this.talkForm.controls['user_id'].setValue(this.user.id);
-		this.talkForm.controls['page_id'].setValue(this.page.id);
-		this.talkForm.controls['type'].setValue(this.question.type);
-		this.talkForm.controls['method'].setValue(this.question.method);
-		this.talkForm.controls['csrf'].setValue(this.question.csrf);
+		if (m) {
+			// m.content = this.convertChoiceScriptTemplate(m.content);
+			this.messages = this.messages.concat(m);
+			this.user.id = m.user_id;
+			this.user.stage = m.stage;
+			this.page.id = m.page_id;
+			this.question.id = m.id;
+			this.question.name = m.name;
+			this.question.title = m.title;
+			this.question.type = m.type;
+			this.question.method = m.method;
+			this.question.key = m.key;
+			this.question.csrf = m.csrf;
+			this.class_selector = (m.key === "user") ? "col-xs-9 offset-xs-3" : "offset-xs-3 col-xs-9";
+			this.err = "";
+			this.talkForm.controls['id_linked_content_meta'].setValue(this.question.id);
+			this.talkForm.controls['name'].setValue(this.question.name);
+			this.talkForm.controls['title'].setValue(this.question.title);
+			this.talkForm.controls['key'].setValue(this.question.key);
+			this.talkForm.controls['stage'].setValue(this.user.stage);
+			this.talkForm.controls['user_id'].setValue(this.user.id);
+			this.talkForm.controls['page_id'].setValue(this.page.id);
+			this.talkForm.controls['type'].setValue(this.question.type);
+			this.talkForm.controls['method'].setValue(this.question.method);
+			this.talkForm.controls['csrf'].setValue(this.question.csrf);
+		}
 	}
 
 	/**
@@ -383,15 +421,72 @@ export class MessagesComponent implements OnInit {
 			errMsg += " File: " + error.fileName + ":" + error.lineNumber;
 		}
 		this.err = errMsg;
+		this.startOver("Error occured: I need to log you out and start over. Don't worry if you have an account, your progress will be saved.");
 	}
 
 	/**
 	* Observable / promise final method on completion. Will not fire on error.
+	* Update the local storage with user and token information
 	*/
 	private getMessagesComplete() {
 
-		console.log("Complete");
 		this.user.message = "";
+		if (this.user != null && this.messagesService.getToken() != null) {
+			this.messagesService.storeUserInfo({
+				user: this.user,
+				token: this.messagesService.getToken()
+			});
+		}
+	}
+
+	/**
+	* Log the user out
+	*/
+	public logOut() {
+
+		this.messagesService.logOut({}).subscribe(
+			(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
+			(error) => { this.getMessagesFail(error) },
+			() => { this.getMessagesComplete() }
+		);
+	}
+
+	/**
+	* Something tragic has happened, lets log out with a custom message
+	*/
+	public startOver(msg: string) {
+
+		let data = {
+			message: msg
+		};
+		this.messagesService.logOut(data).subscribe(
+			(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
+			(error) => { this.getMessagesFail(error) },
+			() => { this.getMessagesComplete() }
+		);
+	}
+
+	/**
+	* Start the user over back to stage 1
+	*/
+	public reset(msg: string) {
+
+		let data = {
+			user_id: this.user.id,
+			message: msg
+		};
+		this.messagesService.reset(data).subscribe(
+			(message) => {
+				this.getMessagesSuccess(message); 
+				this.messagesService.logOut({}).subscribe(
+					(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
+					(error) => { this.getMessagesFail(error) },
+					() => { this.getMessagesComplete() }
+				);
+			},
+			(error) => { this.getMessagesFail(error) },
+			() => { this.getMessagesComplete() }
+		);
 	}
 
 	/**
@@ -457,7 +552,7 @@ export class MessagesComponent implements OnInit {
 				id: 0
 			},
 			user: {
-				id: 0,
+				id: this.user.id,
 				stage: 1,
 			}
 		}
@@ -525,6 +620,8 @@ export class MessagesComponent implements OnInit {
 		msg.user.id = data.user_id,
 		msg.user.stage = data.stage;
 		if (this.user.name == null) {
+
+			// The user is requesting authentication but we don't even know their name! How rude.
 			msg.message = "Hold on, I don't even know your name yet. Who are you?";
 			msg.answer.method = "welcome";
 			this.input_type = "text";
@@ -532,6 +629,8 @@ export class MessagesComponent implements OnInit {
 				.then((message) => { this.getMessagesSuccess(message); })
 				.catch((error) => { this.getMessagesFail(error); });
 		} else if (this.validateEmail(data.content)) {
+
+			// The user has just entered their email, now we need a password.
 			this.user.email = data.content;
 			msg.message = "Thanks, and your password please.";
 			this.input_type = "password";
@@ -540,19 +639,32 @@ export class MessagesComponent implements OnInit {
 				.catch((error) => { this.getMessagesFail(error); })
 				.then(() => { this.getMessagesComplete(); });
 		} else if (this.user.email != null) {
-			this.user.password = data.content;
-			this.input_type = "text";
-			let credentials = { 
-				email: this.user.email, 
-				password: this.user.password
-			};
-			this.messagesService.authenticate(credentials).subscribe(
-				(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
-				(error) => { this.getMessagesFail(error); },
-				() => { this.getMessagesComplete(); }
+
+			// They have entered their email and password this is enough information to authenticate
+			this.messagesService.hashPassword(data.content).subscribe(
+				(hash) => { 
+					this.user.password = hash.password; 
+					this.input_type = "text";
+					let credentials = { 
+						email: this.user.email, 
+						password: data.content
+					};
+					this.messagesService.authenticate(credentials).subscribe(
+						(message) => { 
+							this.getMessagesSuccess(message); 
+							this.messagesService.setToken(message[0].title); 
+							this.user.id = message[0].user_id;
+						},
+						(error) => { this.getMessagesFail(error); },
+						() => { this.getMessagesComplete(); }
+					);
+				},
+				(error) => { this.getMessagesFail(error); }
 			);
 		} else {
-			msg.message = "Sorry, please provide your email address...";
+
+			// The user is being stubborn and isn't providing an email address
+			msg.message = 'Sorry, please provide your email address. You can skip this process by typing "guest" and you will continue as a guest.';
 			this.input_type = "text";
 			this.messagesService.createMessage(msg)
 				.then((message) => { this.getMessagesSuccess(message); })
@@ -666,7 +778,11 @@ export class MessagesComponent implements OnInit {
 					params.lat = this.user.lat;
 					params.lng = this.user.lng;
 					this.messagesService.createUserAccount(params).subscribe(
-						(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
+						(message) => { 
+							this.getMessagesSuccess(message); 
+							this.messagesService.setToken(message[0].title); 
+							this.user.id = message[0].user_id;
+						},
 						(error) => { this.getMessagesFail(error) },
 						() => { this.getMessagesComplete() }
 					);
@@ -696,5 +812,15 @@ export class MessagesComponent implements OnInit {
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(success, fail);
 		}
+	}
+
+	/**
+	* Set the local storage property for our service
+	* @param 	DataStorageService	storage
+	*/
+	public setStorage(storage: any) {
+
+		this.messagesService.storage = storage;
+		console.log(storage);
 	}
 }

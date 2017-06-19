@@ -18,8 +18,3 @@ Route::get('/', function () {
 
 // User, login, registration
 Route::get('import/{id}', 'ImportStoryController');
-
-//Route::group(['middleware'=>'cors','prefix'=>'api'], function (){
-//    Route::get('book', 'BookController@index');
-//    Route::post('book', 'BookController@createBook');
-//});

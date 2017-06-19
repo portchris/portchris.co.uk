@@ -1,16 +1,16 @@
 /**
-* 404 component.
+* Contact me page component.
 * @since   1.0.0 <2017-05-15>
 */
-import { Component, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PageNotFound } from "./page-not-found";
+import { Contact } from "./contact";
 
 @Component({
-	selector: 'page-not-found',
-	templateUrl: './page-not-found.html'
+	selector: 'contact',
+	templateUrl: './contact.html'
 })
-export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
+export class ContactComponent implements OnInit, OnChanges {
 
 	router: any;
 	sub: any;
@@ -27,9 +27,10 @@ export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
 
 	ngOnInit() {
 	
+		this.router.snapshot.params['messages'];
 		this.sub = this.router.data.subscribe((v) => {
 			console.log(v);
-		});	
+		});
 	}
 
 	ngOnChanges() {

@@ -1,16 +1,16 @@
 /**
-* 404 component.
+* Header component.
 * @since   1.0.0 <2017-05-15>
 */
-import { Component, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PageNotFound } from "./page-not-found";
+import { Header } from "./header";
 
 @Component({
-	selector: 'page-not-found',
-	templateUrl: './page-not-found.html'
+	selector: 'app-header',
+	templateUrl: './header.html'
 })
-export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
+export class HeaderComponent implements OnInit, OnChanges {
 
 	router: any;
 	sub: any;

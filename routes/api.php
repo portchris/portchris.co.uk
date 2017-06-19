@@ -20,7 +20,7 @@ Route::get('/user', function(Request $request) {
 	return $request->user();
 })->middleware('auth:api');
 
-Route::group(['middleware' => 'cors'], function() {
+Route::group(['middleware' => ['web', 'cors']], function() {
 
 	Route::resource('book','BookController');
 	
@@ -37,10 +37,10 @@ Route::group(['middleware' => 'cors'], function() {
 	Route::post('/user/guest', 'UserController@createGuestToken');
 	Route::post('/user/authenticate', '\App\User@authenticate');
 	Route::post('/user/password', 'UserController@hashPassword');
+	Route::post('/user/logout', 'UserController@logOut');
+	Route::post('/user/reset', 'UserController@reset');
 
 	// Text based adventure
-	// Route::get('message/question', 'MessageStreamController@question'); // Create new GET route
-	// Route::post('message/answer', 'MessageStreamController@answer'); // Create new POST route
 	Route::resource('message','MessageStreamController', [
 		'except' => [
 			'create', 'edit', 'update', 'destroy'

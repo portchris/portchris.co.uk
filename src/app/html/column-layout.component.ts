@@ -2,34 +2,55 @@
 * This component creates the skeleton layout of the page using bootstrap grid system.
 * @since   1.0.0 <2017-05-15>
 */
-import { Component, OnInit } from '@angular/core';
-import * as ColumnLayout from "./column-layout";
-import { PageNotFoundComponent } from "./page-not-found/page-not-found.component";
+import { NgModule } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { ColumnLayout } from "./column-layout";
+import { HeaderComponent } from "./header/header.component";
+
+@NgModule({
+	declarations: [ 
+		HeaderComponent 
+	],
+	bootstrap: [ 
+		ColumnLayout 
+	]
+})
 
 @Component({
-	selector: 'column-layout',
-	templateUrl: './column-layout.html',
-	// styleUrls: ['./column-layout.css']
-	// directives: [
-	// 	PageNotFoundComponent
-	// ]
+	selector: 'app-column-layout',
+	templateUrl: './column-layout.html'
 })
-export class ColumnLayoutComponent implements OnInit {
+export class ColumnLayoutComponent implements OnInit, OnChanges, OnDestroy {
 	
+	sub: any;
+	router: any;
 	columns: any;
 	errMesg: any;
 
 	/**
 	* Must pass in the data object for the columns to work. 
 	* Accepts columns.class, columns.content
-	* @param  JSON   data
+	* @param  ActivatedRoute   route
 	*/
-	constructor(public data) { 
+	constructor(private route: ActivatedRoute) { 
 
-		this.columns = data.columns;
+		this.router = route;
 	}
 
 	ngOnInit() {
-		
+	
+		this.sub = this.router.data.subscribe((v) => {
+			this.columns = v.columns;
+		});	
+	}
+
+	ngOnChanges() {
+
+	}
+
+	ngOnDestroy() {
+
+		this.sub.unsubscribe();
 	}
 }

@@ -152,7 +152,7 @@ class ContentMeta extends Model
 	* @param 	string 	$usersResponse
 	* @param 	int 		$accuracy
 	*/
-	public static function respond($questionId, $usersResponse, $accuracy = 50) {
+	public static function respond($questionId, $usersResponse, $accuracy = 40) {
 
 		$Message = new self();
 		$Message->setAccuracy($accuracy);
@@ -198,12 +198,37 @@ class ContentMeta extends Model
 			} else {
 
 				// Response not accurate enough, explain all possible responses available
-				$this->setAnswer($stagedResponses);
+				$q = self::find($questionId);
+				$msg = __("I'm sorry I didn't quite understand that. I'm looking for the following responses:%s%s");
+				$res = "";
+				foreach ($stagedResponses as $r) {
+					$res .= PHP_EOL . "> " . $r->content;
+				}
+				$this->setAnswer(Message::create([
+					"id" => $q->id,
+					"content" => sprintf($msg, PHP_EOL, $res),
+					"key" => self::KEY_TYPE_ERROR, 
+					"title" => $q->title,
+					"name" => $q->name,
+					"user_id" => $q->user_id,
+					"page_id" => $q->page_id,
+					"id_linked_content_meta" => $q->id_linked_content_meta
+				]));
 			}
 		} else {
 
 			// No responses... let the user know there has been an error.
-			$this->setAnswer("So sorry but I don't understand. Please ask me something else!");
+			$q = self::find($questionId);
+			$this->setAnswer(Message::create([
+				"id" => $q->id,
+				"content" => __("So sorry but I don't understand. Please ask me something else!"),
+				"key" => self::KEY_TYPE_ERROR,
+				"name" => $q->name,
+				"title" => $q->title,
+				"user_id" => $q->user_id,
+				"page_id" => $q->page_id,
+				"id_linked_content_meta" => $q->id_linked_content_meta
+			]));
 		}
 	}
 
@@ -260,8 +285,9 @@ class ContentMeta extends Model
 	* Return the final message before the game ends. 
 	*
 	* @return 	string
+	* @todo 		Add this to db, but at least it's localised
 	*/
-	public function getFinalMessage() {
+	public static function getFinalMessage() {
 
 		$aboutLink = '<a href="/portfolio" title="' . __('Learn more about Chris Rogers') . '">' . __('read more about me here') . '</a>';
 		$contactLink = '<a href="/contact" title="' . __('Contact Chris Rogers') . '">' . __('contact me') . '</a>';
@@ -379,11 +405,16 @@ class ContentMeta extends Model
 		if (!is_null($q)) {
 			$responses = self::getResponsesToQuestion($q->id, $pageId);
 			if (!is_null($responses)) {
+				$q->content .= PHP_EOL;
 				foreach ($responses as $r) {
 					$q->content .= PHP_EOL . "> " . $r->content;
 				}
-				$r = $q;
+			} else {
+
+				// No responses = end of the game
+				$q->content .= PHP_EOL . self::getFinalMessage();
 			}
+			$r = $q;
 		}
 		return $r;
 	}
@@ -454,18 +485,18 @@ class ContentMeta extends Model
 
 class Message extends ContentMeta {
 
-	private $id;
-	private $content;
-	private $id_linked_content_meta;
-	private $key;
-	private $stage;
-	private $title;
-	private $name;
-	private $user_id;
-	private $page_id;
-	private $type;
-	private $method;
-	private $csrf;
+	public $id;
+	public $content;
+	public $id_linked_content_meta;
+	public $key;
+	public $stage;
+	public $title;
+	public $name;
+	public $user_id;
+	public $page_id;
+	public $type;
+	public $method;
+	public $csrf;
 
 	/**
 	* A child object designed to embody the message stream
