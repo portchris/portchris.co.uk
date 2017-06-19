@@ -3,6 +3,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Http, HttpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app.routes';
 import { AppComponent } from './app.component';
 import { DataStorageService } from './app.storage.service';
@@ -35,7 +36,8 @@ import { PortfolioComponent } from "./html/portfolio/portfolio.component";
 		ReactiveFormsModule,
 		FormsModule,
 		HttpModule,
-		AppRoutingModule
+		AppRoutingModule,
+		BrowserAnimationsModule
 	],
 	providers: [
 		MessagesService,
