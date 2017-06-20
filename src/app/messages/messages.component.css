@@ -1,7 +1,8 @@
 #message-stream {
-	width: 100%;
+	width: calc(100% + 5px);
 	height: 85%;
 	overflow-y: auto;
+	transition: 0.2s 500ms ease-in-out;
 }
 #user-input {
 	position: fixed;
@@ -9,7 +10,8 @@
 	height: 15%;
 	bottom: 0;
 }
-blockquote {
+#message-stream blockquote {
+	display: block;
 	border-radius: 5px;
 }
 blockquote p {

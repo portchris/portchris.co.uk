@@ -17,7 +17,7 @@ trigger('slideInOutAnimation', [
 		position: 'absolute',
 		// display: 'inline-block',
 		transform: 'translateX(0)',
-		transition: '0.2s 100ms ease-out',
+		transition: '0.2s 500ms ease-in-out',
 		opacity: '1',
 		width: "100%",
 		height: "100%"
@@ -31,7 +31,7 @@ trigger('slideInOutAnimation', [
 
 			// Start with the content positioned off the right of the screen,
 			transform: 'translateX(150%)',
-			transition: '0.2s 100ms ease-out',
+			transition: '0.2s 500ms ease-in-out',
 
 			// Start with background opacity set to 0 (invisible)
 			opacity: '0'
@@ -42,7 +42,7 @@ trigger('slideInOutAnimation', [
 			
 			// Transition the right position to 0 which slides the content into view
 			transform: 'translateX(0)',
-			transition: '0.2s 100ms ease-out',
+			transition: '0.2s 500ms ease-in-out',
 
 			// Transition the background opacity to 0.8 to fade it in
 			opacity: '1'
@@ -57,7 +57,7 @@ trigger('slideInOutAnimation', [
 			
 			// Transition the right position to -400% which slides the content out of view
 			transform: 'translateX(150%)',
-			transition: '0.2s 100ms ease-out',
+			transition: '0.2s 100ms ease-in-out',
 			
 			// Transition the background opacity to 0 to fade it out
 			opacity: '0'

@@ -6,10 +6,12 @@ body, html {
 	height: 100%;
 	overflow-x: hidden;
 }
-/*blockquote.blockquote {
-	background-color: #fff;
-	border-left-color: #B5DBA3;
-}*/
+.full-height {
+	height: 100%;
+}
+.overflowx-hidden {
+	overflow-x: hidden;
+}
 .hpadding {
 	padding-left: 25px;
 	padding-right: 25px; 

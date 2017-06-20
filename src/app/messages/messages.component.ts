@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MessagesService } from "./messages.service";
 import { Messages } from "./messages";
 import { DataStorageService } from '../app.storage.service';
+import { slideUpAnimation } from '../animations/slideup.animation';
 
 enum TYPE {
 	USER = 0, 
@@ -13,10 +14,16 @@ enum TYPE {
 	selector: 'app-messages',
 	templateUrl: './messages.component.html',
 	styleUrls: ['./messages.component.css'],
-	inputs: ['storage']
+	inputs: ['storage'],
+	animations: [slideUpAnimation]
 })
 
-export class MessagesComponent implements OnInit {
+export class MessagesComponent implements OnInit, AfterViewChecked {
+
+	/**
+	* Refernce to a child element
+	*/
+	@ViewChild('scrollable') private scrollContainer: ElementRef;
 
 	/**
 	* Message stream
@@ -359,6 +366,35 @@ export class MessagesComponent implements OnInit {
 				.catch((error) => { this.getMessagesFail(error); })
 				.then(() => { this.getMessagesComplete(); });
 		}
+	}
+
+
+	public ngAfterViewChecked() {
+		
+		this.scrollToBottom();        
+	} 
+
+	/**
+	* When a new message is loaded, always scroll to the bottom
+	*/
+	public scrollToBottom(): void {
+
+		try {
+			let pos = this.scrollContainer.nativeElement.scrollTop; 
+			let dest = this.scrollContainer.nativeElement.scrollHeight;
+			console.log("POS", pos);
+			console.log("DEST", dest);
+			this.scrollContainer.nativeElement.scrollTop = dest;
+			// if (pos < dest) {
+			// 	var tO = setTimeout(() => {
+			// 		pos++;
+			// 	}, 100);  
+			// } else {
+			// 	clearTimeout(tO);   
+			// }
+		} catch(err) {
+			console.error(err);
+		}                 
 	}
 
 	/**

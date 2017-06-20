@@ -13,7 +13,8 @@ import 'rxjs/add/operator/debounceTime';
 
 @Component({
 	selector: 'contact',
-	templateUrl: './contact.html',
+	templateUrl: './contact.component.html',
+	styleUrls: ['./contact.component.css'],
 	animations: [slideInOutAnimation],
 	host: { '[@slideInOutAnimation]': '' },
 	providers: [ContactService]

@@ -1,8 +1,8 @@
-<div id="message-stream">
+<div #scrollable id="message-stream">
 	<div class="container">
 		<div *ngFor="let msg of messages" class="row {{ msg.key }}">
-			<div class="{{ msg.class_selector }}">
-				<blockquote class="blockquote">
+			<div class="{{ msg.class_selector }} col-md-12">
+				<blockquote @slideUpAnimation class="blockquote">
 					<small>{{ msg.key }}</small>
 					<p>{{ msg.content }}</p>
 				</blockquote>
