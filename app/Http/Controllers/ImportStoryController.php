@@ -21,6 +21,12 @@ class ImportStoryController extends Controller
 	* @var 	int
 	*/
 	private $pageId;
+
+	/**
+	* The page slug, used for label and scene
+	* @var 	int
+	*/
+	private $pageSlug;
 	
 	/**
 	* The author of these messages (me)
@@ -35,6 +41,12 @@ class ImportStoryController extends Controller
 	private $messages;
 
 	/**
+	* Scenes / Chapters in the story
+	* @var 	array 
+	*/
+	private $scenes;
+
+	/**
 	* These are private settings that conform to the choicescript format
 	* @var 	const 	string 	
 	*/
@@ -44,6 +56,9 @@ class ImportStoryController extends Controller
 	private const DELIMITER_OPTION = "#";
 	private const ACTION_CHOICE = "choice";
 	private const ACTION_FINISH =	"finish";
+	private const ACTION_LABEL = "label";
+	private const ACTION_GOTO = "goto";
+	private const ACTION_SCENE_LIST = "scene_list";
 
 	/**
 	* The standardised array format to aid the interpreter
@@ -72,6 +87,7 @@ class ImportStoryController extends Controller
 		$return = $file = "";
 		$slug = ($id == Page::PAGE_HOMEPAGE) ? "/" : $id;
 		$id .= self::FILE_EXT;
+		$this->setPageSlug($slug);
 		$this->setPageId($slug);
 		if (File::exists($this->importPath . $id) && $this->getPageId() !== false) {
 			$return .= $this->output("Found file of ID: %s", $id, true);
@@ -163,12 +179,14 @@ class ImportStoryController extends Controller
 	*/
 	private function convertFileToMessages(string $file) {
 
-		$choices = 0;
-		$return = [];
+		$currentScene = "";
+		$isLabel = $isGoTo = false;
+		$choices = $label = $idLinkedContentMeta = 0;
+		$return = $stagedQuestions = $stagedResponses = [];
 		$explosion = explode(PHP_EOL, $file);
 		$c = count($explosion);
-		$stagedQuestions = [];
-		$stagedResponses = [];
+		$slug = $this->getPageSlug();
+		$scenes = $this->getScenes();
 		for ($i = 0; $i < $c; $i++) {
 			$newline = str_replace(["\r", "\n"], "", $explosion[$i]);
 			$stage = $this->calcStage($newline);
@@ -178,23 +196,52 @@ class ImportStoryController extends Controller
 					$actions = explode(" ", $newline);
 					$action = str_replace([PHP_EOL, "\t", $delimiter], "", $actions[0]);
 					switch ($action) {
-						case self::ACTION_FINISH:
-							// $nextStage = (isset($explosion[$i+1])) ? (substr_count($explosion[$i+1], "\t") + 1) : 0;
-							// $currentStage = substr_count($newline, "\t");
-							// if ($nextStage < $currentStage) { 
-							// 	$choices = $nextStage;
-							// 	// $stagedResponses["S" . $stage] = 0;
-							// }
+						case self::ACTION_SCENE_LIST:
 
-							// Append this as a variable on the end of the last question
-							// for ($x = $i; $x > 0; $x--) {
-							// 	$lastMsg = &$explosion[$x];
-							// 	$delimiter = substr(str_replace(["\t"], "", $lastMsg), 0, 1);
-							// 	if ($delimiter !== self::ACTION_CHOICE && $delimiter !== self::ACTION_FINISH) {
-							// 		$lastMsg["content"] .= " " . substr(str_replace([PHP_EOL, "\t"], "", $newline), 1);	
-							// 		break;
-							// 	}
-							// }
+							// Keep looping scenes until it ends. Set the iteration and continue.
+							for ($x = ($i+1); $x < $c; $x++) {
+								$nextNewline = str_replace(["\r", "\n"], "", $explosion[$x]);
+								$nextStage = $this->calcStage($newline);
+								if ($nextStage > 1) {
+
+									// This is another scene to add to the list
+									$scene = strtolower(str_replace(["\t"], "", $nextNewline));
+									$this->addScene($scene);
+									$scenes = $this->getScenes();
+									if ($slug == $scene || $slug == Page::PAGE_HOMEPAGE) {
+										$currentScene = $scene;
+									}
+								} else {
+
+									// Set the parent loops iterator as we have already checked these 
+									$i = $x;
+									break;
+								}
+							}
+						break;
+						case self::ACTION_FINISH:
+
+							// This scene has finished, set the id_linked_content_meta to the first question of the next scene
+							$xc = count($scenes);
+							for ($x = 0; $x < $xc; $x++) {
+								$scene = $scenes[$x];
+								if ($scene == $currentScene) {
+									$idLinkedContentMeta = $scenes[$x+1] ?? $currentScene;
+									break;
+								}
+							}
+						break;
+						case self::ACTION_LABEL:
+
+							// The following newline is a checkpoint for *goto actions to hop to at any time
+							$label = $actions[1];
+							$isLabel = true;
+						break;
+						case self::ACTION_GOTO:
+
+							// Assign the id_linked_content_meta to the newline with label
+							$goTo = $actions[1];
+							$isAction = true;
 						break;
 						case self::ACTION_CHOICE:
 							$choices = substr_count($newline, "\t");
@@ -235,7 +282,7 @@ class ImportStoryController extends Controller
 						"stage" => $stage,
 						"title" => $title,
 						"name" => $this->output("Available response to question: %d", $lId),
-						"id_linked_content_meta" => $lId
+						"id_linked_content_meta" => ($idLinkedContentMeta === 0) ? $lId : $idLinkedContentMeta
 					]);
 					if (!$m) {
 						throw new Exception("Error saving response to database.");
@@ -257,7 +304,7 @@ class ImportStoryController extends Controller
 						"stage" => $stage,
 						"title" => $title,
 						"name" => $this->output("Next question on from response: %d", $lId),
-						"id_linked_content_meta" => $lId
+						"id_linked_content_meta" => ($idLinkedContentMeta === 0) ? $lId : $idLinkedContentMeta
 					]); 
 					if (!$m) {
 						throw new Exception("Error saving question to database");
@@ -266,9 +313,41 @@ class ImportStoryController extends Controller
 						$return[] = $m;
 					}
 				break;
+			} // End switch
+			$isLabel = $isGoTo = false;
+		} // End for loop
+		return $return;
+	}
+
+	private function createSceneList($line, &$i) {
+
+		// Keep looping scenes until it ends. Set the iteration and continue.
+		for ($x = ($i+1); $x < $c; $x++) {
+			$nextNewline = str_replace(["\r", "\n"], "", $explosion[$x]);
+			$nextStage = $this->calcStage($newline);
+			if ($nextStage > 1) {
+
+				// This is another scene to add to the list
+				$scene = strtolower(str_replace(["\t"], "", $nextNewline));
+				$scenes[] = $scene;
+				if ($slug == $scene || $slug == Page::PAGE_HOMEPAGE) {
+					$currentScene = $scene;
+				}
+			} else {
+
+				// Set the parent loops iterator as we have already checked these 
+				$i = $x;
+				break;
 			}
 		}
-		return $return;
+	}
+
+	private function createResponse() {
+
+	}
+
+	private function createQuestion() {
+
 	}
 
 	/**
@@ -332,6 +411,26 @@ class ImportStoryController extends Controller
 	}
 
 	/**
+	* Set page slug.
+	*
+	* @param 	string 	$slug
+	*/
+	private function setPageSlug($slug) {
+
+		$this->pageSlug = $slug;
+	}
+
+	/**
+	* Get page slug.
+	*
+	* @return 	string 	$slug
+	*/
+	private function getPageSlug() {
+
+		return $this->pageSlug;
+	}
+
+	/**
 	* Quite simply, this is an administrative controller, so the only admin is me
 	*/
 	private function setUserId() {
@@ -358,6 +457,26 @@ class ImportStoryController extends Controller
 	private function getUserId() {
 
 		return $this->userId;
+	}
+
+	/**
+	* Get list of scenes.
+	*
+	* @return 	string 	$scenes
+	*/
+	private function getScenes() {
+
+		return $this->scenes;
+	}
+
+	/**
+	* Add a new scene. MUST be a key value format
+	*
+	* @param 	array 	$scene
+	*/
+	private function addScene($scene) {
+
+		$this->scenes;
 	}
 
 	/**

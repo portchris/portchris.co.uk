@@ -382,8 +382,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		try {
 			let pos = this.scrollContainer.nativeElement.scrollTop; 
 			let dest = this.scrollContainer.nativeElement.scrollHeight;
-			console.log("POS", pos);
-			console.log("DEST", dest);
+			// console.log("POS", pos);
+			// console.log("DEST", dest);
 			this.scrollContainer.nativeElement.scrollTop = dest;
 			// if (pos < dest) {
 			// 	var tO = setTimeout(() => {

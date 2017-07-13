@@ -1,19 +1,34 @@
 #message-stream {
 	width: calc(100% + 5px);
-	height: 85%;
+	height: 90%;
 	overflow-y: auto;
 	transition: 0.2s 500ms ease-in-out;
 }
 #user-input {
 	position: fixed;
 	width: 100%;
-	height: 15%;
+	height: 10%;
 	bottom: 0;
 }
-#message-stream blockquote {
-	display: block;
-	border-radius: 5px;
+.msg {
+	min-width: 70%;
 }
-blockquote p {
+.msg blockquote {
+	border: 0;
+	border-radius: 7px;
+	background-color: #EEE;
+	color: #333;
+}
+.msg.user blockquote {
+	background-color: transparent;
+	border: solid 2px #EEE;
+	color: #FFF;
+	margin-right: 20px;
+}
+.msg.error blockquote {
+	border: solid 5px #c90000;
+}
+.msg blockquote p {
 	white-space: pre-wrap;
+	margin-bottom: 0;
 }

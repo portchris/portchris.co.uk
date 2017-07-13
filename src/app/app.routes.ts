@@ -14,12 +14,13 @@ const Router: Routes = [
 		data: {
 			columns: [
 				{
-					width: "col-md-3",
-					content: ""
+					class: "col-md-3 header"
 				},
 				{
-					width: "col-md-9",
-					content: ""
+					class: "col-md-7 main"
+				},
+				{
+					class: "col-md-2 sidebar"
 				}
 			]
 		},

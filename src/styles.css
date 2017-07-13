@@ -5,6 +5,33 @@ body, html {
 	color: #FFF;
 	height: 100%;
 	overflow-x: hidden;
+	font-family: "Courier New", Courier, monospace;
+	font-size: 0.9rem;
+}
+form .form-control, form .form-control:focus {
+	background-color: transparent;
+	border: solid 2px #FFF;
+	color: #FFF;
+}
+h1, .h1 {
+	font-size: 2rem;
+}
+h2, .h2 {
+	font-size: 1.75rem;
+}
+h3, .h3 {
+	font-size: 1.5rem;
+}
+h4, .h4 {
+	font-size: 1.25rem;
+}
+h5, .h5, h6, .h6, dt {
+	font-size: 1rem;
+	font-weight: bold;
+}
+.dl > dd, .dl > dt {
+	padding-right: 5px;
+	padding-left: 5px;
 }
 .full-height {
 	height: 100%;
@@ -27,4 +54,25 @@ body, html {
 .vspace {
 	margin-top: 25px;
 	margin-bottom: 25px; 
+}
+.vspace-bottom {
+	margin-bottom: 25px; 
+}
+.no-padding {
+	padding: 0;
+}
+.no-scrollbars {
+	width: calc(100% + 5px);
+	height: 100%;
+	overflow-y: auto;
+}
+.gutter-margin {
+	margin-right: 20px;
+}
+.header {
+	border-right: 2px solid #FFF;
+}
+.box {
+	border: 2px solid #FFF;
+	margin-bottom: 10px;
 }

@@ -1,17 +1,16 @@
 /**
-* Header component.
+* Sidebar component.
 * @since   1.0.0 <2017-05-15>
 */
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Header } from "./header";
+import { Sidebar } from "./sidebar";
 
 @Component({
-	selector: 'app-header',
-	templateUrl: './header.html',
-	styleUrls: ['./header.component.css'],
+	selector: 'app-sidebar',
+	templateUrl: './sidebar.html'
 })
-export class HeaderComponent implements OnInit, OnChanges {
+export class SidebarComponent implements OnInit, OnChanges {
 
 	router: any;
 	sub: any;

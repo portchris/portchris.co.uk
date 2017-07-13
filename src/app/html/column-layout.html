@@ -1,17 +1,13 @@
 <div class="container vpadding full-height">
 	<div class="row full-height">
-		<div class="col-md-3">
+		<div class="{{columns[0].class}}">
 			<app-header></app-header>
 		</div>
-		<div class="col-md-9 overflowx-hidden">
+		<div class="{{columns[1].class}} overflowx-hidden">
 			<router-outlet></router-outlet>
 		</div>
-	</div>
-	
-	<!-- Main content passed in via app.routes.ts -->
-	<div class="row">
-		<div *ngFor="let column of columns" class="{{column.width}}">
-			<p>{{ column.content }}</p>
+		<div class="{{columns[2].class}}">
+			<app-sidebar></app-sidebar>
 		</div>
 	</div>
 </div>

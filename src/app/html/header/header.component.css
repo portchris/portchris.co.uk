@@ -1,0 +1,14 @@
+header h1 {
+	font-size: 23px;
+}
+#logo {
+	display: inline-block;
+	width: 95px;
+	height: 60px;
+	overflow: hidden;
+}
+#logo .icon {
+	margin-top: -35px;
+	width: 100%;
+	height: auto;
+}

@@ -1,18 +1,17 @@
+
 <div #scrollable id="message-stream">
-	<div class="container">
-		<div *ngFor="let msg of messages" class="row {{ msg.key }}">
-			<div class="{{ msg.class_selector }} col-md-12">
-				<blockquote @slideUpAnimation class="blockquote">
-					<small>{{ msg.key }}</small>
-					<p>{{ msg.content }}</p>
-				</blockquote>
-			</div>
+	<div *ngFor="let msg of messages" class="row no-gutters">
+		<div [ngClass]="{'flex-last': msg.key == 'user'}" class="msg {{ msg.class_selector }} col {{ msg.key }}">
+			<blockquote @slideUpAnimation class="blockquote">
+				<p>{{ msg.content }}</p>
+			</blockquote>
 		</div>
+		<div class="col">&nbsp;</div>
 	</div>
-</div>
+</div><!-- #message-stream -->
 <div id="user-input">
-	<div class="container">
-		<form [formGroup]="talkForm" (ngSubmit)="doRespond($event, talkForm.controls['content'].valid)" class="form">
+	<div class="row">
+		<form [formGroup]="talkForm" (ngSubmit)="doRespond($event, talkForm.controls['content'].valid)" class="form-inline col-md-12">
 			<div [ngClass]="{'has-error': !talkForm.controls['content'].valid}" class="form-group">
 				<input formControlName="id_linked_content_meta" type="hidden" name="id_linked_content_meta" [value]="question.id" [pattern]="question.pattern" required>
 				<input formControlName="name" type="hidden" name="name" [value]="question.name">
@@ -26,14 +25,18 @@
 				<!-- span *ngIf="question.csrf">
 					{{ question.csrf }}
 				</span> -->
-				<input formControlName="content" [type]="input_type" name="content" class="inline" placeholder="Talk to meh" [value]="user.message">
-				<button type="submit">
+				<input formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Talk to meh" [value]="user.message">
+				<button type="submit" class="btn btn-primary">
 					<small>Talk</small>
 				</button>
-				<div class="alert alert-danger" *ngIf="err">
-					{{ err }}
-				</div>
 			</div>
 		</form>
 	</div>
-</div>
+	<div class="row">
+		<div class="col-md-12">
+			<div class="alert alert-danger" *ngIf="err">
+				{{ err }}
+			</div>
+		</div>
+	</div>
+</div><!-- #user-input -->

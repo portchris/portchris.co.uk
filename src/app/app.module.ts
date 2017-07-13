@@ -12,6 +12,7 @@ import { MessagesService } from "./messages/messages.service";
 import { UserComponent } from "./user/user.component";
 import { ParticlesComponent } from "./particles/particles.component";
 import { HeaderComponent } from "./html/header/header.component";
+import { SidebarComponent } from "./html/sidebar/sidebar.component";
 import { HomeComponent } from "./html/home/home.component";
 import { ColumnLayoutComponent } from "./html/column-layout.component";
 import { ContactComponent } from "./html/contact/contact.component";
@@ -26,6 +27,7 @@ import { PortfolioComponent } from "./html/portfolio/portfolio.component";
 		ParticlesComponent,
 		HomeComponent,
 		HeaderComponent,
+		SidebarComponent,
 		ColumnLayoutComponent,
 		ContactComponent,
 		PageNotFoundComponent,

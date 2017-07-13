@@ -7,10 +7,12 @@ import { Component, OnInit, OnChanges, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ColumnLayout } from "./column-layout";
 import { HeaderComponent } from "./header/header.component";
+import { SidebarComponent } from "./sidebar/sidebar.component";
 
 @NgModule({
 	declarations: [ 
-		HeaderComponent 
+		HeaderComponent,
+		SidebarComponent
 	],
 	bootstrap: [ 
 		ColumnLayout 
