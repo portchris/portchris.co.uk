@@ -18,6 +18,7 @@ import { ColumnLayoutComponent } from "./html/column-layout.component";
 import { ContactComponent } from "./html/contact/contact.component";
 import { PageNotFoundComponent } from "./html/page-not-found/page-not-found.component";
 import { PortfolioComponent } from "./html/portfolio/portfolio.component";
+import { ImportStoryComponent } from "./import/import.story.component";
 
 @NgModule({
 	declarations: [
@@ -31,7 +32,8 @@ import { PortfolioComponent } from "./html/portfolio/portfolio.component";
 		ColumnLayoutComponent,
 		ContactComponent,
 		PageNotFoundComponent,
-		PortfolioComponent
+		PortfolioComponent,
+		ImportStoryComponent
 	],
 	imports: [
 		BrowserModule,

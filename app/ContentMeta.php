@@ -93,7 +93,7 @@ class ContentMeta extends Model
 	* @var 	object
 	*/
 	protected $fillable = [
-		'id_linked_content_meta', 'name', 'title', 'key', 'content', 'stage', 'user_id', 'page_id'
+		'id_linked_content_meta', 'goto', 'name', 'title', 'key', 'content', 'stage', 'user_id', 'page_id'
 	];
 
 	/**
@@ -212,6 +212,7 @@ class ContentMeta extends Model
 					"name" => $q->name,
 					"user_id" => $q->user_id,
 					"page_id" => $q->page_id,
+					"goto" => $q->goto,
 					"id_linked_content_meta" => $q->id_linked_content_meta
 				]));
 			}
@@ -227,6 +228,7 @@ class ContentMeta extends Model
 				"title" => $q->title,
 				"user_id" => $q->user_id,
 				"page_id" => $q->page_id,
+				"goto" => $q->goto,
 				"id_linked_content_meta" => $q->id_linked_content_meta
 			]));
 		}
@@ -404,15 +406,43 @@ class ContentMeta extends Model
 		])->first();
 		if (!is_null($q)) {
 			$responses = self::getResponsesToQuestion($q->id, $pageId);
-			if (!is_null($responses)) {
+			if (!is_null($responses) && !$responses->isEmpty()) {
 				$q->content .= PHP_EOL;
 				foreach ($responses as $r) {
 					$q->content .= PHP_EOL . "> " . $r->content;
 				}
+			} else if (!is_null($q->goto) && $q->goto !== 0) {
+
+				// Redirect to a new question
+				$qContent = $q->content;
+				$qGoTo = $q->goto;
+				if (is_numeric($qGoTo)) { 
+
+					// Hop to a checkpoint within the same scene
+					$q = self::findOrFail($qGoTo);
+				} else {
+
+					// Finish current scene and move on to beginning of next
+ 					$q = self::where([
+						["name", "=", $qGoTo],
+						["stage", "=", 1],
+						["key", "=", self::KEY_TYPE_QUESTION]
+					])->first();
+				}
+				if (!is_null($q)) {
+					$q->content = $qContent . PHP_EOL . PHP_EOL . $q->content;
+					$responses = self::getResponsesToQuestion($q->id, $pageId);
+					if (!is_null($responses) && !$responses->isEmpty()) {
+						$q->content .= PHP_EOL;
+						foreach ($responses as $r) {
+							$q->content .= PHP_EOL . "> " . $r->content;
+						}
+					}
+				}
 			} else {
 
 				// No responses = end of the game
-				$q->content .= PHP_EOL . self::getFinalMessage();
+				$q->content .= PHP_EOL . PHP_EOL . self::getFinalMessage();
 			}
 			$r = $q;
 		}
@@ -488,6 +518,7 @@ class Message extends ContentMeta {
 	public $id;
 	public $content;
 	public $id_linked_content_meta;
+	public $goto;
 	public $key;
 	public $stage;
 	public $title;
@@ -521,6 +552,8 @@ class Message extends ContentMeta {
 	* @param 	string 	$name
 	* @param 	string 	$title
 	* @param 	int 		$stage
+	* @param 	string 	$goto
+	* @param 	string 	$id_linked_content_meta
 	* @param 	string 	$type
 	* @param 	string 	$method
 	* @param 	int 		$user_id
@@ -549,6 +582,7 @@ class Message extends ContentMeta {
 		$Message->setUserId($user_id ?? 0);
 		$Message->setPageId($page_id ?? 0);
 		$Message->setLinkedMessage($id_linked_content_meta ?? 0);
+		$Message->setGoTo($goto ?? 0);
 		$Message->setType($t);
 		$Message->setMethod($method);
 		return $Message;
@@ -565,6 +599,7 @@ class Message extends ContentMeta {
 			'id' => $this->getId(),
 			'content' => $this->getContent(),
 			'id_linked_content_meta' => $this->getLinkedMessage(),
+			'goto' => $this->getGoTo(),
 			'key' => $this->getKey(),
 			'stage' => $this->getStage(),
 			'title' => $this->getTitle(),
@@ -794,7 +829,27 @@ class Message extends ContentMeta {
 	*/
 	public function setLinkedMessage($id_linked_content_meta) {
 
-		$this->id_linked_content_meta = (int)$id_linked_content_meta;
+		$this->id_linked_content_meta = $id_linked_content_meta;
+	}
+
+	/**
+	* Return the goto for this message
+	*
+	* @return 	int 	id_linked_content_meta
+	*/
+	public function getGoTo() {
+
+		return $this->goto;
+	}
+
+	/**
+	* Set the goto for this message
+	* 
+	* @param 	int 	$id_linked_content_meta
+	*/
+	public function setGoTo($goto) {
+
+		$this->goto = $goto;
 	}
 
 	/**

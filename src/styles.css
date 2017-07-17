@@ -76,3 +76,30 @@ h5, .h5, h6, .h6, dt {
 	border: 2px solid #FFF;
 	margin-bottom: 10px;
 }
+.typing {
+  white-space: nowrap;
+  overflow: hidden;
+  width: 30em;
+  animation: type 4s steps(60, end); 
+}
+.typing:nth-child(2) {
+  animation: type 2 8s steps(60, end);
+}
+.blinking {
+  animation: blink 1s infinite;
+}
+@keyframes type { 
+  from { width: 0; } 
+} 
+@keyframes type2 {
+  0% { width: 0; }
+  50% { width: 0; }
+  100% { width: 100; } 
+} 
+@keyframes blink {
+  to { opacity: .0; }
+}
+::selection {
+  background: black;
+  color: #FFF;
+}

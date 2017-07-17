@@ -79,7 +79,7 @@ class UserController extends Controller
 			$token = JWTAuth::fromUser($user);
 			$q = Messages::getNextQuestion(0);
 			if (!$q) {
-				throw new \Illuminate\Database\QueryException("Error: could not find next question.");
+				throw new \Exception("Error: could not find next question.");
 			} 
 			$id = $q->id;
 			$msg = [
@@ -351,7 +351,7 @@ class UserController extends Controller
 			} else {
 				$q = Messages::getNextQuestion(0);
 				if (!$q) {
-					throw new \Illuminate\Database\QueryException("Error: could not find next question.");
+					throw new \Exception("Error: could not find next question.");
 				}
 				$id = $q->id;
 				$msg = sprintf(__("Welcome %s to the game. Let's begin. %s"), $claims["username"], $q->content);

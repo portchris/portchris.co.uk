@@ -1,0 +1,6 @@
+*scene_list
+	startup
+	manager
+	ending
+
+Thank you for playing, why not ${contactLink} here and let me know what you think! 

@@ -8,50 +8,29 @@
 import { Injectable } from '@angular/core';
 import { Http, Response, Headers } from "@angular/http";
 import { Observable } from "rxjs";
-import { AppModule as App } from "../../app.module";
-import { Contact } from "./contact";
-import { DataStorageService } from '../../app.storage.service';
+import { AppModule as App } from "../app.module";
+import { ImportStory } from "./import.story";
+import { DataStorageService } from '../app.storage.service';
 
 @Injectable()
-export class ContactService {
+export class ImportStoryService {
 
 	uri: string;
-	key:string;
 
 	constructor(private _http: Http, private storage: DataStorageService) { 
 		
-		this.uri = new App().url + "api/enquiry";
+		this.uri = new App().url + "import";
 	}
 
 	/**
-	* Send enquiry to Wufoo. Requires Wufoo ready data
-	* @param 	object 	data
+	* Import story
+	* @param 	string 	id		scene ID
 	*/
-	public sendEnquiry(data):Observable<Contact[]>{
+	public import(id):Observable<ImportStory[]>{
 
-		let d = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		return this._http.post(this.uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
-	}
-
-	/**
-	* Get contact form information from local storage service
-	* @return 	any 	contactData
-	*/
-	public getContactFormData() {
-
-		let contactData = JSON.parse(this.storage.getItem('contactData'));
-		return contactData;
-	}
-
-	/**
-	* Set contact form information in local storage service
-	* @param 	any 	data
-	*/
-	public setContactFormData(data: any) {
-
-		this.storage.setItem('contactData', JSON.stringify(data));
+		return this._http.get(this.uri + "/" + id, { headers: h }).map(res => res.json()).catch(this.handleError);
 	}
 
 	private handleError (error: Response | any) {

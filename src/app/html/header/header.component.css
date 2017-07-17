@@ -12,3 +12,13 @@ header h1 {
 	width: 100%;
 	height: auto;
 }
+.navbar a {
+	transition: 0.2s 500ms ease-in-out;
+	border: 2px solid transparentpi;
+}
+.navbar a.active, .navbar a:hover {
+	border: 2px solid #FFF;
+}
+.navbar a, .navbar a:active, .navbar a:focus, .navbar a.active {
+	color: #FFF;
+}

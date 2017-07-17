@@ -6,6 +6,7 @@ import { ContactComponent } from "./html/contact/contact.component";
 import { PageNotFoundComponent } from "./html/page-not-found/page-not-found.component";
 import { PortfolioComponent } from "./html/portfolio/portfolio.component";
 import { ColumnLayoutComponent } from "./html/column-layout.component";
+import { ImportStoryComponent } from "./import/import.story.component";
 
 const Router: Routes = [
 	{
@@ -36,6 +37,10 @@ const Router: Routes = [
 			{
 				path: "contact",
 				component: ContactComponent
+			},
+			{
+				path: "import/:id",
+				component: ImportStoryComponent
 			},
 			{ 
 				path: '**', 

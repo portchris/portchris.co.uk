@@ -165,6 +165,7 @@ class MessageStreamController extends Controller
 					'response' => $response->getResponse(),
 					'stage' => $a->stage,
 					'name' => $a->name,
+					'goto' => $a->goto,
 					'id_linked_content_meta' => $a->id_linked_content_meta,
 					'title' => $a->title,
 					'key' => Messages::KEY_TYPE_QUESTION,

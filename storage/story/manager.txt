@@ -1,0 +1,22 @@
+*scene_list
+	startup
+	manager
+	ending
+
+You walk upstairs toward the managers office. It smells sweet and reminds you of good times. You are waiting at the entrance to his office what do you do?
+	#Knock
+		*label manager
+		The manager opens the door, and has been expecting you.
+		*choice
+			#I want pitch a social network idea
+				Yeah that can be done, what budget do you have?
+				*finish
+			#I want pitch a media sharing service idea
+				Yeah that can be done, what budget do you have?
+				*finish
+			#I want pitch an app idea that will make millions!
+				Haha yeah that can be done, what budget do you have?
+				*finish
+	#Read the sign on the door
+		It reads: "Anyone who calls themselves a guru of their practice needs to be eliminated"
+		*goto manager
