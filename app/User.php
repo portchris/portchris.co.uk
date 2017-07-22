@@ -124,7 +124,11 @@ class User extends Authenticatable
 				$code = 200;
 				$nextQ = ($stage == 1) ? Messages::getNextQuestion() : Messages::find($stage);
 				if (!$nextQ) {
-					throw new \Exception(__("Error: could not get next question."), 500);
+
+					// The importer may have overrided IDs, update the users stage back to 1
+					$user->stage = 1;
+					$user->save();
+					throw new \Exception(__("An error occurred trying to retrieve your progress. You'll have to restart the game to continue. Please sign-in again. Apologies for the inconvenience caused."), 500);
 				}
 				$id = $nextQ->id;
 				if ($stage != 1) {
@@ -138,7 +142,7 @@ class User extends Authenticatable
 						$nextQ->content .= PHP_EOL . Messages::getFinalMessage();
 					}
 				}
-				$msg = $User->messageUserAuthorised($user->name, $nextQ->stage, $nextQ->content);
+				$msg = $User->messageUserAuthorised($user, $nextQ);
 			}
 		} catch (JWTException $e) {
 			
@@ -172,11 +176,14 @@ class User extends Authenticatable
 	/**
 	* Message to display when user has been succesfully verified
 	*
+	* @param 	User 			$user
+	* @param 	ContentMeta 	$question
 	* @return 	string
 	*/
-	public function messageUserAuthorised($name, $stage, $content) {
+	public function messageUserAuthorised($user, $question) {
 
-		return sprintf(__("Welcome back %s. Let's pick up where you left off at level %s.%s%s"), $name, $stage, PHP_EOL, $content);
+		$content = Messages::convertChoiceScriptVariables($question->content, $user);
+		return sprintf(__("Welcome back %s. Let's pick up where you left off at stage %s of scene \"%s\":%s%s"), $user->name, $question->stage, $question->name, PHP_EOL . PHP_EOL, $content);
 	}
 
 	/**

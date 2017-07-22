@@ -13,7 +13,6 @@ export class DataStorageService {
 	constructor() {
 
 		this.allStorage();
-		console.log(this.storage);
 	}
 
 	/**
@@ -50,7 +49,7 @@ export class DataStorageService {
 	*/
 	private allStorage() {
 
-		this.storage = [];
+		this.storage = (this.storage == null) ? [] : this.storage;
 		for (var i = 0; i < localStorage.length; i++) {
 			this.storage[localStorage.key(i)] = localStorage.getItem(localStorage.key(i));
 		}

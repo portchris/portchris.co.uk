@@ -163,6 +163,11 @@ export class MessagesService {
 		});
 	}
 
+	/**
+	* Use Laravel's hashing formula to hash a password so we limit plain text information passing.
+	* @param 	string 	password 	un-hashed password
+	* @return 	string 	req 	hashed password JSON 
+	*/
 	public hashPassword(password) {
 
 		let uri = new App().url + 'api/user/password';
@@ -170,6 +175,20 @@ export class MessagesService {
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
 		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Get the portchris user (me)
+	* @return 	the admin user information
+	*/
+	public getAdminUser() {
+
+		let uri = new App().url + 'api/user/admin';
+		console.log(uri);
+		let h = new Headers();
+		h.append('Content-Type', 'application/json');
+		let req = this._http.get(uri, { headers: h }).map(res => res.json()).catch(this.handleError);
 		return req;
 	}
 
@@ -210,6 +229,7 @@ export class MessagesService {
 	public getStoredUserInfo() {
 
 		let currentUser = JSON.parse(this.storage.getItem('currentUser'));
+		currentUser = (typeof currentUser === "string") ? JSON.parse(currentUser) : currentUser;
 		if (currentUser != null && currentUser.token != null) {
 			this.setToken(currentUser.token);
 		}

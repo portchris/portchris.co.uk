@@ -31,24 +31,26 @@ class MessageStreamController extends Controller
 		// $this->middleware('web');
 		$this->request = app('request');
 		$this->is_guest = false;
-		try { 
-			JWTAuth::parseToken();
-			$this->token = JWTAuth::getToken()->get();
-			$this->user = JWTAuth::authenticate($this->token);
-			if (!$this->user && $this->isVerifiedGuest() && $this->request->input('user')) {
-				$this->setUser((array)$this->request->input('user'));
-			}
-		} catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
-			if (!$this->isVerifiedGuest()) {
-				throw new \Tymon\JWTAuth\Exceptions\TokenExpiredException($e->getMessage(), $e->getStatusCode());
-			}
-		} catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
-			if (!$this->isVerifiedGuest()) {
-				throw new \Tymon\JWTAuth\Exceptions\JWTException($e->getMessage(), $e->getStatusCode());
-			}
-		} catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
-			if (!$this->isVerifiedGuest()) {
-				throw new \Tymon\JWTAuth\Exceptions\TokenInvalidException($e->getMessage(), $e->getStatusCode());
+		if (!\App::runningInConsole()) {
+			try { 
+				JWTAuth::parseToken();
+				$this->token = JWTAuth::getToken()->get();
+				$this->user = JWTAuth::authenticate($this->token);
+				if (!$this->user && $this->isVerifiedGuest() && $this->request->input('user')) {
+					$this->setUser((array)$this->request->input('user'));
+				}
+			} catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+				if (!$this->isVerifiedGuest()) {
+					throw new \Tymon\JWTAuth\Exceptions\TokenExpiredException($e->getMessage(), $e->getStatusCode());
+				}
+			} catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+				if (!$this->isVerifiedGuest()) {
+					throw new \Tymon\JWTAuth\Exceptions\JWTException($e->getMessage(), $e->getStatusCode());
+				}
+			} catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+				if (!$this->isVerifiedGuest()) {
+					throw new \Tymon\JWTAuth\Exceptions\TokenInvalidException($e->getMessage(), $e->getStatusCode());
+				}
 			}
 		}
 	}
@@ -151,7 +153,7 @@ class MessageStreamController extends Controller
 			} else {
 
 				// Convert ChoiceScript variables 
-				$content = $this->convertChoiceScriptTemplate($a->content);
+				$content = Messages::convertChoiceScriptVariables($a->content, $this->user);
 				
 				// Update the users progress
 				User::where("id", $user["id"])->update(["stage" => $a->id]);
@@ -276,22 +278,24 @@ class MessageStreamController extends Controller
 	* @param 	string 	$str
 	* @return 	string 	$str
 	*/
-	public function convertChoiceScriptTemplate(string $str) {
+	// public function convertChoiceScriptVariables(string $str) {
 		
-		$re = '/\${(.*?)\}/';
-		$res = [
-			"name" => (isset($this->user->name)) ? $this->user->name : __("Guest"),
-			"firstname" => (isset($this->user->firstname)) ? $this->user->firstname : __("Guest"),
-			"lastname" => (isset($this->user->lastname)) ? $this->user->lastname : __("Guest"),
-			"finish" => Messages::getFinalMessage()
-		];
-		do {
-			preg_match($re, $str, $m);
-			if ($m) {
-				$info = (isset($res[$m[1]])) ? $res[$m[1]] : "";
-				$str = str_replace($m[0], $info, $str);
-			}
-		} while ($m);
-		return $str;
-	}
+	// 	$re = '/\${(.*?)\}/';
+	// 	$res = [
+	// 		"name" => (isset($this->user->name)) ? $this->user->name : __("Guest"),
+	// 		"firstname" => (isset($this->user->firstname)) ? $this->user->firstname : __("Guest"),
+	// 		"lastname" => (isset($this->user->lastname)) ? $this->user->lastname : __("Guest"),
+	// 		"finish" => Messages::getFinalMessage(),
+	// 		"contactLink" => Messages::getContactLink(),
+	// 		"aboutLink" => Messages::getAboutLink()
+	// 	];
+	// 	do {
+	// 		preg_match($re, $str, $m);
+	// 		if ($m) {
+	// 			$info = (isset($res[$m[1]])) ? $res[$m[1]] : "";
+	// 			$str = str_replace($m[0], $info, $str);
+	// 		}
+	// 	} while ($m);
+	// 	return $str;
+	// }
 }

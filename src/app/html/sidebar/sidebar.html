@@ -1,11 +1,25 @@
 <div id="sidebar" class="d-flex flex-column">
-	<div id="cv" class="box p-2">
+	<div #cvPanel id="cv" class="box p-2 clickable">
 		Download CV
 	</div>
-	<div id="key" class="box p-2">
-		Key:
+	<div #helpPanel id="key" class="box p-2 clickable">
+		<div class="ticker-wrap">
+			<div class="ticker">
+				<div class="ticker__item">Helper commands:</div>
+			</div>
+		</div>
+		<ul class="content">
+			<li *ngFor="let key of help">&quot;{{ key }}&quot;</li>
+		</ul>
+		<div class="shadow-bottom"></div>
+		<a href="#" class="dropdown-indicator" (click)="changeShowStatus($event)">^</a>
 	</div>
-	<div id="situation" class="box p-2">
-		My current situation
+	<div #weatherPanel id="situation" class="box p-2 clickable">
+		<div class="ticker-wrap">
+			<div class="ticker">
+				<div class="ticker__item">My current situation</div>
+			</div>
+		</div>
+		<a href="#" class="dropdown-indicator" (click)="changeShowStatus($event)">^</a>
 	</div>
 </div>

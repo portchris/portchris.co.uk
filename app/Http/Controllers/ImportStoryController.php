@@ -360,7 +360,6 @@ class ImportStoryController extends Controller
 
 		$nextScene = $this->goToNextScene();
 		$goto = ($this->getCurrentScene() === $nextScene) ? 0 : $nextScene;
-		$this->setCurrentScene($nextScene);
 		$msg = Messages::findOrFail($lastMsg["id"]);
 		if (!is_null($msg)) {
 			$msg->goto = $goto;

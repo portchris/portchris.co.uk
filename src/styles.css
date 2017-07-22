@@ -29,6 +29,23 @@ h5, .h5, h6, .h6, dt {
 	font-size: 1rem;
 	font-weight: bold;
 }
+a, a:focus, a:hover {
+	color: #FFF;
+	transition: 0.2s 500ms ease-in-out;
+}
+a:focus, a:hover {
+	text-decoration: underline;
+}
+ul {
+	list-style-type: '>';
+	padding-left: 7px;
+}
+ul li {
+	padding-left: 7px;
+}
+.hidden {
+	display: none;
+}
 .dl > dd, .dl > dt {
 	padding-right: 5px;
 	padding-left: 5px;
@@ -76,30 +93,107 @@ h5, .h5, h6, .h6, dt {
 	border: 2px solid #FFF;
 	margin-bottom: 10px;
 }
-.typing {
-  white-space: nowrap;
-  overflow: hidden;
-  width: 30em;
-  animation: type 4s steps(60, end); 
+.border {
+	border: 2px solid #FFF;
 }
-.typing:nth-child(2) {
-  animation: type 2 8s steps(60, end);
+.notification {
+	position: fixed;
+	top: 0;
+	z-index: 99;
+}
+.clickable:hover {
+	cursor: pointer;
+}
+.typing > * {
+	white-space: nowrap;
+	overflow: hidden;
+	width: 100%;
+	animation: type 4s steps(60, end); 
+	overflow-y: hidden;
+}
+.typing > *:nth-child(2) {
+	animation: type2 8s steps(60, end);
 }
 .blinking {
-  animation: blink 1s infinite;
+	font-size: 24px;
+	font-weight: bold;
+	animation: blink 1s infinite;
 }
-@keyframes type { 
-  from { width: 0; } 
-} 
-@keyframes type2 {
-  0% { width: 0; }
-  50% { width: 0; }
-  100% { width: 100; } 
-} 
-@keyframes blink {
-  to { opacity: .0; }
+.fade-in { 
+	animation: fadeIn 4s infinite linear; 
+	animation-fill-mode:both; 
+}
+.fade-in:nth-child(1) { 
+	animation-delay: .5s; 
+}
+.fade-in:nth-child(2) { 
+	animation-delay: 1s; 
+}
+.fade-in:nth-child(3) { 
+	animation-delay: 1.5s; 
+}
+.shadow-bottom {
+	position: relative;
+	bottom: 0;
+	z-index: 2;
+	box-shadow: 0px -15px 15px -15px #000 inset;
+	height: 20px;
+	margin-top: -20px; 
+}
+#portfolio-shadow {
+	opacity: 0.5;
+}
+.ticker-wrap {
+	position: relative;
+	width: 100%;
+	overflow: hidden;
+	height: 1.2rem;  
+	background-color: rgba(#000, 0.9); 
+	padding-left: 100%;  /* Offset items to begin */
+
+}
+.ticker {
+	position: absolute;
+	top: 0;
+	display: inline-block;
+	white-space: nowrap; /* Display items in a line */
+	padding-right: 100%; /* Ensure items go before animations repeat (taken from parent due to inline-block) */
+	animation-iteration-count: infinite;
+	animation-timing-function: linear;
+	animation-name: ticker;
+	animation-duration: 7.5s;
+}
+.ticker__item {
+	display: inline-block;
+	padding: 0 2rem;
 }
 ::selection {
-  background: black;
-  color: #FFF;
+	background: black;
+	color: #FFF;
+}
+@keyframes ticker {
+	0% {
+		transform: translate3d(0, 0, 0);
+		visibility: visible;
+	}
+	100% {
+		transform: translate3d(-100%, 0, 0);
+	}
+}
+@keyframes type { 
+	from { width: 100% }
+	to { width: 0 }
+} 
+@keyframes type2 {
+	0% { width: 0; }
+	50% { width: 0; }
+	100% { width: 100; } 
+} 
+@keyframes blink {
+	to { opacity: .0; }
+}
+@keyframes fadeIn { 
+	0% { opacity: 0; transform:scale(.1); }
+	21.25% { opacity: 1; transform:scale(1.05); }
+	25% { transform:scale(1); }
 }

@@ -4,6 +4,7 @@ import { MessagesService } from "./messages.service";
 import { Messages } from "./messages";
 import { DataStorageService } from '../app.storage.service';
 import { slideUpAnimation } from '../animations/slideup.animation';
+import { slideInOutAnimation } from '../animations/slideinout.animation';
 
 enum TYPE {
 	USER = 0, 
@@ -16,6 +17,7 @@ enum TYPE {
 	styleUrls: ['./messages.component.css'],
 	inputs: ['storage'],
 	animations: [slideUpAnimation]
+	// host: { '(window:keydown)': 'handleKeyboardEvent($event)' },
 })
 
 export class MessagesComponent implements OnInit, AfterViewChecked {
@@ -24,6 +26,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* Refernce to a child element
 	*/
 	@ViewChild('scrollable') private scrollContainer: ElementRef;
+	@ViewChild('searchFauxInput') private searchFauxInput: ElementRef;
+	@ViewChild('searchBox') private searchBox: ElementRef;
+	@ViewChild('shadow') private shadowBox: ElementRef;
 
 	/**
 	* Message stream
@@ -64,6 +69,12 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	messageAction: string;
 	input_type: string;
 	class_selector: string;
+	keyboardActions: any;
+
+	/**
+	* Display the typing bubble when computer is writing a response
+	*/
+	typing: boolean;
 
 	/**
 	* These constants are used to limit the message types allowed
@@ -189,6 +200,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		};
 		this.input_type = "text";
 		this.class_selector = "col-xs-9 offset-xs-3";
+		this.typing = false;
+		this.talkForm.enable();
+		this.keyboardActions = [];
 	}
 
 	/**
@@ -201,6 +215,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		if (valid) {
 			let data = this.talkForm.value;
 			data.user = (this.user != null) ? this.user : {};
+			this.talkForm.disable();
 			this.decipherMessageType(data);
 			this.decipherMessageAction(data);
 			this.createUserMessage(data);
@@ -276,6 +291,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public ngOnInit() {
 
+		this.typing = true;
+		this.talkForm.disable();
 		let storage = this.messagesService.getStoredUserInfo();
 		if (storage != null && storage.user != null && storage.user.id != null && storage.user.id !== 0 && storage.token.length) {
 			this.user = storage.user;
@@ -298,6 +315,11 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 					.catch((error) => { this.getMessagesFail(error); })
 					.then(() => { this.getMessagesComplete(); });
 		}
+
+		// Add focus to input to guide users eyes
+		// this.searchBox.nativeElement.classList.add("js");
+		// this.searchFauxInput.nativeElement.classList.add("js");
+		this.searchBox.nativeElement.focus();
 	}
 
 	/**
@@ -307,6 +329,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 		let msg = this.createMessageTemplate();
 		let data = this.talkForm.value;
+		this.talkForm.disable();
 		this.user.name = data.content;
 		this.user.firstname = data.content;
 		this.user.lastname = data.content;
@@ -338,6 +361,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 		let msg = this.createMessageTemplate();
 		let answer = this.talkForm.value.content.toLowerCase();
+		this.talkForm.disable();
 		if (answer.indexOf("no") !== -1) {
 			this.continueAsGuest();
 		} else if (answer.indexOf("yes") !== -1) {
@@ -382,8 +406,6 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		try {
 			let pos = this.scrollContainer.nativeElement.scrollTop; 
 			let dest = this.scrollContainer.nativeElement.scrollHeight;
-			// console.log("POS", pos);
-			// console.log("DEST", dest);
 			this.scrollContainer.nativeElement.scrollTop = dest;
 			// if (pos < dest) {
 			// 	var tO = setTimeout(() => {
@@ -412,35 +434,47 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	/**
 	* Observable / promise success method
 	* @param 	string 	message
+	* @param 	boolean	delay
 	*/
-	private getMessagesSuccess(message) {
+	private getMessagesSuccess(message, delay = true) {
 		
 		let m = message[message.length - 1];
 		if (m) {
-			// m.content = this.convertChoiceScriptTemplate(m.content);
-			this.messages = this.messages.concat(m);
-			this.user.id = m.user_id;
-			this.user.stage = m.stage;
-			this.page.id = m.page_id;
-			this.question.id = m.id;
-			this.question.name = m.name;
-			this.question.title = m.title;
-			this.question.type = m.type;
-			this.question.method = m.method;
-			this.question.key = m.key;
-			this.question.csrf = m.csrf;
-			this.class_selector = (m.key === "user") ? "col-xs-9 offset-xs-3" : "offset-xs-3 col-xs-9";
-			this.err = "";
-			this.talkForm.controls['id_linked_content_meta'].setValue(this.question.id);
-			this.talkForm.controls['name'].setValue(this.question.name);
-			this.talkForm.controls['title'].setValue(this.question.title);
-			this.talkForm.controls['key'].setValue(this.question.key);
-			this.talkForm.controls['stage'].setValue(this.user.stage);
-			this.talkForm.controls['user_id'].setValue(this.user.id);
-			this.talkForm.controls['page_id'].setValue(this.page.id);
-			this.talkForm.controls['type'].setValue(this.question.type);
-			this.talkForm.controls['method'].setValue(this.question.method);
-			this.talkForm.controls['csrf'].setValue(this.question.csrf);
+			this.typing = (m.key === "user") ? false : true;
+			this.talkForm.disable();
+			const fnc = () => {
+				// m.content = this.convertChoiceScriptTemplate(m.content);
+				this.messages = this.messages.concat(m);
+				this.user.id = m.user_id;
+				this.user.stage = m.stage;
+				this.page.id = m.page_id;
+				this.question.id = m.id;
+				this.question.name = m.name;
+				this.question.title = m.title;
+				this.question.type = m.type;
+				this.question.method = m.method;
+				this.question.key = m.key;
+				this.question.csrf = m.csrf;
+				this.class_selector = (m.key === "user") ? "col-xs-9 offset-xs-3" : "offset-xs-3 col-xs-9";
+				this.err = "";
+				this.talkForm.controls['id_linked_content_meta'].setValue(this.question.id);
+				this.talkForm.controls['name'].setValue(this.question.name);
+				this.talkForm.controls['title'].setValue(this.question.title);
+				this.talkForm.controls['key'].setValue(this.question.key);
+				this.talkForm.controls['stage'].setValue(this.user.stage);
+				this.talkForm.controls['user_id'].setValue(this.user.id);
+				this.talkForm.controls['page_id'].setValue(this.page.id);
+				this.talkForm.controls['type'].setValue(this.question.type);
+				this.talkForm.controls['method'].setValue(this.question.method);
+				this.talkForm.controls['csrf'].setValue(this.question.csrf);
+				this.typing = false;
+				this.talkForm.enable();
+			};
+			if (m.key === "user" || !delay) {
+				fnc();
+			} else {
+				setTimeout(fnc, 2000);
+			}
 		}
 	}
 
@@ -450,6 +484,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private getMessagesFail(error: any) {
 		
+		this.talkForm.enable();
 		let errMsg = error;
 		console.error(error);
 		if (errMsg instanceof Error) {
@@ -467,11 +502,28 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	private getMessagesComplete() {
 
 		this.user.message = "";
-		if (this.user != null && this.messagesService.getToken() != null) {
+		if (this.user != null && this.user.id !== 0 && this.messagesService.getToken().length > 0) {
+			console.log("user", this.user);
+			console.log("token", this.messagesService.getToken().length);
 			this.messagesService.storeUserInfo({
 				user: this.user,
 				token: this.messagesService.getToken()
 			});
+		}
+		this.checkMessagesOverflowed();
+	}
+
+
+	/**
+	* If the message stream overflows the content height then apply a shadow to indicate to the user 
+	* this area is scrollable
+	*/
+	private checkMessagesOverflowed() {
+
+		if (this.scrollContainer.nativeElement.scrollHeight > this.scrollContainer.nativeElement.clientHeight) {
+			this.shadowBox.nativeElement.classList.remove("hidden");
+		} else {
+			this.shadowBox.nativeElement.classList.add("hidden");
 		}
 	}
 
@@ -580,6 +632,31 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 					.then((message) => { this.getMessagesSuccess(message); })
 					.catch((error) => { this.getMessagesFail(error); })
 					.then(() => { this.getMessagesComplete(); });
+		}
+	}
+
+	private copyInput(event) {
+		
+		this.searchFauxInput.nativeElement.textContent = this.talkForm.value.content;
+		this.searchBox.nativeElement.setAttribute("value", this.talkForm.value.content);
+	}
+
+	private focusInput(event) {
+
+		this.searchBox.nativeElement.focus();
+	}
+	
+	/**
+	* Method called whenever user emits keydown event.
+	* @param 	KeyboardEvent	event
+	*/
+	// @HostListener('document:keypress', ['$event'])
+	private handleKeyboardEvent(event: KeyboardEvent) {
+
+		let key = event.key;
+		this.keyboardActions.push(key);
+		if (this.keyboardActions.length > 5) {
+			this.keyboardActions.pop();
 		}
 	}
 
@@ -791,14 +868,14 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		msg.page.id = data.page_id;
 		msg.user.id = data.user_id;
 		msg.user.stage = 1;
+		this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message, false); this.typing = true; })
+				.catch((error) => { this.getMessagesFail(error); });
 		this.messagesService.createGuestAccount(params).subscribe(
 			(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
 			(error) => { this.getMessagesFail(error) },
 			() => { this.getMessagesComplete() }
 		);
-		this.messagesService.createMessage(msg)
-				.then((message) => { this.getMessagesSuccess(message); })
-				.catch((error) => { this.getMessagesFail(error); });
 	}
 
 	/**

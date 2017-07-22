@@ -291,9 +291,60 @@ class ContentMeta extends Model
 	*/
 	public static function getFinalMessage() {
 
-		$aboutLink = '<a href="/portfolio" title="' . __('Learn more about Chris Rogers') . '">' . __('read more about me here') . '</a>';
-		$contactLink = '<a href="/contact" title="' . __('Contact Chris Rogers') . '">' . __('contact me') . '</a>';
+		$aboutLink = self::getAboutLink();
+		$contactLink = self::getContactLink();
 		return sprintf(__("I hope you've enjoyed playing the game and experiencing a small taster of agency life. Feel free to %s. Or if you'd rather cut to the point and %s, then please go right ahead! I would appreciate some feedback."), $aboutLink, $contactLink);
+	}
+
+	/**
+	* About me link. 
+	*
+	* @return 	string
+	* @todo 		Add this to db, but at least it's localised
+	*/
+	public static function getAboutLink() {
+
+		return '<a href="/portfolio" target="_blank" title="' . __('Learn more about Chris Rogers') . '">' . __('read more about me here') . '</a>';
+	}
+
+	/**
+	* Contact me link. 
+	*
+	* @return 	string
+	* @todo 		Add this to db, but at least it's localised
+	*/
+	public static function getContactLink() {
+
+		return '<a href="/contact" target="_blank" title="' . __('Contact Chris Rogers') . '">' . __('contact me') . '</a>';
+	}
+
+	/**
+	* To import my story I have chosen the popular ChoiceScript templating format which
+	* uses ${} for their variables. This will convert that to useful user info.   
+	*
+	* @param 	string 	$str
+	* @param 	User 		$user
+	* @return 	string 	$str
+	*/
+	public static function convertChoiceScriptVariables(string $str, $user) {
+		
+		$re = '/\${(.*?)\}/';
+		$res = [
+			"name" => (isset($user->name)) ? $user->name : __("Guest"),
+			"firstname" => (isset($user->firstname)) ? $user->firstname : __("Guest"),
+			"lastname" => (isset($user->lastname)) ? $user->lastname : __("Guest"),
+			"finish" => self::getFinalMessage(),
+			"contactLink" => self::getContactLink(),
+			"aboutLink" => self::getAboutLink()
+		];
+		do {
+			preg_match($re, $str, $m);
+			if ($m) {
+				$info = (isset($res[$m[1]])) ? $res[$m[1]] : "";
+				$str = str_replace($m[0], $info, $str);
+			}
+		} while ($m);
+		return $str;
 	}
 
 	/**
@@ -829,7 +880,7 @@ class Message extends ContentMeta {
 	*/
 	public function setLinkedMessage($id_linked_content_meta) {
 
-		$this->id_linked_content_meta = $id_linked_content_meta;
+		$this->id_linked_content_meta = (int)$id_linked_content_meta;
 	}
 
 	/**

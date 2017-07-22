@@ -16,9 +16,12 @@ import { SidebarComponent } from "./html/sidebar/sidebar.component";
 import { HomeComponent } from "./html/home/home.component";
 import { ColumnLayoutComponent } from "./html/column-layout.component";
 import { ContactComponent } from "./html/contact/contact.component";
+import { ContactService } from "./html/contact/contact.service";
 import { PageNotFoundComponent } from "./html/page-not-found/page-not-found.component";
 import { PortfolioComponent } from "./html/portfolio/portfolio.component";
 import { ImportStoryComponent } from "./import/import.story.component";
+import { ImportStoryService } from "./import/import.story.service";
+import { WeatherService } from './html/sidebar/weather.service';
 
 @NgModule({
 	declarations: [
@@ -45,7 +48,10 @@ import { ImportStoryComponent } from "./import/import.story.component";
 	],
 	providers: [
 		MessagesService,
-		DataStorageService
+		DataStorageService,
+		WeatherService,
+		ContactService,
+		ImportStoryService
 	],
 	bootstrap: [
 		AppComponent

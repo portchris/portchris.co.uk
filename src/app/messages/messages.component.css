@@ -1,14 +1,20 @@
 #message-stream {
 	width: calc(100% + 5px);
-	height: 90%;
+	height: 93%;
 	overflow-y: auto;
 	transition: 0.2s 500ms ease-in-out;
+	position: relative;
 }
 #user-input {
 	position: fixed;
 	width: 100%;
-	height: 10%;
-	bottom: 0;
+	height: 7%;
+	bottom: 1px;
+}
+#user-input button {
+	position: absolute;
+	right: 0;
+	top: 0;
 }
 .msg {
 	min-width: 70%;
@@ -31,4 +37,89 @@
 .msg blockquote p {
 	white-space: pre-wrap;
 	margin-bottom: 0;
+}
+.notification {
+	width: 97%;
+}
+.active-typing {
+	border-radius: 10px;
+	padding: 0 10px;
+	height: 30px;
+	overflow: hidden;
+	background: #FFF;
+	float: left;
+}
+.active-typing-dots {
+	font-size: 30px;
+	color: #2B2F3D;
+	line-height: 0;
+	margin: 15px -7px 0px;
+	display: inline-block;
+}
+.talk {
+	height: 100%;
+	width: 100%;
+	position: relative;
+	background-color: #AAA;
+	border: solid 2px #FFF;
+}
+.talk input.form-control {
+	color: #333;
+	border: none;
+}
+.talk_Input {
+	appearance: none;
+}
+.js.talk_Input {
+	position: absolute;
+	left: -100vw;
+}
+.talk_FauxInput {
+	display: none;
+	align-items: center;
+	max-width: 80%;
+	border: 0;
+	font-size: 20px;
+	font-size: 1.3rem;
+	color: #333;
+	background-color: #AAA;
+	border-right: 3px solid transparent;
+}
+.js.talk_FauxInput {
+	display: flex;
+	width: 100%;
+}
+.talk_Input:focus ~ .talk_FauxInput {
+	animation: pulseAttention 1.5s cubic-bezier(.215, .61, .355, 1) forwards infinite;
+}
+.talk_Button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	padding: 5px;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-align: center;
+	-ms-flex-align: center;
+	align-items: center;
+	color: #a7a7a7;
+	font-size: 15px;
+}
+.talk_Input:not([value=""]) ~ .talk_Button {
+	-webkit-box-pack: end;
+	-ms-flex-pack: end;
+	justify-content: flex-end;
+}
+@keyframes pulseAttention {
+	50% {
+		border-color: green;
+	}
+}
+@keyframes pulseAttention {
+	50% {
+		border-color: green;
+	}
 }

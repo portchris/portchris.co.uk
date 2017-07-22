@@ -182,6 +182,29 @@ class UserController extends Controller
 	}
 
 	/**
+	 * Get the admin user (me).
+	 *
+	 * @param  Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function getAdminUser(Request $request) {
+
+		$r = [];
+		$admin = User::where("email", "=", User::ADMIN_EMAIL)->firstOrFail();
+		if ($admin && !$admin->isEmpty()) {
+			$r = [
+				'firstname' => $admin->firstname,
+				'lastname' => $admin->lastname,
+				'name' => $admin->name,
+				'lat' => $admin->lat,
+				'lng' => $admin->lng,
+				'email' => $admin->email
+			];
+		}
+		return response()->json($r);
+	}
+
+	/**
 	 * Return user information and next question in the game if the token is valid.
 	 *
 	 * @param  \App\User  $user
@@ -217,7 +240,7 @@ class UserController extends Controller
 						$nextQ->content .= PHP_EOL . Messages::getFinalMessage();
 					}
 				}
-				$msg = $User->messageUserAuthorised($user->name, $nextQ->stage, $nextQ->content);
+				$msg = $User->messageUserAuthorised($user, $nextQ);
 				$r = Messages::create([
 					'id' => $id,
 					'content' => $msg,

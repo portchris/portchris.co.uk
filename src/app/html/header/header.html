@@ -3,13 +3,17 @@
 	<div class="row">
 		<div class="col-md-4">
 			<span id="logo">
-				<svg class="icon">
-					<use xlink:href="#logo-white"></use>
-				</svg>
+				<a routerLink="/" routerLinkActive="active">
+					<svg class="icon">
+						<use xlink:href="#logo-white"></use>
+					</svg>
+				</a>
 			</span>
 		</div>
 		<div class="col-md-8">
-			<h1>Chris Rogers</h1>
+			<a routerLink="/" routerLinkActive="active">
+				<h1>Chris Rogers</h1>
+			</a>
 		</div>
 	</div>
 	<div class="row">
@@ -19,7 +23,7 @@
 	</div>
 </header>
 <nav class="navbar">
-	<a routerLink="/" routerLinkActive="active" class="navbar-brand">Talk to me</a>
+	<a routerLink="/" routerLinkActive="active" routerLinkInactive="" class="navbar-brand">Talk to me</a>
 	<a routerLink="/portfolio" routerLinkActive="active" class="navbar-brand">Portfolio</a>
 	<a routerLink="/contact" routerLinkActive="active" class="navbar-brand">Contact</a>
 </nav>

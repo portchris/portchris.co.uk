@@ -3,16 +3,30 @@
 	<div *ngFor="let msg of messages" class="row no-gutters">
 		<div [ngClass]="{'flex-last': msg.key == 'user'}" class="msg {{ msg.class_selector }} col {{ msg.key }}">
 			<blockquote @slideUpAnimation class="blockquote">
-				<p>{{ msg.content }}</p>
+				<p [innerHTML]="msg.content"></p>
 			</blockquote>
 		</div>
 		<div class="col">&nbsp;</div>
 	</div>
+	<div @slideUpAnimation class="row no-gutters gutter-margin" *ngIf="typing">
+		<div class="col-md-12">
+			<div class="border active-typing">
+				<span class="fade-in active-typing-dots">&bull;</span>
+				<span class="fade-in active-typing-dots">&bull;</span>
+				<span class="fade-in active-typing-dots">&bull;</span>
+			</div>
+		</div>
+	</div>
 </div><!-- #message-stream -->
+<div id="overflow-shadow">
+	<div class="row no-gutters gutter-margin">
+		<div #shadow class="shadow-bottom hidden col-md-12"></div>
+	</div>
+</div>
 <div id="user-input">
-	<div class="row">
-		<form [formGroup]="talkForm" (ngSubmit)="doRespond($event, talkForm.controls['content'].valid)" class="form-inline col-md-12">
-			<div [ngClass]="{'has-error': !talkForm.controls['content'].valid}" class="form-group">
+	<div class="row no-gutters gutter-margin full-height">
+		<form [formGroup]="talkForm" (ngSubmit)="doRespond($event, talkForm.controls['content'].valid)" class="col-md-12 full-height">
+			<div [ngClass]="{'has-error': !talkForm.controls['content'].valid}" class="full-height">
 				<input formControlName="id_linked_content_meta" type="hidden" name="id_linked_content_meta" [value]="question.id" [pattern]="question.pattern" required>
 				<input formControlName="name" type="hidden" name="name" [value]="question.name">
 				<input formControlName="title" type="hidden" name="title" [value]="question.title">
@@ -25,14 +39,17 @@
 				<!-- span *ngIf="question.csrf">
 					{{ question.csrf }}
 				</span> -->
-				<input formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0" placeholder="Talk to meh" [value]="user.message">
-				<button type="submit" class="btn btn-primary">
-					<small>Talk</small>
-				</button>
+				<div class="talk" (click)="focusInput($event)">
+					<input #searchBox formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0 full-height" placeholder="Talk to meh" [value]="user.message">
+					<span #searchFauxInput class="talk_FauxInput" dir="rtl"></span>
+					<button type="submit" class="btn btn-primary full-height">
+						<small>Talk</small>
+					</button>
+				</div>
 			</div>
 		</form>
 	</div>
-	<div class="row">
+	<div class="row no-gutters gutter-margin">
 		<div class="col-md-12">
 			<div class="alert alert-danger" *ngIf="err">
 				{{ err }}
