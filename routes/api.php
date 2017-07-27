@@ -39,7 +39,10 @@ Route::group(['middleware' => ['web', 'cors']], function() {
 	Route::post('/user/password', 'UserController@hashPassword');
 	Route::post('/user/logout', 'UserController@logOut');
 	Route::post('/user/reset', 'UserController@reset');
-	Route::get('/user/admin', 'UserController@getAdminUser');
+	Route::get('/adminuser', 'UserController@getAdminUser');
+
+	// Timezone info
+	Route::post('/timezone', 'UserController@getNearestTimezone');
 
 	// Text based adventure
 	Route::resource('message','MessageStreamController', [

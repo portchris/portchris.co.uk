@@ -191,7 +191,7 @@ class UserController extends Controller
 
 		$r = [];
 		$admin = User::where("email", "=", User::ADMIN_EMAIL)->firstOrFail();
-		if ($admin && !$admin->isEmpty()) {
+		if (!is_null($admin)) {
 			$r = [
 				'firstname' => $admin->firstname,
 				'lastname' => $admin->lastname,
@@ -202,6 +202,60 @@ class UserController extends Controller
 			];
 		}
 		return response()->json($r);
+	}
+
+	/**
+	 * Get nearest timezone information based on geolocation.
+	 *
+	 * @param  Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function getNearestTimezone(Request $request) {
+
+		$time_zone = '';
+		$tz_distance = 0;
+		$cur_lat = $request->lat; 
+		$cur_long = $request->lng; 
+		$country_code = $request->country_code ?? '';
+		$time_format = $request->time_format ?? 'H:i';
+		$date_format = $request->date_format ?? 'd/m/Y';
+		$r = new \DateTime("now");
+		$timezone_ids = ($country_code) ? \DateTimeZone::listIdentifiers(\DateTimeZone::PER_COUNTRY, $country_code) : \DateTimeZone::listIdentifiers();
+		if ($timezone_ids && is_array($timezone_ids) && isset($timezone_ids[0])) {
+
+			// Only one identifier?
+			if (count($timezone_ids) == 1) {
+				$time_zone = $timezone_ids[0];
+			} else {
+				foreach ($timezone_ids as $timezone_id) {
+					$timezone = new \DateTimeZone($timezone_id);
+					$location = $timezone->getLocation();
+					$tz_lat   = $location['latitude'];
+					$tz_long  = $location['longitude'];
+					$theta    = $cur_long - $tz_long;
+					$distance = (sin(deg2rad($cur_lat)) * sin(deg2rad($tz_lat))) + (cos(deg2rad($cur_lat)) * cos(deg2rad($tz_lat)) * cos(deg2rad($theta)));
+					$distance = acos($distance);
+					$distance = abs(rad2deg($distance));
+					if (!$time_zone || $tz_distance > $distance) {
+						$time_zone   = $timezone_id;
+						$tz_distance = $distance;
+					} 
+				}
+			}
+			$r = new \DateTime("now", new \DateTimeZone($time_zone));
+		}
+		$timestamp = $r->getTimestamp();
+		$sunrise = date_sunrise($timestamp, SUNFUNCS_RET_TIMESTAMP, $cur_lat, $cur_long);
+		$sunset = date_sunset($timestamp, SUNFUNCS_RET_TIMESTAMP, $cur_lat, $cur_long);
+		return response()->json([
+			'time' => $r->format($time_format),
+			'timestamp' => $timestamp,
+			'date' => $r->format($date_format),
+			'timezone' => $time_zone,
+			'sunrise' => $sunrise,
+			'sunset' => $sunset,
+			'dark' => ($timestamp <= $sunrise || $timestamp >= $sunset) ? true : false
+		]);
 	}
 
 	/**
@@ -331,21 +385,21 @@ class UserController extends Controller
 	* @param  array  $data
 	* @return \Illuminate\Contracts\Validation\Validator
 	*/
-    protected function validator(array $data) {
+	protected function validator(array $data) {
 
-        return Validator::make($data, [
-            'username' => 'required|max:20',
-            'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|min:6|confirmed',
-        ]);
-    }
+		return Validator::make($data, [
+			'username' => 'required|max:20',
+			'email' => 'required|email|max:255|unique:users',
+			'password' => 'required|min:6|confirmed',
+		]);
+	}
 
-    /**
-    * Silly, the user has opted out of creating an account. Oh well, they can still play on a guest token.
-    *
-    * @param 	Request 	$request
-    * @return 	JSON
-    */
+	/**
+	* Silly, the user has opted out of creating an account. Oh well, they can still play on a guest token.
+	*
+	* @param 	Request 	$request
+	* @return 	JSON
+	*/
 	public function createGuestToken(Request $request) {
 
 		$id = 0;

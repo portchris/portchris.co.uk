@@ -8,7 +8,7 @@
 */
 
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers } from "@angular/http";
+import { Http, Response, Headers, Jsonp } from "@angular/http";
 import { Observable } from "rxjs";
 import { AppModule as App } from "../../app.module";
 import { Weather } from "./weather";
@@ -21,10 +21,11 @@ export class WeatherService {
 	key: string;
 	
 	private static readonly API_KEY: string = "5eeb97790d4f6cf008d3613ef077098f";
+	private static readonly GOOGLE_API_KEY: string = "AIzaSyDNBoqalASIHil1YXDFpYvMrsGgB--26Yc";
 
-	constructor(private _http: Http, private storage: DataStorageService) { 
+	constructor(private _http: Http, private _jsonp: Jsonp, private storage: DataStorageService) { 
 		
-		this.uri = "api.openweathermap.org/data/2.5/weather?APPID=" + WeatherService.API_KEY;
+		this.uri = "http://api.openweathermap.org/data/2.5/weather?callback=JSONP_CALLBACK&APPID=" + WeatherService.API_KEY + "&units=metric";
 	}
 
 	/**
@@ -35,10 +36,29 @@ export class WeatherService {
 	*/
 	public getWeatherByCoordinates(lat, lng):Observable<Weather[]>{
 
-		let u = this.uri + "&lat=" + lat + "&lng=" + lng;
+		let u = this.uri + "&lat=" + lat + "&lon=" + lng;
+		let h = new Headers();
+		h.append('Content-Type', 'application/javascript');
+		return this._jsonp.get(u, { headers: h }).map(res => res.json()).catch(this.handleError);
+	}
+
+	/**
+	* Get timezone info from Google api based on lat and lng
+	* @param 	float 	lat
+	* @param 	float 	lng
+	* @return 	JSON
+	*/
+	public getTimezoneByCoordinates(lat, lng):Observable<Weather[]>{
+
+		let uri = new App().url + 'api/timezone';
+		let creds = JSON.stringify({
+			lat: lat,
+			lng: lng
+		});
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		return this._http.get(u, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
 	}
 
 	/**
@@ -60,9 +80,10 @@ export class WeatherService {
 		this.storage.setItem('weatherData', JSON.stringify(data));
 	}
 
-	private handleError (error: Response | any) {
+	private handleError(error: Response | any) {
 		
 		// Might use a remote logging infrastructure for live environment
+		console.log("YO", error);
 		let errMsg: string;
 		if (error instanceof Response) {
 			const body = error.json() || '';

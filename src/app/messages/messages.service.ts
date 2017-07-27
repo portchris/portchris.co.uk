@@ -184,8 +184,7 @@ export class MessagesService {
 	*/
 	public getAdminUser() {
 
-		let uri = new App().url + 'api/user/admin';
-		console.log(uri);
+		let uri = new App().url + 'api/adminuser';
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
 		let req = this._http.get(uri, { headers: h }).map(res => res.json()).catch(this.handleError);

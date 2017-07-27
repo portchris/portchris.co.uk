@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Http, HttpModule } from '@angular/http';
+import { Http, HttpModule, JsonpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app.routes';
@@ -43,6 +43,7 @@ import { WeatherService } from './html/sidebar/weather.service';
 		ReactiveFormsModule,
 		FormsModule,
 		HttpModule,
+		JsonpModule,
 		AppRoutingModule,
 		BrowserAnimationsModule
 	],
