@@ -43,6 +43,37 @@ ul {
 ul li {
 	padding-left: 7px;
 }
+button.btn, button.btn-primary {
+	border-radius: 0;
+	background-color: #FFF;
+	border: 2px solid #FFF;
+	color: #272935;
+	font-weight: bold;
+	font-family: "Courier New", Courier, monospace;
+}
+button:hover, button:focus, .btn-primary:hover, .btn-primary:focus {
+	cursor: pointer;
+	background-color: #272935;
+	color: #FFF;
+	border: 2px solid #FFF;
+	border-left: 2px solid #FFF;
+	box-shadow: none;
+}
+.btn:disabled, .btn-primary:disabled, .btn:disabled:hover, .btn-primary:disabled:hover {
+	border-color: #FFF;
+	background-color: #FFF;
+	color: #999;
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.btn-primary:active {
+	background-color: #272935;
+	color: #FFF;
+}
+.form-control:disabled, .form-control[readonly], .form-control.disabled {
+	background-color: #CCC;
+	opacity: 0.5;
+}
 .hidden {
 	display: none;
 }
@@ -138,6 +169,7 @@ ul li {
 	z-index: 2;
 	box-shadow: 0px -15px 15px -15px #000 inset;
 	height: 20px;
+	width: calc(100% - 15px);
 	margin-top: -20px; 
 }
 #portfolio-shadow {
@@ -166,6 +198,14 @@ ul li {
 .ticker__item {
 	display: inline-block;
 	padding: 0 2rem;
+}
+portfolio .icon {
+	width: 100%;
+	height: auto;
+	max-width: 25px;
+	display: inline;
+	max-height: 25px;
+	margin-bottom: -5px;
 }
 ::selection {
 	background: black;
@@ -196,4 +236,57 @@ ul li {
 	0% { opacity: 0; transform:scale(.1); }
 	21.25% { opacity: 1; transform:scale(1.05); }
 	25% { transform:scale(1); }
+}
+@media (max-width: 767px) {
+	.container {
+		max-width: none;
+		width: 100%;
+	}
+	.no-scrollbars, #message-stream {
+		width: calc(100% - 10px) !important;
+	}
+	.header {
+		position: fixed;
+		top: 0;
+		height: 130px;
+		z-index: 10;
+		border-right: 0;
+	}
+	.header nav.navbar, .header nav .navbar-nav {
+		display: flex;
+		flex-direction: row;
+		margin-top: 0;
+		width: 100%;
+	}
+	.nav-item {
+		border: 2px solid #FFF !important;
+		width: 100% !important;
+	}
+	.nav-item:not(:last-child) {
+		border-right: none !important;
+	}
+	.nav-item:hover, .nav-item:focus, .nav-item.active {
+		background-color: #FFF;
+	}
+	.nav-item:hover a, .nav-item:focus a, .nav-item.active a {
+		color: #272935;
+	}
+	.header p {
+		margin-bottom: 0;
+	}
+	.main {
+		position: fixed;
+		top: 130px;
+		height: calc(100% - 130px);
+		padding-top: 15px;
+	}
+	.main > * {
+		height: calc(100% - 15px) !important;
+	}
+	.main > home {
+		height: calc(100% - 25px) !important;
+	}
+	.sidebar {
+		display: none;
+	}
 }

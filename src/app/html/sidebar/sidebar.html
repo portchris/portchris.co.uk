@@ -1,26 +1,15 @@
 <div id="sidebar" class="d-flex flex-column">
 	<div #weatherPanel id="situation" class="box show p-2">
-		<div class="ticker-wrap">
-			<div class="ticker">
-				<div class="ticker__item">My Current Situation:</div>
-			</div>
+		<div class="panel-icon">
+			<svg class="icon">
+				<use xlink:href="#maps-and-flags" />
+			</svg>
 		</div>
+		<h6>My Location:</h6>
 		<div class="weather" *ngIf="weather">
 			<div class="row">
 				<div class="col-6">
-					<span class="temp">{{weather.main.temp}}&#8451;</span>
-					<div *ngIf="!timezone.dark;then daytime else nighttime">here is ignored</div>
-					<ng-template #daytime>
-						<svg class="icon">
-							<use xlink:href="#sun" />
-						</svg>
-					</ng-template>
-					<ng-template #nighttime>
-						<svg class="icon">
-							<use xlink:href="#half-moon" />
-						</svg>
-					</ng-template>
-					<span>{{timezone.time}}</span>
+					<span class="temp">{{weather.main.temp}}&nbsp;&#8451;</span>
 				</div>
 				<div class="col-6">
 					<svg class="icon">
@@ -30,24 +19,50 @@
 			</div>
 			<div class="row">
 				<div class="col-12">
-					<p>{{ weather.name }}</p>
+					<div class="ticker-wrap">
+						<div class="ticker">
+							<div class="ticker__item">
+								<span *ngIf="!timezone.dark;then daytime else nighttime"></span>
+								<ng-template #daytime>
+									<svg class="icon">
+										<use xlink:href="#sun" />
+									</svg>
+								</ng-template>
+								<ng-template #nighttime>
+									<svg class="icon">
+										<use xlink:href="#half-moon" />
+									</svg>
+								</ng-template>
+								<span>{{ timezone.time }}</span>
+								<span>{{ weather.name }}</span>
+								<span>{{ timezone.timezone }}</span>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div #cvPanel id="cv" class="box p-2">
-		<div class="ticker-wrap">
-			<div class="ticker">
-				<div class="ticker__item">Download CV:</div>
-			</div>
+		<div class="panel-icon">
+			<svg class="icon">
+				<use xlink:href="#man-in-suit-and-tie" />
+			</svg>
 		</div>
+		<h6>Download CV:</h6>
+		<a href="../../../assets/CV.pdf" class="dropdown-indicator" download>
+			<svg class="icon">
+				<use xlink:href="#web" />
+			</svg>
+		</a>
 	</div>
-	<div #helpPanel id="key" class="box p-2">
-		<div class="ticker-wrap">
-			<div class="ticker">
-				<div class="ticker__item">Helper Commands:</div>
-			</div>
+	<div #helpPanel id="help" class="box p-2">
+		<div class="panel-icon">
+			<svg class="icon">
+				<use xlink:href="#info" />
+			</svg>
 		</div>
+		<h6>Helper Commands:</h6>
 		<ul class="content">
 			<li *ngFor="let key of help">&quot;{{ key }}&quot;</li>
 		</ul>

@@ -1,7 +1,7 @@
 <!-- Message stream -->
 <header>
-	<div class="row">
-		<div class="col-md-4">
+	<div class="d-flex flex-row">
+		<div class="p-2">
 			<span id="logo">
 				<a routerLink="/" routerLinkActive="active">
 					<svg class="icon">
@@ -10,20 +10,28 @@
 				</a>
 			</span>
 		</div>
-		<div class="col-md-8">
+		<div id="chris-rogers" class="p-2">
 			<a routerLink="/" routerLinkActive="active">
 				<h1>Chris Rogers</h1>
 			</a>
 		</div>
 	</div>
-	<div class="row">
-		<div class="col-xl-12">
+	<div class="d-flex flex-row">
+		<div class="p-2">
 			<p>Full-stack web application developer</p>
 		</div>
 	</div>
 </header>
-<nav class="navbar">
-	<a routerLink="/" routerLinkActive="active" routerLinkInactive="" class="navbar-brand">Talk to me</a>
-	<a routerLink="/portfolio" routerLinkActive="active" class="navbar-brand">Portfolio</a>
-	<a routerLink="/contact" routerLinkActive="active" class="navbar-brand">Contact</a>
+<nav class="navbar navbar-toggleable">
+	<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+		<li class="nav-item active">
+			<a routerLink="/" routerLinkActive="active" routerLinkInactive="" class="nav-link">Talk to me</a>
+		</li>
+		<li class="nav-item">
+			<a routerLink="/portfolio" routerLinkActive="active" class="nav-link">Portfolio</a>
+		</li>
+		<li class="nav-item">
+			<a routerLink="/contact" routerLinkActive="active" class="nav-link">Contact</a>
+		</li>
+	</ul>
 </nav>

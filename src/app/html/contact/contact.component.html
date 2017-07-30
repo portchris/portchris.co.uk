@@ -14,6 +14,9 @@
 			<form id="form1" name="form1" class="wufoo topLabel page" accept-charset="UTF-8" autocomplete="off" enctype="multipart/form-data" method="post" novalidate [formGroup]="contactForm" (ngSubmit)="contact($event)" >
 				<div [ngClass]="{ 'has-danger': !contactForm.controls['name'].valid && contactForm.controls['name'].touched }" class="form-group">
 					<label class="desc control-label" id="title3" for="Field3">
+						<svg class="icon">
+							<use xlink:href="#user-shape" />
+						</svg>
 						Name<span id="req_3" class="req">*</span>
 					</label>
 					<input formControlName="name" id="Field3" name="Field3" type="text" class="field text medium form-control" value="" maxlength="255" tabindex="1" required placeholder="" aria-describedby="nameError"/>
@@ -23,6 +26,9 @@
 				</div>
 				<div [ngClass]="{ 'has-danger': !contactForm.controls['email'].valid  && contactForm.controls['email'].touched}" class="form-group">
 					<label class="desc control-label" id="title4" for="Field4">
+						<svg class="icon">
+							<use xlink:href="#at-sign" />
+						</svg>
 						Email<span id="req_4" class="req">*</span>
 					</label>
 					<input formControlName="email" id="Field4" name="Field4" type="email" spellcheck="false" class="field text medium form-control" value="" maxlength="255" tabindex="2" placeholder="" required aria-describedby="emailError" />
@@ -33,6 +39,9 @@
 				</div>
 				<div [ngClass]="{ 'has-danger': !contactForm.controls['message'].valid && contactForm.controls['message'].touched }" class="form-group">
 					<label class="desc control-label" aria-hidden="true" id="title5" for="Field5">
+						<svg class="icon">
+							<use xlink:href="#chat-comment-oval-speech-bubble-with-text-lines" />
+						</svg>
 						Message<span id="req_5" class="req">*</span>
 					</label>
 					<textarea formControlName="message" id="Field5" name="Field5" class="field textarea small form-control" spellcheck="true" rows="10" cols="50" tabindex="3" placeholder="" required aria-describedby="messageError"></textarea>
@@ -50,6 +59,9 @@
 				<div class="form-group">
 					<button type="submit" class="btn btn-primary" [disabled]="!contactForm.valid">
 						Fire away!
+						<svg class="icon">
+							<use xlink:href="#send" />
+						</svg>
 					</button>
 					<small id="emailHelp" class="form-text text-muted">* = required fields.</small>
 				</div>
@@ -57,28 +69,28 @@
 		</div>
 	</div>
 	<div class="row no-gutters gutter-margin">
-		<div class="social col-md-3">
+		<div class="social col-3">
 			<a href="https://www.linkedin.com/in/chris-rogers-b4792116/" target="_blank" title="Visit my LinkedIn profile">
 				<svg id="linkedin-contact" class="icon">
 					<use xlink:href="#linkedin-logo"></use>
 				</svg>
 			</a>
 		</div>
-		<div class="social col-md-3">
+		<div class="social col-3">
 			<a href="https://twitter.com/PortChris" target="_blank" title="Visit my Twitter profile">
 				<svg id="twitter-contact" class="icon">
 					<use xlink:href="#twitter-logo-on-black-background"></use>
 				</svg>
 			</a>
 		</div>
-		<div class="social col-md-3">
+		<div class="social col-3">
 			<a href="https://www.facebook.com/portchris.co.uk" target="_blank" title="Visit my Facebook profile">
 				<svg id="facebook-contact" class="icon">
 					<use xlink:href="#facebook-app-logo"></use>
 				</svg>
 			</a>
 		</div>
-		<div class="social col-md-3">
+		<div class="social col-3">
 			<a href="mailto:chris@portchris.co.uk" title="E-mail me directly">
 				<svg id="email-contact" class="icon">
 					<use xlink:href="#multimedia"></use>

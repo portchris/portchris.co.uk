@@ -1,10 +1,14 @@
 header h1 {
 	font-size: 23px;
 }
+header .p-2 {
+	padding: 0 !important;
+}
 #logo {
 	display: inline-block;
 	width: 95px;
-	height: 60px;
+	height: 52px;
+	margin-right: -35px;
 	overflow: hidden;
 }
 #logo .icon {
@@ -12,10 +16,15 @@ header h1 {
 	width: 100%;
 	height: auto;
 }
-.navbar {
-	padding: 0;
+#chris-rogers {
+	max-width: 120px;
+	margin-left: 15px;
 }
-.navbar a {
+.navbar-nav, .navbar {
+	padding: 0;
+	display: block;
+}
+.navbar li {
 	transition: 0.2s 500ms ease-in-out;
 	border: 2px solid transparent;
 	border-right: none;
@@ -23,10 +32,10 @@ header h1 {
 	margin-right: 0;
 	width: calc(100% + 15px);
 }
-.navbar a.active, .navbar a:hover {
+.navbar li.active, .navbar li:hover {
 	border: 2px solid #FFF;
 	border-right: none;
 }
-.navbar a, .navbar a:active, .navbar a:focus, .navbar a.active {
+.navbar li, .navbar li:active, .navbar li:focus, .navbar li.active {
 	color: #FFF;
 }

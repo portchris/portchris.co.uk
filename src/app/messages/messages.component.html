@@ -40,10 +40,10 @@
 					{{ question.csrf }}
 				</span> -->
 				<div class="talk" (click)="focusInput($event)">
-					<input #searchBox formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0 full-height" placeholder="Talk to meh" [value]="user.message">
+					<input #searchBox formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0 full-height" placeholder="Respond to my message here..." [value]="user.message">
 					<span #searchFauxInput class="talk_FauxInput" dir="rtl"></span>
 					<button type="submit" class="btn btn-primary full-height">
-						<small>Talk</small>
+						<small>&crarr;</small>
 					</button>
 				</div>
 			</div>
