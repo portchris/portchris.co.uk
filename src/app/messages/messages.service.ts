@@ -125,12 +125,26 @@ export class MessagesService {
 	}
 
 	/**
-	* Destroy the JWT token client and server side.
+	* Destroy the JWT token client and server side and set the users progress back to stage 0.
 	* @return 	JSON 	req
 	*/
 	public reset(data):Observable<Messages[]> {
 
 		let uri = new App().url + 'api/user/reset';
+		let d = JSON.stringify(data);
+		let h = new Headers();
+		h.append('Content-Type', 'application/json');
+		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return req;
+	}
+
+	/**
+	* Destroy the JWT token client and server side. Remove the user from our records.
+	* @return 	JSON 	req
+	*/
+	public remove(data):Observable<Messages[]> {
+
+		let uri = new App().url + 'api/user/remove';
 		let d = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');

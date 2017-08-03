@@ -1,12 +1,17 @@
+<div class="row" *ngIf="err || success">
+	<div @popInOutAnimation class="col-md-12 notification">
+		<div class="alert alert-danger" *ngIf="err">
+			{{ err }}
+		</div>
+		<div class="alert alert-success" *ngIf="success">
+			{{ success }}
+		</div>
+	</div>
+</div>
 <div id="contact-me" class="no-scrollbars">
-	<div class="row no-gutters gutter-margin" *ngIf="err || success">
-		<div class="col-md-12">
-			<div class="alert alert-danger" *ngIf="err">
-				{{ err }}
-			</div>
-			<div class="alert alert-success" *ngIf="success">
-				{{ success }}
-			</div>
+	<div class="row no-gutters gutter-margin">
+		<div class="col-md-12 vspace-bottom">
+			<h1>Contact Me</h1>
 		</div>
 	</div>
 	<div class="row no-gutters gutter-margin">
@@ -57,15 +62,29 @@
 					<input type="hidden" id="idstamp" name="idstamp" value="oeS/R7xx09MzqKFzIG1OlJpkgucUGOGLdCc8GdL87Q8=" />
 				</div>
 				<div class="form-group">
-					<button type="submit" class="btn btn-primary" [disabled]="!contactForm.valid">
+					<button *ngIf="!sending; else sendingNotifier" type="submit" class="btn btn-primary" [disabled]="!contactForm.valid">
 						Fire away!
 						<svg class="icon">
 							<use xlink:href="#send" />
 						</svg>
 					</button>
+					<ng-template #sendingNotifier>
+						<div id="is-sending">
+							<div class="border active-typing">
+								<span class="fade-in active-typing-dots">&bull;</span>
+								<span class="fade-in active-typing-dots">&bull;</span>
+								<span class="fade-in active-typing-dots">&bull;</span>
+							</div>
+						</div>
+					</ng-template>
 					<small id="emailHelp" class="form-text text-muted">* = required fields.</small>
 				</div>
 			</form>
+		</div>
+	</div>
+	<div class="row no-gutters gutter-margin">
+		<div class="col-md-12 vspace-bottom">
+			<h1>Connect Via Social Networks</h1>
 		</div>
 	</div>
 	<div class="row no-gutters gutter-margin">

@@ -21,23 +21,35 @@ export class HeaderComponent implements OnInit, OnChanges {
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
-	constructor(private route: ActivatedRoute) { 
+	public constructor(private route: ActivatedRoute) { 
 
 		this.router = route;
 	}
 
-	ngOnInit() {
+	public ngOnInit() {
 	
 		this.sub = this.router.data.subscribe((v) => {
 			console.log(v);
 		});	
 	}
 
-	ngOnChanges() {
+	/**
+	* When user clicks on navigation, apply classes for styling
+	* @param 	object 	event
+	*/
+	public navigate(event) {
+		let target = event.target || event.srcElement || event.currentTarget;
+		let navClass = "." + target.className.replace(" ", ".").replace(".active", "");
+		event.preventDefault();
+		document.querySelector(navClass).classList.remove("active");
+		target.classList.add("active");
+	}
+
+	public ngOnChanges() {
 
 	}
 
-	ngOnDestroy() {
+	public ngOnDestroy() {
 
 		this.sub.unsubscribe();
 	}

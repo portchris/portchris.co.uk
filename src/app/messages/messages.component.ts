@@ -1,10 +1,11 @@
 import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MessagesService } from "./messages.service";
+import { WeatherService } from '../html/sidebar/weather.service';
 import { Messages } from "./messages";
 import { DataStorageService } from '../app.storage.service';
 import { slideUpAnimation } from '../animations/slideup.animation';
-import { slideInOutAnimation } from '../animations/slideinout.animation';
+import { popInOutAnimation } from '../animations/popinout.animation';
 
 enum TYPE {
 	USER = 0, 
@@ -16,7 +17,7 @@ enum TYPE {
 	templateUrl: './messages.component.html',
 	styleUrls: ['./messages.component.css'],
 	inputs: ['storage'],
-	animations: [slideUpAnimation]
+	animations: [slideUpAnimation, popInOutAnimation]
 	// host: { '(window:keydown)': 'handleKeyboardEvent($event)' },
 })
 
@@ -60,6 +61,12 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	err: any;
 	errMsg: string;
+
+	/**
+	* Any notifications to report
+	* @var 	any
+	*/
+	success: any;
 
 	/**
 	* Message type and actions
@@ -147,6 +154,14 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		{
 			phrase: "Reset",
 			method: "reset"
+		},
+		{
+			phrase: "Forget about me",
+			method: "remove"
+		},
+		{
+			phrase: "Remove me from the guestbook",
+			method: "remove"
 		}
 	];
 
@@ -176,7 +191,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @param 	object 	MessagesService
 	* @param 	object 	FormBuilder
 	*/
-	public constructor(private messagesService: MessagesService, public formBuilder: FormBuilder) {
+	public constructor(private messagesService: MessagesService, public formBuilder: FormBuilder, private weatherService: WeatherService) {
 
 		this.messages = [];
 		this.user = {
@@ -243,7 +258,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			}
 		} else {
 			console.error(this.talkForm);
-			this.err = this.errMsg;
+			this.setError(this.errMsg);
 		}
 		this.talkForm.controls['content'].setValue("");
 	}
@@ -262,6 +277,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			case 'welcome':
 				this.welcome();
 			break;
+			case 'teaCoffeeOrWater':
+				this.teaCoffeeOrWater();
+			break;
 			case 'authenticate':
 				this.authenticate();
 			break;
@@ -278,10 +296,13 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				this.logOut();
 			break;
 			case 'startOver':
-				this.startOver("Okay I'm logging you out and starting over. Don't worry if you have an account, your progress will be safe.");
+				this.startOver("Okay I'm logging you out and starting over. Don't worry if you've signed the guestbook, your progress will be safe.");
 			break;
 			case 'reset':
-				this.reset("Starting a new game and logging you off.");
+				this.reset("Okay I'm logging you out for the day and resetting your progress back to stage 0.");
+			break;
+			case 'remove':
+				this.remove("Okay I'm removing you from the guestbook and any future records.");
 			break;
 		}
 	}
@@ -303,7 +324,13 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			);
 		} else {
 			let msg = this.createMessageTemplate();
-			msg.message = "Welcome, what is your name?";
+			let weather = this.weatherService.getWeatherData();
+			if (typeof weather === "object" && weather.time != null) {
+				msg.message = (weather.time.dark) ? "Good evening! " : "Good day to you! ";
+			} else {
+				msg.message = "Hello!";
+			}
+			msg.message += "Welcome to the Portchris office, my name is Lucy what is your name?";
 			msg.answer.name = "Init";
 			msg.answer.title = msg.answer.name;
 			msg.answer.key = "question";
@@ -339,14 +366,43 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			split.splice(0, 1);
 			this.user.lastname = split.join(" ");
 		}
-		msg.message = "Welcome " + this.user.name + "! Before we begin, have you previously had saved progress? If not then would you like to save you progress for next time?";
+		msg.message = "Welcome " + this.user.name + "! Can we get you a drink? Tea, coffee or even a water?";
 		msg.answer.name = "Init";
 		msg.answer.title = msg.answer.name;
 		msg.answer.key = "question";
 		msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
-		msg.answer.method = "toSaveOrNotToSave";
+		msg.answer.method = "teaCoffeeOrWater";
 		this.messageAction = msg.answer.method;
 		msg.user.stage = 0;
+		this.messagesService.createMessage(msg)
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
+	}
+
+	/**
+	* Bit of a gimmick, fires a notification
+	*/
+	public teaCoffeeOrWater() {
+
+		let msg = this.createMessageTemplate();
+		let drink = this.talkForm.value.content.toLowerCase();
+		if (drink.indexOf("tea") !== -1 || drink.indexOf("coffee") !== -1 || drink.indexOf("water") !== -1) {
+			msg.message = "Enjoy " + this.user.name + ". Whilst you enjoy your " + drink + ". Would you like to sign the vistors guestbook so we remember you next time?";
+			msg.answer.method = "toSaveOrNotToSave";
+			setTimeout(() => {
+				this.setSuccess("You acquired a " + drink);
+			}, 2000);
+		} else {
+			msg.message = "Sorry, I didn't catch that. Did you want a 'tea', 'coffee' or 'water'?";
+			msg.answer.method = "teaCoffeeOrWater";
+		}
+		msg.answer.name = "Init";
+		msg.answer.title = msg.answer.name;
+		msg.answer.key = "question";
+		msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+		msg.user.stage = 0;
+		this.messageAction = msg.answer.method;
 		this.messagesService.createMessage(msg)
 				.then((message) => { this.getMessagesSuccess(message); })
 				.catch((error) => { this.getMessagesFail(error); })
@@ -365,7 +421,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		if (answer.indexOf("no") !== -1) {
 			this.continueAsGuest();
 		} else if (answer.indexOf("yes") !== -1) {
-			msg.message = "Excellent choice " + this.user.firstname + ". By tracking your progress you can come back whenever you like and pick up where you left off! In order to track your progress I will require you to create an account or login. Please may I have your email address?";
+			msg.message = "Excellent choice " + this.user.firstname + ". Please can you write your email address so I can remember you for next time. Don't worry about anything happening to your details, our guestbook is locked up so nobody outside this office is allowed to see.";
 			msg.answer.name = "Init";
 			msg.answer.title = msg.answer.name;
 			msg.answer.key = "question";
@@ -378,7 +434,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				.then(() => { this.getMessagesComplete(); });
 			// this.getMessages();
 		} else {
-			msg.message = "Sorry, did you want to track your progress? Answer 'Yes' or 'No'";
+			msg.message = "Sorry, did you want to sign the guestbook? Answer 'Yes' or 'No'";
 			msg.answer.name = "Init";
 			msg.answer.title = msg.answer.name;
 			msg.answer.key = "question";
@@ -456,7 +512,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				this.question.key = m.key;
 				this.question.csrf = m.csrf;
 				this.class_selector = (m.key === "user") ? "col-xs-9 offset-xs-3" : "offset-xs-3 col-xs-9";
-				this.err = "";
+				this.setError("");
 				this.talkForm.controls['id_linked_content_meta'].setValue(this.question.id);
 				this.talkForm.controls['name'].setValue(this.question.name);
 				this.talkForm.controls['title'].setValue(this.question.title);
@@ -469,6 +525,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				this.talkForm.controls['csrf'].setValue(this.question.csrf);
 				this.typing = false;
 				this.talkForm.enable();
+				this.searchBox.nativeElement.focus();
 			};
 			if (m.key === "user" || !delay) {
 				fnc();
@@ -491,7 +548,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			errMsg = error.message ? error.message : error.toString();
 			errMsg += " File: " + error.fileName + ":" + error.lineNumber;
 		}
-		this.err = errMsg;
+		this.setError(errMsg);
 		this.startOver("Error occured: I need to log you out and start over. Don't worry if you have an account, your progress will be saved.");
 	}
 
@@ -503,14 +560,40 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 		this.user.message = "";
 		if (this.user != null && this.user.id !== 0 && this.messagesService.getToken().length > 0) {
-			console.log("user", this.user);
-			console.log("token", this.messagesService.getToken().length);
 			this.messagesService.storeUserInfo({
 				user: this.user,
 				token: this.messagesService.getToken()
 			});
 		}
 		this.checkMessagesOverflowed();
+	}
+
+	/**
+	* Set the error notification.
+	* @var 	e 	string
+	*/
+	private setError(e: string) {
+		
+		this.err = e;
+		if (e.length > 0) {
+			setTimeout(() => {
+				this.err = "";
+			}, 4000);
+		}
+	}
+
+	/**
+	* Set the success notification.
+	* @var 	s 	string
+	*/
+	private setSuccess(s: string) {
+		
+		this.success = s;
+		if (s.length > 0) {
+			setTimeout(() => {
+				this.success = "";
+			}, 4000);
+		}
 	}
 
 
@@ -570,6 +653,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 	/**
 	* Start the user over back to stage 1
+	* @var 	string 	msg
 	*/
 	public reset(msg: string) {
 
@@ -578,6 +662,30 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			message: msg
 		};
 		this.messagesService.reset(data).subscribe(
+			(message) => {
+				this.getMessagesSuccess(message); 
+				this.messagesService.logOut({}).subscribe(
+					(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
+					(error) => { this.getMessagesFail(error) },
+					() => { this.getMessagesComplete() }
+				);
+			},
+			(error) => { this.getMessagesFail(error) },
+			() => { this.getMessagesComplete() }
+		);
+	}
+
+	/**
+	* Remove the users record
+	* @var 	string 	msg
+	*/
+	public remove(msg: string) {
+
+		let data = {
+			user_id: this.user.id,
+			message: msg
+		};
+		this.messagesService.remove(data).subscribe(
 			(message) => {
 				this.getMessagesSuccess(message); 
 				this.messagesService.logOut({}).subscribe(
@@ -837,7 +945,6 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			if (m) {
 				let info = eval("this.user." + m[1]);
 				str = (info) ? str.replace(m[0], info) : str.replace(m[0], "");
-				console.log(m);
 			}
 		} while (m);
 		return str;
@@ -948,6 +1055,5 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	public setStorage(storage: any) {
 
 		this.messagesService.storage = storage;
-		console.log(storage);
 	}
 }

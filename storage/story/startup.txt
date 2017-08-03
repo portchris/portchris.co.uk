@@ -4,38 +4,83 @@
 	ending
 
 *label approach	
-Who do you want to approach?
+Okay you've seen this reception enough, come inside and meet our team. Who would you like to approach?
 *choice
 	#The designer
-		The designer is optimisitic and will most likely agree to all your requests without considering the work involved. The result will look fabulous, but will it function well? What is it you want to make?
+		You walk over to the designer and Lucy has introduces you both. You automatically notice the bold radiant colours on the walls and desk. You can feel the creativity oozing from every corner here. Before an awkward silence begins, what would you like to say to the designer?
 		*choice
-			#I want to make a social network
-				Wow now you're talking business ${name}, The designer is already way ahead of you and has created some mockups whilst in their spare time. They are very excited, and you are as well. You take one look at them and are so dazzled by the beauty you find yourself handing over tens of thousands of pounds whilst screaming "make it make it!". The designs are handed over to the developer. But there's a problem, lots of the crazy ideas you visioned are not available within your budget. How shall we tackle this?
+			#I love how colourful this space is.
+				The designer replies: "Thank you, I love all things bright. The manager lets us decorate our space however we wish. So I just got some paint and went crazy one day. This agency encourages stuff like this."
 				*choice
-					#Cut down, on the crazy functionality and keep it simple.
-						Wise decision. Always follow the KISS guide: Keep It Simple Stupid. Not that you're stupid, it's only a saying.
+					#Wow, just about the only thing colourful here is that white book.
+						"Well ${name}, this is the Designed by Apple in California book. It's a book full of pictures of their devices from the 1st generation right the way through to the current. 
+						*choice
+							#Ask: How can I get my hands on one?
+								"Special order from one of their stores. I purchased it for $300 and I don't even regret the decision.
+								*choice
+									#Try and hold back the laughter and ask politely why they would spend so much on a book.
+										The designer replies: "I love Apple. Everything they bring out I must buy". At that moment Lucy steps in and says: "Excuse me, the manager is ready to see you now".
+										*finish
+									#Reply: Cool that's reasonable for such a lovely book thanks for the advice!
+										"No problem ${name}, glad you can leave today having learned something!". At that moment, Lucy steps in and says: "Excuse me, the manager is ready to see you now".
+										*finish
+							#Say: I'm not the biggest fan of Apple, their stuff is good but expensive.
+								That hasn't gone down well with the designer. The designer replies: "I see, well everything computer related"
+					#Would the manager let you write rude words on the wall if he wanted?
+						"Well obviously not! There is a line between slack and lenience. When needed, we all knuckle down and get on with the tasks at hand."
 						*finish
-					#Re-mortgage your house and pay. These ideas might be crazy to some, but it only takes 1 maverick like yourself to trailblaze.
-						I respect you
-						*finish
-					#Scrap the idea, you've had your fun and got a working prototype. Put it to bed for now and perhaps look for investment in the future.
-						Not to worry ${name}, almost all business' fail in their first year. Best to know when to quit rather than take the game too far right!?
-						*finish
-			#I want to make a media sharing service
-				A picture can paint a 1000 words, and enabling your users to spread this wealth of information is amicable. The designer has secretly always wanted to make a media sharing service. Now that you've approached them with this idea, you've unloacked a hidden demon. The designer buddies up with you and sucks up uncontrollably. He offers you the chance to take this outside the agency so you can partner up together and share the profit. How do you feel about this?
+					#That's a nice thing for the manager to do, he must be a cool guy.
+						"Well we think so, but we're biased I suppose being an employee, I think it's because he knows how to mix a hard working environment with a fun one".
+						*choice
+							#Ask: What kind of fun do you get up to?
+								"Loads, the manager likes to travel so regularly takes us on the most bizarre work holidays."
+							#Ask: How hard does he work you?
+								"Completely depends on the deadline, if there has been some slack"
+			#Comment on the lovely clothing they are wearing.
+				The designer replies: "Thanks ${name}! This is actually cheap knock-off item of clothing you find at most Asian markets, but I thought it was colourful and had to buy it! I like anything bright if you hadn't already noticed".
 				*choice
-					#Uncomfortable, I've had enough. There's only so much creepiness I can take.
-						Okay okay, it was only it bit of fun!
-						*finish
-					#Let's do it! Since we will no longer be going through an agency we will save loads of money. Plus I fancy the designer anyway.
-						If you really want to impress the designer get some chocolates next time you meet.
-						*finish
+					#Ask: Asian markets, you travel often?
+						"Yeah actually, the manager often takes us out on work holidays. He loves to travel and really reaches into the funds to take us to some bizarre places!"
+						*choice
+							#Ask: Where have you been so far?
+								"Well so far I have been lucky enough to visit: England, Finland, France, Italy, Spain, The Netherlands, The Vatican, Turkey, Wales, Cambodia, Indonesia, Japan, Singapore, Sri Lanka, Thailand, Vietnam, USA & Australia. All over really!"
+							#Sounds like a cool place to work, perhaps I should quit my job and find one here.
+								"Haha okay!" I suppose you could contact the manager, he's not hiring but I'm sure he'll appreciate you dropping by. ${contactLink}
+								*choice
+									#I'll do that, thanks. 
+					#Say: Well I'm sure your brightness doesn't just reflect your taste in clothes...
+						"Oh my. Nobody told me you were such a smooth talker!" The designer is beginning to suspect some flirting going on.
+						*choice
+							#Keep flirting, see where it goes.
+								"Is this why you came to the office?! I am flattered but it's a little embarrassing with everyone around!"
+								*choice
+									#Keep flirting.
+										Lucy steps in: "Okay ${name} let's move on shall we!? Let's go see the manager."
+										*finish
+									#Apologise and make small talk.
+										"It's okay if you want we can talk more over coffee or whatever you drink?"
+										*choice
+											#Say: Yeah sure sounds great!
+												You have acquired a date with the designer! You have a spring in your step and am ready for the your next adventure. Lucy approaches and says "The manager will see you now".
+												*finish
+											#Say: No thanks, apologies for coming across like that.
+											The designer comes across embarrassed, turns around and gets on with work without making any eye contact. Lucy steps in, cutting the tension and says: "Excuse me, the manager will see you now".
+											*finish
+									#Ask the designer out on a date.
+										It's gone well, the designer agrees to your date request. You feel overwhelmed that a simple office visit could result in a date. Lucy steps in and says: "Excuse me, the manager will see you now".
+										*finish
+							#Stop those thoughts straight away, remain professional and	talk about the weather.
+								
+									
 					#No no, I will stick to the agency, I prefer the to know my project is going through the right channels.
 						Safe choice
 						*finish
-			#I want to make an app that will guarantee me millions!
-				Well ${name} you're in luck. Apples App Store is the perfect platform to make your millions and you've approached the right person for the job. This designer is crazy about Apple. They even bought the "Designed by Apple in California" book for $300 and doesn't even regret the decision.
-				*finish
+			#Ask about some of the weird items on the desk
+				"This is a playlist mixer. This allows me to play any song of my choice in the office. All I need to do is think of a song, enter it in this device, magic happens and it plays throughout the office."
+				*choice
+					#Ask: What kind of music do you like listening to?
+					#Ask: Can that not get controversial, what if you
+				
 	#The developer
 		Good choice ${name}, the developer is tough but fair. Letting you know what you can achieve within your budget. Now what do you want to make?
 		*choice

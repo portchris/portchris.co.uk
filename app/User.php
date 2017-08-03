@@ -128,7 +128,7 @@ class User extends Authenticatable
 					// The importer may have overrided IDs, update the users stage back to 1
 					$user->stage = 1;
 					$user->save();
-					throw new \Exception(__("An error occurred trying to retrieve your progress. You'll have to restart the game to continue. Please sign-in again. Apologies for the inconvenience caused."), 500);
+					throw new \Exception(__("Oh dear, there's been an accident in the office which is in the way of retrieving your records. You'll have to come back again another time to continue. Please sign-in again. Apologies for the inconvenience caused."), 500);
 				}
 				$id = $nextQ->id;
 				if ($stage != 1) {
@@ -147,7 +147,7 @@ class User extends Authenticatable
 		} catch (JWTException $e) {
 			
 			// Something went wrong whilst attempting to encode the token
-			$msg = "Something went wrong. Please try again or say 'Continue as guest' to continue as a guest.";
+			$msg = "Sorry I must've missed something. Please try again or say 'Continue as guest' to continue as a guest.";
 			$code = 500;
 		}
 		return Messages::create([
@@ -170,7 +170,7 @@ class User extends Authenticatable
 	*/
 	public function messageUserNotFound() {
 
-		return sprintf(__("Sorry, I don't recognise you. You must be new around here:%s> If you want to create a new account? Type 'Create an account'. This way you I track your progress for next time.%s> Don't want me to track your progress? No biggie, type 'Continue as guest' to continue as a guest.%s> Or perhaps you simply mis-typed your email address or password try entering another address if this is the case."), PHP_EOL . PHP_EOL, PHP_EOL, PHP_EOL);
+		return sprintf(__("Your name hasn't appeared in our guestbook before now.%s> If you would like to sign up type 'Create an account'.%s> If you don't want to sign it type 'Continue as guest'.%s> If there has been a mistake and you know you've signed guestbook before then perhaps there has been a mis-typed email or password. Please try again by entering your email address once more."), PHP_EOL . PHP_EOL, PHP_EOL, PHP_EOL);
 	}
 
 	/**
@@ -183,7 +183,7 @@ class User extends Authenticatable
 	public function messageUserAuthorised($user, $question) {
 
 		$content = Messages::convertChoiceScriptVariables($question->content, $user);
-		return sprintf(__("Welcome back %s. Let's pick up where you left off at stage %s of scene \"%s\":%s%s"), $user->name, $question->stage, $question->name, PHP_EOL . PHP_EOL, $content);
+		return sprintf(__("Ah yes I can see your name in our guestbook. Welcome back to the office %s. Let's pick up where you left off at stage %s of scene \"%s\":%sRemember, if you need any assistance then ask me anything from the \"Helper Commands\" reference at any time. It is located to the right.%s%s"), $user->name, $question->stage, $question->name, PHP_EOL . PHP_EOL, PHP_EOL . PHP_EOL, $content);
 	}
 
 	/**

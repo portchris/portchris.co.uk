@@ -7,6 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Contact } from "./contact";
 import { ContactService } from "./contact.service";
 import { slideInOutAnimation } from '../../animations/slideinout.animation';
+import { popInOutAnimation } from '../../animations/popinout.animation';
 import { FormBuilder, Validators } from '@angular/forms';
 import { Observable }  from 'rxjs/Observable';
 import 'rxjs/add/operator/debounceTime';
@@ -15,7 +16,7 @@ import 'rxjs/add/operator/debounceTime';
 	selector: 'contact',
 	templateUrl: './contact.component.html',
 	styleUrls: ['./contact.component.css'],
-	animations: [slideInOutAnimation],
+	animations: [slideInOutAnimation, popInOutAnimation],
 	host: { '[@slideInOutAnimation]': '' },
 	providers: [ContactService]
 })
@@ -44,6 +45,12 @@ export class ContactComponent implements OnInit, OnChanges {
 	* @var 	Observable
 	*/
 	private sub: any;
+
+	/**
+	* If the contact service is sending
+	* @var 	boolean
+	*/
+	private sending: boolean;
 
 	/**
 	* These constants are used to limit the message types allowed
@@ -144,6 +151,7 @@ export class ContactComponent implements OnInit, OnChanges {
 		let data = this.contactForm.value;
 		if (this.isValid()) {
 			let d = this.constructWufooData(data);
+			this.setIsSending(true);
 			this.contactService.sendEnquiry(d).subscribe(
 				(enquiry) => { this.sendEnquirySuccess(enquiry); },
 				(error) => { this.sendEnquiryError(error) },
@@ -207,6 +215,7 @@ export class ContactComponent implements OnInit, OnChanges {
 
 		console.error(error);
 		this.err = error;
+		this.setIsSending(false);
 	}
 
 	/**
@@ -215,9 +224,20 @@ export class ContactComponent implements OnInit, OnChanges {
 	*/
 	private sendEnquiryComplete() {
 
+		this.setIsSending(false);
+		this.contactForm.controls["message"].setValue(" ");
 		setTimeout(() => {
 			this.success = "";
 			this.err = "";
 		}, 6000);
+	}
+
+	/**
+	* If the contact service is sending, notify the user
+	* @param 	isSending 	boolean
+	*/
+	private setIsSending(isSending: boolean) {
+
+		this.sending = isSending;
 	}
 }

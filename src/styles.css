@@ -43,6 +43,10 @@ ul {
 ul li {
 	padding-left: 7px;
 }
+hr {
+	background-color: #FFF;
+	margin-top: 0;
+}
 button.btn, button.btn-primary {
 	border-radius: 0;
 	background-color: #FFF;
@@ -110,12 +114,13 @@ button:hover, button:focus, .btn-primary:hover, .btn-primary:focus {
 	padding: 0;
 }
 .no-scrollbars {
-	width: calc(100% + 5px);
+	width: calc(100% + 25px);
 	height: 100%;
 	overflow-y: auto;
+	/*margin-left: 25px;*/
 }
 .gutter-margin {
-	margin-right: 20px;
+	margin-right: 25px;
 }
 .header {
 	border-right: 2px solid #FFF;
@@ -131,6 +136,21 @@ button:hover, button:focus, .btn-primary:hover, .btn-primary:focus {
 	position: fixed;
 	top: 0;
 	z-index: 99;
+}
+.active-typing {
+	border-radius: 10px;
+	padding: 0 10px;
+	height: 30px;
+	overflow: hidden;
+	background: #FFF;
+	float: left;
+}
+.active-typing-dots {
+	font-size: 30px;
+	color: #2B2F3D;
+	line-height: 0;
+	margin: 15px -7px 0px;
+	display: inline-block;
 }
 .clickable:hover {
 	cursor: pointer;
@@ -237,6 +257,17 @@ portfolio .icon {
 	21.25% { opacity: 1; transform:scale(1.05); }
 	25% { transform:scale(1); }
 }
+@media (max-width: 991px) {
+	#sidebar {
+		font-size: 0.75rem !important;
+	}
+	#situation .temp {
+		font-size: 170% !important;
+	}
+	#situation .icon {
+		max-height: 23px !important;
+	}
+}
 @media (max-width: 767px) {
 	.container {
 		max-width: none;
@@ -259,17 +290,22 @@ portfolio .icon {
 		width: 100%;
 	}
 	.nav-item {
+		width: 100% !important;
+		padding: 0;
+	}
+	a.nav-link {
 		border: 2px solid #FFF !important;
 		width: 100% !important;
+		padding: 7px !important;
 	}
-	.nav-item:not(:last-child) {
+	.nav-item:not(:last-child) a.nav-link {
 		border-right: none !important;
 	}
-	.nav-item:hover, .nav-item:focus, .nav-item.active {
+	a.nav-link:hover, a.nav-link:focus, a.nav-link.active {
 		background-color: #FFF;
 	}
-	.nav-item:hover a, .nav-item:focus a, .nav-item.active a {
-		color: #272935;
+	a.nav-link:hover, a.nav-link:focus, a.nav-link.active {
+		color: #272935 !important;
 	}
 	.header p {
 		margin-bottom: 0;
@@ -288,5 +324,11 @@ portfolio .icon {
 	}
 	.sidebar {
 		display: none;
+	}
+	#user-input {
+		width: calc(100% - 10px) !important;
+	}
+	#contact-me .form-control {
+		max-width: none !important;
 	}
 }

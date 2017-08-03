@@ -7,9 +7,98 @@
 
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="icon" type="image/x-icon" href="favicon.ico">
+	<style type="text/css">
+		body, html {
+			position: relative;
+			background-color: transparent;
+			color: #FFF;
+			font-family: "Courier New", Courier, monospace;
+			font-size: 0.9rem;
+			font-weight: 400;
+			line-height: 1.5;
+		}
+		p {
+			margin-top: 0;
+			margin-bottom: 1rem;
+		}
+		small {
+			font-size: 80%;
+			font-weight: 400;
+		}
+		#out-of-date-link {
+			color: #FFF; 
+			text-decoration: underline;
+		}
+		.full-width {
+			width: 100%;
+			clear: both;
+		}
+		.centre {
+			position: fixed; 
+			top: 50%; 
+			left: 50%; 
+			transform: translate(-50%, -50%);
+			text-align: center;
+		}
+		#active-typing-container {
+			margin: 0 auto; 
+			max-width: 55px; 
+			height: 50px;
+		}
+		.active-typing {
+			border: 2px solid #FFF;
+			border-radius: 10px;
+			padding: 0 10px;
+			height: 30px;
+			overflow: hidden;
+			background: #FFF;
+			float: left;
+		}
+		.active-typing-dots {
+			font-size: 30px;
+			color: #2B2F3D;
+			line-height: 0;
+			margin: 15px -7px 0px;
+			display: inline-block;
+		}
+		.fade-in { 
+			animation: fadeIn 4s infinite linear; 
+			animation-fill-mode:both; 
+		}
+		.fade-in:nth-child(1) { 
+			animation-delay: .5s; 
+		}
+		.fade-in:nth-child(2) { 
+			animation-delay: 1s; 
+		}
+		.fade-in:nth-child(3) { 
+			animation-delay: 1.5s; 
+		}
+		@keyframes fadeIn {
+			0% { opacity: 0; transform:scale(.1); }
+			21.25% { opacity: 1; transform:scale(1.05); }
+			25% { transform:scale(1); }
+		}
+	</style>
 </head>
-<body>
-	<app-root>Loading...</app-root>
+<body style="background-color: #282B38;">
+	<app-root>
+		<div class="centre">
+			<div class="full-width">
+				<div id="active-typing-container">
+					<div class="active-typing">
+						<span class="fade-in active-typing-dots">&bull;</span>
+						<span class="fade-in active-typing-dots">&bull;</span>
+						<span class="fade-in active-typing-dots">&bull;</span>
+					</div>
+				</div>
+			</div>
+			<div class="full-width">
+				<p>Not loading? Please ensure JavaScript is enabled and your browser is up to date. <a id="out-of-date-link" href="https://www.whatismybrowser.com/" target="_blank">Click here to check your browser is up to date.</a></p>
+				<small>This is a portfolio site designed to show off the developer's skills in the latest technologies available.</small>
+			</div>
+		</div>
+	</app-root>
 	
 	<!-- 3rd party scripts -->
 	<script type="text/javascript" src="assets/js/particlejs/particles.min.js"></script>

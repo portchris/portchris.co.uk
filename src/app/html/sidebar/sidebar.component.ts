@@ -100,7 +100,41 @@ export class SidebarComponent implements OnInit, OnChanges {
 			this.weather = w;
 			this.timezone = t;
 			this.displayWeatherIcon(weatherCond.main, weatherCond.description);
+			this.weatherService.setWeatherData({
+				weather: this.weather,
+				time: this.timezone
+			});
+			var myTime = setInterval(() => this.refreshTime(this.timezone.timestamp), 1000);
 		}
+	}
+
+	/**
+	* Configure the clock feature
+	* @param 	int 	timestamp
+	*/
+	private refreshTime(timestamp) {
+
+		let newTimestamp = timestamp + 1;
+		let today = new Date(newTimestamp * 1000);
+		let h = today.getHours();
+		let m = today.getMinutes();
+		let s = today.getSeconds();
+		m = this.checkTime(m);
+		s = this.checkTime(s);
+		this.timezone.time = h + ":" + m + ":" + s;
+		this.timezone.timestamp = newTimestamp;
+	}
+
+	/**
+	* Add leading zero in front of numbers < 10
+	* @param 	int 	i
+	*/
+	private checkTime(i) {
+
+		if (i < 10) {
+			i = "0" + i;
+		};
+		return i;
 	}
 
 	/**

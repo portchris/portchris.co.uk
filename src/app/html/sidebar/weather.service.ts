@@ -68,6 +68,7 @@ export class WeatherService {
 	public getWeatherData() {
 
 		let weatherData = JSON.parse(this.storage.getItem('weatherData'));
+		weatherData = (typeof weatherData === "string" && weatherData.length > 0) ? JSON.parse(weatherData) : weatherData;
 		return weatherData;
 	}
 
@@ -77,13 +78,13 @@ export class WeatherService {
 	*/
 	public setWeatherData(data: any) {
 
+		data.updated = Math.round((new Date()).getTime() / 1000);
 		this.storage.setItem('weatherData', JSON.stringify(data));
 	}
 
 	private handleError(error: Response | any) {
 		
 		// Might use a remote logging infrastructure for live environment
-		console.log("YO", error);
 		let errMsg: string;
 		if (error instanceof Response) {
 			const body = error.json() || '';

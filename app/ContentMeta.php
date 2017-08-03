@@ -116,7 +116,6 @@ class ContentMeta extends Model
 		return $this->belongsTo('App\User');
 	}
 
-
 	/**
 	* Create and return new message using template constant
 	*
@@ -293,7 +292,7 @@ class ContentMeta extends Model
 
 		$aboutLink = self::getAboutLink();
 		$contactLink = self::getContactLink();
-		return sprintf(__("I hope you've enjoyed playing the game and experiencing a small taster of agency life. Feel free to %s. Or if you'd rather cut to the point and %s, then please go right ahead! I would appreciate some feedback."), $aboutLink, $contactLink);
+		return sprintf(__("I hope you enjoyed meeting the team. Feel free to %s. Or if you'd rather cut to the point and %s, then please go right ahead. I'm sure he would appreciate some feedback."), $aboutLink, $contactLink);
 	}
 
 	/**
@@ -304,7 +303,7 @@ class ContentMeta extends Model
 	*/
 	public static function getAboutLink() {
 
-		return '<a href="/portfolio" target="_blank" title="' . __('Learn more about Chris Rogers') . '">' . __('read more about me here') . '</a>';
+		return '<a href="/portfolio" target="_blank" title="' . __('Learn more about Chris Rogers') . '">' . __('read more about Chris here') . '</a>';
 	}
 
 	/**
@@ -315,7 +314,7 @@ class ContentMeta extends Model
 	*/
 	public static function getContactLink() {
 
-		return '<a href="/contact" target="_blank" title="' . __('Contact Chris Rogers') . '">' . __('contact me') . '</a>';
+		return '<a href="/contact" target="_blank" title="' . __('Contact Chris Rogers') . '">' . __('contact Chris directly') . '</a>';
 	}
 
 	/**

@@ -24,18 +24,17 @@ header .p-2 {
 	padding: 0;
 	display: block;
 }
-.navbar li {
+.navbar a {
 	transition: 0.2s 500ms ease-in-out;
 	border: 2px solid transparent;
 	border-right: none;
-	padding: 5px;
 	margin-right: 0;
 	width: calc(100% + 15px);
 }
-.navbar li.active, .navbar li:hover {
+.navbar a.active, .navbar a:hover {
 	border: 2px solid #FFF;
 	border-right: none;
 }
-.navbar li, .navbar li:active, .navbar li:focus, .navbar li.active {
+.navbar a, .navbar a:active, .navbar a:focus, .navbar a.active {
 	color: #FFF;
 }

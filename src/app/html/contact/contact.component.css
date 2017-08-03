@@ -1,8 +1,8 @@
 #contact-me .icon {
 	width: 100%;
 	height: auto;
-	max-width: 110px;
-	max-height: 110px;
+	max-width: 55px;
+	max-height: 55px;
 	border-radius: 10px;
 	transition: 0.2s 100ms ease-in-out;
 }
@@ -25,8 +25,15 @@
 #contact-me button:not([disabled]):hover .icon {
 	display: inline;
 }
+#contact-me .form-control {
+	max-width: 95%;
+}
+#is-sending {
+	min-height: 41.8px;
+}
 .social {
 	padding: 10px;
+	text-align: center;
 }
 #linkedin-contact:hover {
 	background-color: #4875B4; 

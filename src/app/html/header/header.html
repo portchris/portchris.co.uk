@@ -24,14 +24,14 @@
 </header>
 <nav class="navbar navbar-toggleable">
 	<ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-		<li class="nav-item active">
-			<a routerLink="/" routerLinkActive="active" routerLinkInactive="" class="nav-link">Talk to me</a>
+		<li class="nav-item">
+			<a routerLink="/" [routerLinkActive]="['active']" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">Talk to me</a>
 		</li>
 		<li class="nav-item">
-			<a routerLink="/portfolio" routerLinkActive="active" class="nav-link">Portfolio</a>
+			<a routerLink="/portfolio" [routerLinkActive]="['active']" class="nav-link">Portfolio</a>
 		</li>
 		<li class="nav-item">
-			<a routerLink="/contact" routerLinkActive="active" class="nav-link">Contact</a>
+			<a routerLink="/contact" [routerLinkActive]="['active']" class="nav-link">Contact</a>
 		</li>
 	</ul>
 </nav>

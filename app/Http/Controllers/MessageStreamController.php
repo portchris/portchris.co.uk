@@ -98,7 +98,7 @@ class MessageStreamController extends Controller
 		// Respond to users message
 		$return = $this->doRespond($data);
 
-		// Save message for existing users - NOTE: removed this, might delete in future...
+		// Save message for existing users - NOTE: commented this out, might delete in future...
 		// if (!$this->is_guest && !empty((array)$this->user)) {
 		// 	$k = $data['key'] ?? false;
 		// 	$c = $data['content'] ?? false;
@@ -270,32 +270,4 @@ class MessageStreamController extends Controller
 		$this->is_guest = (strlen($t) > 0) ? true : false;
 		return $this->is_guest;
 	}
-
-	/**
-	* To import my story I have chosen the popular ChoiceScript templating format which
-	* uses ${} for their variables. This will convert that to useful user info.   
-	*
-	* @param 	string 	$str
-	* @return 	string 	$str
-	*/
-	// public function convertChoiceScriptVariables(string $str) {
-		
-	// 	$re = '/\${(.*?)\}/';
-	// 	$res = [
-	// 		"name" => (isset($this->user->name)) ? $this->user->name : __("Guest"),
-	// 		"firstname" => (isset($this->user->firstname)) ? $this->user->firstname : __("Guest"),
-	// 		"lastname" => (isset($this->user->lastname)) ? $this->user->lastname : __("Guest"),
-	// 		"finish" => Messages::getFinalMessage(),
-	// 		"contactLink" => Messages::getContactLink(),
-	// 		"aboutLink" => Messages::getAboutLink()
-	// 	];
-	// 	do {
-	// 		preg_match($re, $str, $m);
-	// 		if ($m) {
-	// 			$info = (isset($res[$m[1]])) ? $res[$m[1]] : "";
-	// 			$str = str_replace($m[0], $info, $str);
-	// 		}
-	// 	} while ($m);
-	// 	return $str;
-	// }
 }

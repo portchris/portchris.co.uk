@@ -84,7 +84,7 @@ class UserController extends Controller
 			$id = $q->id;
 			$msg = [
 				'id' => $id,
-				'content' => sprintf(__("Welcome %s. Let's begin.%s%s"), $user->name, PHP_EOL . PHP_EOL, $q->content),
+				'content' => sprintf(__("All done %s. You are successfully signed in our guestbook! Let's begin.%s%s"), $user->name, PHP_EOL . PHP_EOL, $q->content),
 				'type' => Messages::TYPES['ContentMeta'],
 				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => sprintf(__("New user: %s"), $user->id),
@@ -138,11 +138,11 @@ class UserController extends Controller
 		$msg = "";
 		try {
 			$token = (JWTAuth::getToken()) ? JWTAuth::getToken()->get() : false;
-			$msg = (JWTAuth::invalidate($token)) ? __("Successfully logged off, as if we never met.") : __("Sorry, we couldn't log you out, looks like you're stuck with me for now...");
+			$msg = (JWTAuth::invalidate($token)) ? __("Done! Successfully signed out of our guestbook.") : __("Sorry, we couldn't log you out, looks like you're stuck with us for the time being. It's raining outside anyway!");
 		} catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
 
 			// Even if it errors, then JWT Auth has successfully forgotten the token.
-			$msg = __("You are now logged out, as if we never met.");
+			$msg = __("Done! Successfully signed out of our guestbook.");
 		}
 		return response()->json(Messages::create([
 			'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : $msg,
@@ -162,12 +162,12 @@ class UserController extends Controller
 	 */
 	public function reset(Request $request) {
 		
-		$msg = "Cannot reset, this user does not exist!";
+		$msg = "Cannot reset, your name does not appear in the visitors guestbook!";
 		$r = $this->error($msg);
 		$userId = $request->input("user_id");
 		if ($userId && (int)$userId > 0 && is_numeric($userId)) {
 			User::where("id", $userId)->update(["stage" => 1]);
-			$msg = "Users progress successfully reset.";
+			$msg = "Okay, you've been signed out of our guestbook and your progress has been reset back to stage 1.";
 			$r = response()->json(Messages::create([
 				'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : __($msg),
 				'type' => Messages::TYPES['User'],
@@ -177,6 +177,50 @@ class UserController extends Controller
 				'method' => 'welcome',
 				'user_id' => $userId
 			]));
+		}
+		return $r;
+	}
+
+	/**
+	 * Remove the user.
+	 *
+	 * @param  Request  $request
+	 * @return \Illuminate\Http\Response
+	 */
+	public function remove(Request $request) {
+		
+		$msg = "Cannot remove you, your name does not appear in the visitors guestbook!";
+		$r = $this->error($msg);
+		$userId = $request->input("user_id");
+		if ($userId && (int)$userId > 0 && is_numeric($userId)) {
+			try {
+				$deleted = User::where("id", $userId)->delete();
+				if ($deleted) {
+					$msg = "Okay, we have removed your name from the guestbook. As if we never met... :(";
+					$r = response()->json(Messages::create([
+						'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : __($msg),
+						'type' => Messages::TYPES['User'],
+						'key' => Messages::KEY_TYPE_ANSWER,
+						'name' => __('Reset'),
+						'title' => __('Reset'),
+						'method' => 'welcome',
+						'user_id' => $userId
+					]));
+				} else {
+					throw new \Exception($msg, 1);
+					
+				}
+			} catch (Exception $e) {
+				$r = response()->json(Messages::create([
+					'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : __($msg),
+					'type' => Messages::TYPES['User'],
+					'key' => Messages::KEY_TYPE_ERROR,
+					'name' => __('Reset'),
+					'title' => __('Reset'),
+					'method' => 'welcome',
+					'user_id' => $userId
+				]), 500);
+			}
 		}
 		return $r;
 	}
@@ -358,9 +402,6 @@ class UserController extends Controller
 		$type = Messages::TYPES["User"];
 		try {
 			$msg = User::authenticate($request);
-			// $request = Request::create('api/user/authenticate', 'POST', $data);
-			// $msg = Route::dispatch($request);
-			// $msg = ($msg->original) ? $msg->original : $msg;
 		} catch (\Exception $e) {
 			$code = ($e->getCode() !== 0) ? $e->getCode() : 401;
 			$msg = Messages::create([
@@ -417,7 +458,7 @@ class UserController extends Controller
 			);
 			$token = JWTAuth::encode($payload);
 			if (!$token) {
-				$msg = __("Could not create guest account please try again");
+				$msg = __("Could not create guest record please try again");
 				$code = 500;
 				$name = "error";
 				$title = "NO TOKEN";
@@ -431,11 +472,11 @@ class UserController extends Controller
 					throw new \Exception("Error: could not find next question.");
 				}
 				$id = $q->id;
-				$msg = sprintf(__("Welcome %s to the game. Let's begin. %s"), $claims["username"], $q->content);
+				$msg = sprintf(__("Fantastic %s, you are all registered in the guestbook! If you ever change your mind in the future, please refer to the \"Helper Commands\" box to the right and type any of those commands at any point. Let's begin. %s"), $claims["username"], $q->content);
 				$code = 200;
 				$name = "success";
 				$title = $token->get();
-				$key = Messages::KEY_TYPE_ANSWER;
+				$key = Messages::KEY_TYPE_QUESTION;
 				$stage = 1;
 				$type = Messages::TYPES['ContentMeta'];
 				$method = "talk";
@@ -509,55 +550,4 @@ class UserController extends Controller
 			0
 		]), $errCode);
 	}
-
-	/**
-	* Get the logged in user
-	*
-	* @return 	JSON response of user
-	*/
-	// public function getAuthenticatedUser() {
-
-	// 	$msg = "";
-	// 	$code = 200;
-	// 	try {
-	// 		$msg = User::authenticate();
-	// 	} catch (Exception $e) {
-	// 		$code = $e->getCode();
-	// 		$msg = Messages::create([
-	// 			'content' => __($e->getMessage()), 
-	// 			'key' => "answer", 
-	// 			'name' => "error", 
-	// 			'title' => $e->getCode(), 
-	// 			'stage' => 0,
-	// 			'type' => Messages::TYPES["User"],
-	// 			'method' => "authenticate"
-	// 		]);
-	// 	}
-
-	// 	// The token is valid and we have found the user via the sub claim
-	// 	var_dump(response()->json(compact('user'))); die;
-	// 	return response()->json($msg, $code);
-	// }
-
-	/**
-	 * Attempt to identify the user.
-	 *
-	 * @param  array 	$data
-	 * @return \Illuminate\Http\Response 	JSON
-	 */
-	// public function identify($data) {
-		
-	// 	$return = User::message("Welcome, with whom is it I speak?");
-	// 	$username = $data["username"] ?? false;
-	// 	$password = $data["password"] ?? false;
-	// 	if (Auth::check()) {
-	// 		$return = Auth::user();		
-	// 	} else if ($username && $password) {
-	// 		$return = Auth::attempt([
-	// 			'username' => $username, 
-	// 			'password' => $password
-	// 		]);
-	// 	}
-	// 	return $return;
-	// }
 }
