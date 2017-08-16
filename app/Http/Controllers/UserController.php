@@ -84,7 +84,7 @@ class UserController extends Controller
 			$id = $q->id;
 			$msg = [
 				'id' => $id,
-				'content' => sprintf(__("All done %s. You are successfully signed in our guestbook! Let's begin.%s%s"), $user->name, PHP_EOL . PHP_EOL, $q->content),
+				'content' => sprintf(__("All done %s. You have successfully registered in our guestbook! Let's begin.%s%s%sNote: If you ever get stuck, you can refer to the \"Helper Commands\" box - you can type any of those commands in at any point."), $user->name, PHP_EOL . PHP_EOL, $q->content, PHP_EOL . PHP_EOL),
 				'type' => Messages::TYPES['ContentMeta'],
 				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => sprintf(__("New user: %s"), $user->id),
@@ -472,7 +472,7 @@ class UserController extends Controller
 					throw new \Exception("Error: could not find next question.");
 				}
 				$id = $q->id;
-				$msg = sprintf(__("Fantastic %s, you are all registered in the guestbook! If you ever change your mind in the future, please refer to the \"Helper Commands\" box to the right and type any of those commands at any point. Let's begin. %s"), $claims["username"], $q->content);
+				$msg = sprintf(__("Okay %s! Now let's begin. %s%sNote: If you ever get stuck, you can refer to the \"Helper Commands\" box - you can type any of those commands in at any point."), $claims["username"], $q->content, PHP_EOL . PHP_EOL);
 				$code = 200;
 				$name = "success";
 				$title = $token->get();
@@ -495,7 +495,7 @@ class UserController extends Controller
 		$m = Messages::create([
 			'id' => $id,
 			'content' => $msg,  
-			'key' => Messages::KEY_TYPE_ERROR, 
+			'key' => $key, 
 			'name' => $name,
 			'title' => $title,
 			'stage' => $stage, 

@@ -170,7 +170,7 @@ class User extends Authenticatable
 	*/
 	public function messageUserNotFound() {
 
-		return sprintf(__("Your name hasn't appeared in our guestbook before now.%s> If you would like to sign up type 'Create an account'.%s> If you don't want to sign it type 'Continue as guest'.%s> If there has been a mistake and you know you've signed guestbook before then perhaps there has been a mis-typed email or password. Please try again by entering your email address once more."), PHP_EOL . PHP_EOL, PHP_EOL, PHP_EOL);
+		return sprintf(__("Your name hasn't appeared in our guestbook before.%s> To sign it, type 'Create an account'.%s> If you don't want to sign it, type 'Continue as guest'.%s> If you have signed the guestbook before, then perhaps there has been a mis-typed email or password. Please try again by entering your email address."), PHP_EOL . PHP_EOL, PHP_EOL . PHP_EOL, PHP_EOL . PHP_EOL);
 	}
 
 	/**

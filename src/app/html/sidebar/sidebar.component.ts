@@ -98,6 +98,7 @@ export class SidebarComponent implements OnInit, OnChanges {
 		if (w && t && w.weather && w.name && w.main && t.time) {
 			let weatherCond = w.weather[0];
 			this.weather = w;
+			this.weather.main.temp = Math.floor(this.weather.main.temp);
 			this.timezone = t;
 			this.displayWeatherIcon(weatherCond.main, weatherCond.description);
 			this.weatherService.setWeatherData({

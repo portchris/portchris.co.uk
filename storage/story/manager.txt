@@ -3,20 +3,320 @@
 	manager
 	ending
 
-You walk upstairs toward the managers office. It smells sweet and reminds you of good times. You are waiting at the entrance to his office what do you do?
-	#Knock
+As you walk upstairs, you notice the sudden drop in temperature. Photos of employees at various staff events line the left hand side walls of the corridor leading to the managers office. They look amateur and some are nearly impossible to make out, but everyone is smiling and having a great time. You approach the door to Chris' office, what do you want to do?
+*choice
+	#Follow the manager into his office.
 		*label manager
-		The manager opens the door, and has been expecting you.
+		The manager opens the door and suddenly a sweet smell envelops your senses which remind you of happy childhood memories. The room itself however, looks nothing like the rest of the office. In fact it looks unfinished and a bit barron. To avoid potentially insulting Chris you hide your true feelings and say:
 		*choice
-			#I want pitch a social network idea
-				Yeah that can be done, what budget do you have?
-				*finish
-			#I want pitch a media sharing service idea
-				Yeah that can be done, what budget do you have?
-				*finish
-			#I want pitch an app idea that will make millions!
-				Haha yeah that can be done, what budget do you have?
-				*finish
-	#Read the sign on the door
-		It reads: "Anyone who calls themselves a guru of their practice needs to be eliminated"
-		*goto manager
+			#What a lovely office you have.
+				Chris replies: "Heh, you honestly don't have to say that ${name}, I am fully aware this looks like a basement. It's on the to-do list, the other rooms such as the main office needed finishing first".
+				*choice
+					#It does look a little depressing in here, why did you make this your office?
+						"Truth is I disslike being separate from the rest of the team, but nobody else fancied up here and it made sense for me to take it. I have got the interior decorator coming around next week though, everyone's going to wish they had this office by the end of it!".
+						*goto business
+					#How long has it been like this for?
+						"Oh not long we only moved into this office one month ago, but it's really beginning to agitate me now having to work in this space. Next week an interior decorator will be around to help fix it up".
+						*goto business
+			#What a pleasant smell, it's really bringing back some amazing memories.
+				Chris replies: "Glad you like it. It's a freshly cut grass smell... well I have to make this office pleasant in some way. As you can tell it's unfinished, but it's usually only me in here so it doesn't need to be fancy looking unlike downstairs. Don't worry though, I'm going to have an interior decorator come in and transform this into a paradise!".
+				*choice
+					#Say: I look forward to the finished product.
+						*label business
+						"Yeah hopefully soon this place will look complete! But enough of that, let's get down to business. You have arrived here to progress your development skills. Well, you're in great hands here. What is it you wish to expand in particular?".
+						*choice
+							#Say: My front-end skills.
+								*label shadowing
+								"Awesome! I'm highly comptetent in this area, hopefully I can show you a thing or two".
+								*choice
+									#Say: I am already advanced in this field, I am only looking to sharpen my skills.
+										"Great, well then it's probably best you shadow me for the moment".
+										*choice 
+											#Say: Great! Where do we begin?
+												"Well let's start with you ${name}, what is it you wish to achieve with this role?".
+												*choice
+													#Say: To get more experience on the CV.
+														"Well I guarantee you'll leave this office with a unique experience ${name}. We might be relatively small but we use that to our advantage to make it quirky".
+														*choice 
+															#Ask: Quirky how?
+																"Well firstly we play to our employees strengths by pushing projects toward areas they're most skilled in. Secondly, we always try to have an internal project running alongside a client so everyone can expand their knowledge. Thirdly, have you ever played Vietnamese shuttlecock at work? If not then you are in for a treat as every lunch time we have activities like this to get you out of your seat. I never want a day to be the same".
+																*goto startjob
+															#Say: Sounds good. What projects do you currently have on?
+																"We are currently working on a Magento 2 application for a client. Internally we are working on a virtual reality zombie escape room game".
+																*choice
+																	#Say: Zombies and problem solving sounds really intense...
+																		"My thoughts exactly, the only problem is testing. We've come to a position where the game is too intense to test and it's freaking out our employees. But you ${name} I have high hopes for, the zombies could use some fresh meat!".
+																		*choice
+																			#Say: Bring it on, I'll find all the bugs!
+																				"That's exactly what we're looking for!".
+																				*goto future
+																			#Say: I don't think so, not my game!
+																				*label future
+																				"Heh, of course you won't be doing this all day, this position is for your benefit as well as ours".
+																				*choice
+																					#Ask: Where do you see me in the future?
+																						"Well hopefully with us! You seem compentent and fun and you can clearly hold a conversation with me - which is encouraging. I hope I come across the same".
+																						*goto startjob
+																					#Say: Good, because I have a few ideas I'd love for you to hear.
+																						"Excellent ${name}, and I'd love to hear them. Your opinion really does count here, and despite only knowing you briefly I can already tell you will fit right in".
+																						*goto startjob
+																	#Say: Magento 2...
+																		"Yes, a large client wants an eCommerce site. We are very competent in Magento 1 and have just begun expanding our knowledge into Magento 2".
+																		*choice
+																			#Ask: What's the difference between 1 and 2?
+																				"The architecture of Magento 2 is vastly different from Magento 1 and thus requires a steep learning curve. Changing from version 1 to 2 is more of a process than an upgrade. As a result, the development has changed considerbly".
+																				*choice
+																					#Say: That must've annoyed the Magento community.
+																						"Yes, and the marketplace is still emerging which means some features that used to exist in Magento 1 via extensions would require custom integration for Magento 2. As a result, Magento 1 might still be the best solution depending on your clients needs. Sooner or later, Magento will stop security patches for versions 1.X. The faster you can progress to Magento 2, the better".
+																						*goto startjob
+																					#Say: I see so really they are 2 separate beasts.
+																						"There are some changes in it's design pattern. Magento was previously considered MVC, now it could be considered MVVM - where the Magento block object acts as the ViewModel. Views (phtml files) are now responsible for fetching their information from the ViewModel. There are still many similarities however, such as: XML configuration files, themes, modules etc. It really is a beast, but I love it".
+																						*goto startjob
+																			#Say: I'm not a fan of Magento.
+																				"I must admit the change from version 1 to 2 has shaken this community, but when do you ever stop learning in this industry? The improvements are worth learning. Having said that, people in this office share your views. Firstly it's bloated. There are too many configuration files which makes more room for annoying bugs. It also makes your code less concise and more difficult to debug. Secondly, the documentation is bad and you often find yourself reverse-engineering. Thirdly, the server costs involved in hosting such a solution are considerable. However, while WooCommerce or Shopify might be decent solutions for smaller companies, larger companies would require the complexities that Magento offers. We are experts in PHP, and now more than 25% of eCommerce shops worldwide run on some version of Magento. There really isn't an alternative for us".
+																				*goto startjob
+													#Say: To get to know you guys.
+														"I'm flattered ${name}, we will arrange a meal for you so you can get to know us a little better. Is there anything you want to know in particular?".
+														*choice
+															#Ask: What do you guys do for fun?
+																"Lots, every lunch time I arrange an activity so it get's everyone out of their seats. I also put aside an activity budget each month for people to vote on and every once in a while I'll subsidise a work trip abroad".
+																*choice
+																	#Ask: Abroad sounds nice, where have you been so far?
+																		"Well so far we have been to: Europe, North America, Asia and Australasia".
+																		*choice
+																			#Reply: Woah that's a crazy amount of continents. Why so many and so varied?
+																				"I believe that travelling is the best way to gain an insight into and appreciation for other cultures. Most of the trips have been for leisure, but occasionally they have been for work and they are the best kind of team bonding exercise! We are a family now and have been through some amazing times together".
+																				*goto startjob
+																			#Where's the next?
+																				"There are a few working opportunities in Australia worth applying for...".
+																				*goto startjob
+																	#Say: That's cool, what kind of activities have you done in the past?
+																		"Anything from surfing to go-karting. I usually suggest something and the office will give me their opinion. I personally prefer anything involving the water. We have also arranged some great events indoors too, however".
+																		*choice
+																			#What kind of watersports?
+																				"I love surfing but am still learning. We are looking into kite-surfing for our next adventure. Not sure the office will agree though!".
+																				*goto startjob
+																			#What kind of indoor events?
+																				"We love hackathons, the atmosphere is great and it gives me and excuse to buy some craft ales to tick off of my list!".
+																				*choice 
+																					#Ask: List?
+																						"I got a gift from my father-in-law, '1001 beers you must try before you die' and I have been trying to tick them off of the list ever since".
+																						*goto startjob
+																					#Ask: What kind of ales?
+																						"My favourite so far is the Left-handed Milk Stout. Give it a try. I got a gift from my father-in-law, '1001 beers you must try before you die' and I have been trying to tick them off of the list ever since".
+																						*goto startjob
+															#Ask: What stack do you operate with?
+																"Our office has worked with many stacks, but currently the favourite is a Linux Apache MySQL PHP (LAMP) stack".
+																*choice
+																	#Ask: Have you ever tried NoSQL?
+																		"Yes we are practicing an internal project using a MEAN stack, and it's something we have used for mobile apps. It's de-normalised nature helps improve on performance, especially when you have a portable device accessing your API from anywhere. For websites however, relational databases are still king for now. They are more widely supported, better documented and work out-of-the-box with our platforms and frameworks".
+																		*goto startjob
+																	#Ask: Have you ever tried Nginx?
+																		"Absolutely, we are practicing an internal project using a MEAN stack. We really like how Nginx is designed to better handle a higher number of concurrent users over Apache. On the other hand Apache is more popular, widely supported, better documented and works out-of-the-box with our platforms and frameworks".
+																		*goto startjob
+																	#Ask: Have you ever tried Node.js?
+																		"Not extensively, but we are very familiar with JavaScript including ES6. We are using a MEAN stack in an internal project of ours, however. I personally think it's fantastic for front-end developers looking to more easily expand their knowledge into the world of back-end. It is also newer than PHP, so would naturally be more efficient. We do however, have years of experience with PHP and with such a large community and deep code base we will be sticking with PHP for now".
+																		*goto startjob
+															#Ask: How did you get to this position Chris?
+																"A good question. I went to university with a vague love for media and art. Here I was introduced to world of programming where I quickly grew to love it's ability to bring things to life. I decided to start a business with a colleague to continue creating the things I loved, unfortunately this venture didn't work out and I got a job in an agency. Luckily, I was offered positions that gave me fantastic insight across all areas of web development. After gaining 4 years of valuable experience I went travelling to experience work in other countries, and here I am today!".
+																*choice
+																	#Ask: Which uni did you attend?
+																		"I went to the University of Bournemouth to study Interactive Media Production where I recieved a 2:1 BA Hons degree".
+																		*choice
+																			#Congratulate Chris.
+																				You give your congratulations. Chris replies: "That's really nice of you to say ${name}".
+																				*goto startjob
+																			#Praise Chris.
+																				You start praising Chris. Chris replies: "That's really nice of you to say ${name}".
+																				*goto startjob
+																			#You realise you want to be just like Chris.
+																				You start to explain how you want to be just like Chris. Chris replies: "That's really nice of you to say ${name}".
+																				*goto startjob
+																	#Say: Travelling sounds a little counter-productive to me.
+																		"Not at all, in my personal experience it has enabled me to further expand my knowledge by offering more opportunities. I am not limited by my location".
+																		*goto startjob
+																	#Ask: What happended to the business?
+																		"In the beginning the business looked really promising. We acquired offices in the middle of Bournemouth and we had a few small projects with notable clients. Dry spells however, can really harm a start-up company like ours. Unfortunately most business' fail in their first year and we were no exception. Having just come out of university we had much debt, couple that with the cost of starting a business and we quickly realised we couldn't continue like this. I loved the opportunity and it taught me a lot, but I was thankful to get out and focus on the coding".
+																		*goto startjob																		
+													#Say: To get out and try something different.
+														"Okay ${name} let me ask you something: have you had any projects you've always wanted to build?".
+														*choice
+															#Reply: I have always wanted to build something interactive using Arduino or Raspberry Pi.
+																*label ambitions
+																"That's cool ${name}, in your spare time try and come up with an idea and pitch it to me. If I think the idea is something that will benefit PortChris I may take it further".
+																*choice
+																	#Ask: And if not?
+																		"If it isn't of any interest but you still really want to take it further, then we will arrange a meeting discussing the possibility of a hackathon. This event will take place outside work hours, but I will provide food and craft ales to fuel us all. With an entire team behind it the project is much more likely to become a reality!".
+																		*choice
+																			#Say: What kind of ales?
+																				"Ha, I knew you were going to bring that up! I like to try craft ales from all over the world, I guarantee to bring one you have never tried".
+																				*goto startjob
+																			#Say: Wow how can I say no to that!
+																				"Not a problem ${name}. Events like these aren't just fun, they also expand everyones skills and time management as well as bringing everyone together. It'll be fun!".
+																				*goto startjob
+																	#Ask: How will you take it further?
+																		"If I believe it would be of interest then I will run it past the project manager and we could turn this into an internal project. If so, we will work on it within work hours and with an entire team behind it. This will bring it to life!".
+																		*goto startjob
+															#Reply: I have always wanted to build more games, or at least gamify a project in some way.
+																"I like your ideas. I created an online multi-player game for my final year project in university. I am looking to expand it from a prototype now".
+																*goto ambitions
+															#Reply: No, I haven't really thought of anything.
+																"A couple weeks here and we'll get that creative juice overflowing!".
+																*goto ambitions
+											#Say: What areas do you specialise in Chris?
+												"I am most skilled in the creative side of front-end and programmatical side of back-end. I also have competent sys-admin skills too".
+												*choice
+													#Ask: Can you elaborate on the front-end, which areas specifically?
+														*label frontend
+														"Specifically: HTML4, HTML5, CSS as well as pre-processors, CLI web workflows, CLI package managers, JavaScript including ES5/ES6/TypeScript, RESTful integration, SEO/social implementation and front-end optimisation such as PageSpeed Insights".
+														*choice
+															#Say: There must be areas in front-end you are not so competent in.
+																"Oh of course ${name}, I'd be lying if we said I was a master in this area; you learn all the time. There are areas which we are still exploring such as: Front-end UI testing and automated testing, enhancing our UX/UI, enhancing our design skills, enhancing our TypeScript/ES6 skills, keeping track of all the extensive amount of emerging libraries/frameworks and of course the security around all of it.
+																*goto startjob
+															#Ask: Very nice, how about your  back-end skills?
+																"Of course ${name}".
+																*goto backend
+															#Ask: Very nice how about your sys-admin skills?
+																"Of course ${name}".
+																*goto sysadmin
+													#Ask: Can you elaborate on the back-end, which areas specifically?
+														*label backend
+														"Specifically I have knowledge in: many frameworks/platforms, HTTP Request methods with a good understanding of the security around it, PHP5 and 7 languages, doing semi-complex logical calculations using the MVC Object Oriented & CRUD methodologies/patterns, Relational Database Management Systems (RDMS) including semi-complex SQL querying, sessions, cookies, creating RESTful APIs with authentication such as JSON Web Tokens (JWT), version control and aspects of testing using PHPUnit.
+														*choice
+															#Say: There must be areas in back-end you are not so competent in.
+																"Oh of course ${name}, I'd be lying if I said I was a master. The more you learn the more you realise you don't know. There are areas which I am still exploring such as: event-driven asynchronous multi-threaded server-side development, enhancing our unit testing/end-to-end/automated testing skills, continuous integration, highly complex SQL queries, big data management, enhancing our non-relational database knowledge and of course the security around all of this".
+																*goto startjob
+															#Ask: Very nice, how about your front-end skills?
+																"Of course ${name}"
+																*goto frontend
+															#Ask: Very nice how about your sys-admin skills?
+																"Of course ${name}"
+																*goto sysadmin
+													#Ask: Can you elaborate on your sys-admin experience?
+														*label sysadmin
+														"I am quite competent in areas such as: server deployment, server set-up, server configuration, knowledge of using many hosting companies either command line based or graphical user interface based, SSL certificates specifically LetsEncrypt, SSH, SFTP, FTP, Rsync, Linux, Nginx, Apache, Bash, backups, updates, installing, maintaining, CRON and dealing with server outages for managed servers".
+														*choice
+															#Ask: So what are the main areas you are not so competent in?
+																"Like all of these roles, they are deep enough to have specialists. There are areas which I am still exploring such as: the deep ocean of networking, the phyical side of building computers and it's components, system recovery, complex server clusters/architechures, setting up email servers, load balancers and of course the security around all of this.
+																*goto startjob
+															#Ask: Very nice, how about your front-end skills?
+																"Of course ${name}".
+																*goto frontend
+															#Ask: Very nice, how about your back-end skills?
+																"Of course ${name}".
+																*goto backend
+									#Say: I am not very advanced, but really want to develop my skills further.
+										"Not a problem ${name}. Come and shadow me for a while, but if it get's too much then just say and we'll let you shadow some of our junior developers".
+										*choice
+											#Say: Great! Where do we begin?
+												*label startjob
+												"Alright ${name}. We shall begin your day by getting to know everyone. Then it'll probably be lunch time by that point and we'll go out for a meal to celebrate your arrival. After this we'll start you on some menial tasks such as newsletter templates, bug fixes and small updates to gauge your ability".
+												*choice
+													#Say: A meal sounds fun, where do you suggest?
+														"What is your favourite cuisine?".
+														*choice
+															#Reply: Indian.
+																"My favourite cuisine! We'll take you to an awesome street vendor".
+																*goto food
+															#Reply: Mexican.
+																"Absolutely love guacamole, avocado is my favourite food. There's a sweet-as place down the road".
+																*goto food
+															#Reply: Italian.
+																"Can't beat the pizzas over at Tramonte's. I'll get someone to make a reservation".
+																*goto food
+															#Reply: American.
+																*label food
+																"Nice choice, we'll come away stuffed from this one. Might need the gym afterwards".
+																*choice
+																	#Ask: Are people health conscious here?
+																		"It's mixed, personally I am really health conscious. I try to eat healthy when I can and cut down on meat where I can".
+																		*choice
+																			#Ask: Why cut down on meat? 
+																				"A few people here are vegetarian, after you look at the facts it can get a little hard to see meat in the same way. The only hurdle is the taste, and I often slip - but I try!".
+																				*goto ending
+																			#Ask: I'm with you there, perhaps we can stick to a salad.
+																				"If that's what you want ${name}, the menu has a healthy section".
+																				*goto ending
+																	#Say: I may need a second work-out today to cope with this!
+																		*label workouts
+																		"I'm with you there buddy. Hope you don't mind me tagging along."
+																		*choice
+																			#Say: Sure, what do you usually get up to in the gym?
+																				"I actually practice gymnastics strength training, so it's mainly bodyweight exercises. Don't worry about me getting in your way!".
+																				*goto ending
+																			#Say: You can if you can keep up. I like to play squash.
+																				"Oh no not another one! I have had my fair share of beating from squash, but I would be more than happy to play with you!".
+																				*goto ending
+													#Say: Menial tasks don't sound fun at all.
+														"This is only to gauge your ability. Once you've proven yourself, we can move you onto larger tasks. All of our projects are quite unique and offer a great platform to learn on. It's also a fantastic way to get used to our code base, repositories and workflow".
+														*goto ending
+													#Say: Sounds really good, I can't wait.
+														*label ending
+														You have officially started your adventure with PortChris. Over the coming weeks you get to know everyone, go to work events and become an incredible developer. Your experience has been worth it.
+														*finish
+											#Say: I'm a little afraid that I won't fit in.
+												"Non-sense, you'll fit in no problem".
+												*goto ambitions
+							#Say: My back-end skills.
+								"I love the problem-solving too ${name}".
+								*goto shadowing
+							#Say: Skills in all areas really.
+								"A man after my own heart, good to hear. In that case I would most probably be the best candidate for you to shadow".
+								*choice
+									#Say: Great! Where do we begin?
+										Chris replies:
+										*goto startjob
+									#Ask: I'm already competent in all areas but really wish to master them.
+										"Amazing, but being a full-stack developer as well as being a master in each field is quite a claim. In the past it would have been considered full-stack to know LAMP, but nowadays stacks are a lot bigger".
+										*choice
+											#Ask: How has is grown?
+												"New areas are added to the definition all of the time. I am openly better in some areas than others. I believe what makes a true full-stack developer is having the ability and knowledge to comptetently create a website from start to finish by yourself; as well as understanding areas in which you might not be skilled, but are willing to learn them when needed".
+												*choice
+													#Say: No problem, I am willing and keep up to date with the industry all of the time.
+														"Then you shouldn't have a problem keeping up ${name}".
+														*goto startjob
+													#Say: Sounds intimidating.
+														"Don't be intimidated, if you love this industry then it will be a breeze".
+														*goto startjob
+					#Ask: How do you achieve that smell?
+						"That living wall in the corridor gets trimmed regularly. It also has very fragrant flowers designed to attract bees, so if you're allergic then be careful!".
+						*goto business
+	#Read the sign on the door.
+		It's a picture of a crane standing on a turtles back.
+		*choice
+			#Ask Chris: Why is this on your office door?
+				Chris replies: "In China it is a symbol of long life, which is what I want for PortChris of course. Also the door itself really suited the office well. Anyways come on in".
+				*goto manager
+			#Say to Chris: I don't like this, it makes me sad.
+				Chris replies: "Don't be sad! It's a good luck charm, if you hate it that much I'll remove it. Well you might as well come on in rather than looking at this thing!".
+				*goto manager
+	#Hang around for a moment and admire the other side of the wall.
+		You admire the other side of the corridor - the living wall. There are all kinds of plants here including: Venus Fly Trap, Pitcher plants, Orchids and many more. Chris steps in and says: "Awesome plants aren't they, they're carnivorous so they keep the flies away. I'm free to leave the windows open as I please!".
+		*choice
+			#Ask: Does that explain the cold?
+				"No, actually these plants grow naturally in cloud rainforest climates. Therefore I have to drop the temperature slightly to keep them alive!".
+				*choice
+					#Say: A small trade-off for such a beautiful wall!
+						Chris says: "Absolutely! But it's warmer in my office, come on in".
+						*goto manager
+					#Say: I see, I couldn't handle that personally.
+						Chris replies: "Haha, well you wait until you see my office then".
+						*goto manager
+			#Ask: Why on earth are such plants in the office?
+				"Ever had writers block ${name}? If you're ever stuck on something, come up here. These plants combined with the fresh air will garner all your answers. Look at us now for example, we are just standing here rather than being in the office. It works. Anyway let's go inside".
+				*goto manager
+			#Ask: What are these photos of?
+				"The PortChris team on work events. This is our memory lane. All of these photos are terrible quality but they capture a particular moment. These were mainly taken on the designers' polaroid camera".
+				*choice
+					#Ask: What's this one about?
+						"It doesn't look like it but that's us doing a tandem bungie in Turkey. Sometimes I subsidise work trips abroad".
+						*choice
+							#Say: That's generous of you.
+								"Ultimate team bonding exercise, and it's fun to visit other cultures. Anyway ${name} step into my office".
+								*goto manager
+							#Say: When's the next trip abroad?
+								"Thinking of going to China, the only problem is it's huge and I'm not content on just doing a city visit. I'll talk it over with the others, perhaps you can join us! We'll talk about it more in the office. Come in".
+								*goto manager
+					#Say: Cool! When's the next one?
+						"We are currently arranging a meal out for you. Do you like Zorbing? We'll talk more inside. Come on in!".
+						*goto manager

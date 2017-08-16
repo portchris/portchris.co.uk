@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MessagesService } from "./messages.service";
 import { WeatherService } from '../html/sidebar/weather.service';
@@ -17,8 +17,8 @@ enum TYPE {
 	templateUrl: './messages.component.html',
 	styleUrls: ['./messages.component.css'],
 	inputs: ['storage'],
-	animations: [slideUpAnimation, popInOutAnimation]
-	// host: { '(window:keydown)': 'handleKeyboardEvent($event)' },
+	animations: [slideUpAnimation, popInOutAnimation],
+	host: { '(window:keypress)': 'handleKeyboardEvent($event)' }
 })
 
 export class MessagesComponent implements OnInit, AfterViewChecked {
@@ -67,6 +67,18 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @var 	any
 	*/
 	success: any;
+
+	/**
+	* Is user scrolling
+	* @var 	boolean
+	*/
+	userScrolling: boolean;
+
+	/**
+	* Timeout variable
+	* @var 	any
+	*/
+	timer: any;
 
 	/**
 	* Message type and actions
@@ -216,6 +228,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		this.input_type = "text";
 		this.class_selector = "col-xs-9 offset-xs-3";
 		this.typing = false;
+		this.userScrolling = false;
 		this.talkForm.enable();
 		this.keyboardActions = [];
 	}
@@ -244,6 +257,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 						} else {
 
 							// Game related message
+							this.userScrolling = false;
+							this.scrollToBottom();
 							this.messagesService.getResponse(data).subscribe(
 								(message) => { this.getMessagesSuccess(message) },
 								(error) => { this.getMessagesFail(error) },
@@ -326,11 +341,11 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			let msg = this.createMessageTemplate();
 			let weather = this.weatherService.getWeatherData();
 			if (typeof weather === "object" && weather.time != null) {
-				msg.message = (weather.time.dark) ? "Good evening! " : "Good day to you! ";
+				msg.message = (weather.time.dark) ? "Hello! " : "Hello! ";
 			} else {
 				msg.message = "Hello!";
 			}
-			msg.message += "Welcome to the Portchris office, my name is Lucy what is your name?";
+			msg.message += "You must be the new intern. Welcome to the PortChris office, my name is Lucy. I am the receptionist for Chris Rogers - our manager. What is your name?";
 			msg.answer.name = "Init";
 			msg.answer.title = msg.answer.name;
 			msg.answer.key = "question";
@@ -347,6 +362,12 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		// this.searchBox.nativeElement.classList.add("js");
 		// this.searchFauxInput.nativeElement.classList.add("js");
 		this.searchBox.nativeElement.focus();
+		this.scrollContainer.nativeElement.addEventListener('scroll', this.isScrolling, true);
+	}
+
+	public ngOnDestroy() {
+
+		this.scrollContainer.nativeElement.removeEventListener('scroll', this.isScrolling, true);
 	}
 
 	/**
@@ -388,7 +409,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		let msg = this.createMessageTemplate();
 		let drink = this.talkForm.value.content.toLowerCase();
 		if (drink.indexOf("tea") !== -1 || drink.indexOf("coffee") !== -1 || drink.indexOf("water") !== -1) {
-			msg.message = "Enjoy " + this.user.name + ". Whilst you enjoy your " + drink + ". Would you like to sign the vistors guestbook so we remember you next time?";
+			msg.message = "Enjoy, " + this.user.name + ". Whilst you enjoy your " + drink + ", would you like to sign the vistors guestbook so we remember you next time?";
 			msg.answer.method = "toSaveOrNotToSave";
 			setTimeout(() => {
 				this.setSuccess("You acquired a " + drink);
@@ -451,8 +472,22 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 	public ngAfterViewChecked() {
 		
-		this.scrollToBottom();        
+		if (!this.userScrolling || this.typing) {
+			this.scrollToBottom();
+		}
 	} 
+
+	// @HostListener('scroll')
+	public isScrolling = (): void => {
+
+		this.userScrolling = true;
+		if (this.timer !== null) {
+			clearTimeout(this.timer);
+		}
+		this.timer = setTimeout(() => {
+			this.userScrolling = true; // Keep it true for now
+		}, 3000);
+	}
 
 	/**
 	* When a new message is loaded, always scroll to the bottom
@@ -526,6 +561,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				this.typing = false;
 				this.talkForm.enable();
 				this.searchBox.nativeElement.focus();
+				this.userScrolling = false;
+				this.scrollToBottom();
 			};
 			if (m.key === "user" || !delay) {
 				fnc();
@@ -761,11 +798,12 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	// @HostListener('document:keypress', ['$event'])
 	private handleKeyboardEvent(event: KeyboardEvent) {
 
-		let key = event.key;
-		this.keyboardActions.push(key);
-		if (this.keyboardActions.length > 5) {
-			this.keyboardActions.pop();
-		}
+		// let key = event.key;
+		// this.keyboardActions.push(key);
+		// if (this.keyboardActions.length > 5) {
+		// 	this.keyboardActions.pop();
+		// }
+		this.userScrolling = false;
 	}
 
 	/**
@@ -867,7 +905,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 			// The user has just entered their email, now we need a password.
 			this.user.email = data.content;
-			msg.message = "Thanks, and your password please.";
+			msg.message = "Thanks, and a password please.";
 			this.input_type = "password";
 			this.messagesService.createMessage(msg)
 				.then((message) => { this.getMessagesSuccess(message); })
@@ -976,7 +1014,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		msg.user.id = data.user_id;
 		msg.user.stage = 1;
 		this.messagesService.createMessage(msg)
-				.then((message) => { this.getMessagesSuccess(message, false); this.typing = true; })
+				.then((message) => { this.getMessagesSuccess(message, false); this.typing = true; this.userScrolling = false; })
 				.catch((error) => { this.getMessagesFail(error); });
 		this.messagesService.createGuestAccount(params).subscribe(
 			(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },

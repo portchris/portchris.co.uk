@@ -4,122 +4,536 @@
 	ending
 
 *label approach	
-Okay you've seen this reception enough, come inside and meet our team. Who would you like to approach?
+You applied for work experience and the PortChris office was happy to give you an insight into agency life. It's your first day of working in the office, Lucy (the receptionist) says: "come inside and meet our team. Who would you like to approach?".
 *choice
 	#The designer
-		You walk over to the designer and Lucy has introduces you both. You automatically notice the bold radiant colours on the walls and desk. You can feel the creativity oozing from every corner here. Before an awkward silence begins, what would you like to say to the designer?
+		You walk over to the designer and Lucy introduces you both before leaving you to it. You automatically notice the bold radiant colours on the walls and desk. You can feel the creativity oozing from every corner here. Before an awkward silence begins, what would you like to say to the designer?
 		*choice
 			#I love how colourful this space is.
-				The designer replies: "Thank you, I love all things bright. The manager lets us decorate our space however we wish. So I just got some paint and went crazy one day. This agency encourages stuff like this."
+				The designer replies: "Thank you, I love all things bright. Chris Rogers the manager lets us decorate our space however we wish; so I just got some paint and went crazy one day. You get that kind of freedom in this agency".
 				*choice
-					#Wow, just about the only thing colourful here is that white book.
-						"Well ${name}, this is the Designed by Apple in California book. It's a book full of pictures of their devices from the 1st generation right the way through to the current. 
+					#Say: Wow, just about the only thing not colourful here is that white book.
+						"Well ${name}, this is the 'Designed by Apple in California' book. It's a book full of pictures of their devices dating back to the 1st generation, right the way through to the current". 
 						*choice
 							#Ask: How can I get my hands on one?
-								"Special order from one of their stores. I purchased it for $300 and I don't even regret the decision.
+								"Special order from one of their stores. I purchased it for $300 and I don't even regret the decision".
 								*choice
-									#Try and hold back the laughter and ask politely why they would spend so much on a book.
-										The designer replies: "I love Apple. Everything they bring out I must buy". At that moment Lucy steps in and says: "Excuse me, the manager is ready to see you now".
+									#Ask politely why they would ever spend so much on a book.
+										The designer replies: "I love Apple. Everything they bring out I simply must buy. But not everyone shares that opinion in this office". At that moment Lucy steps in and says: "Excuse me, the manager is ready to see you now".
 										*finish
-									#Reply: Cool that's reasonable for such a lovely book thanks for the advice!
-										"No problem ${name}, glad you can leave today having learned something!". At that moment, Lucy steps in and says: "Excuse me, the manager is ready to see you now".
+									#Reply: I never knew they made such a thing, I will have to look into one myself!
+										"You won't regret it ${name}, glad you can leave today having learned something!". At that moment, Lucy steps in and says: "Excuse me, the manager is ready to see you now".
 										*finish
-							#Say: I'm not the biggest fan of Apple, their stuff is good but expensive.
-								That hasn't gone down well with the designer. The designer replies: "I see, well everything computer related"
-					#Would the manager let you write rude words on the wall if he wanted?
-						"Well obviously not! There is a line between slack and lenience. When needed, we all knuckle down and get on with the tasks at hand."
-						*finish
-					#That's a nice thing for the manager to do, he must be a cool guy.
-						"Well we think so, but we're biased I suppose being an employee, I think it's because he knows how to mix a hard working environment with a fun one".
+							#Say: I'm not the biggest fan of Apple, their stuff is okay but not worth the price tag.
+								That hasn't gone down well. The designer replies: "I see, well everything electrical on my desk is Apple, it suits me and I think it has the best software for the job". At that point the designer hides the white book out of embarrassment.
+								*choice
+									#Stop the designer and say: There's no need to do that, it's good that you have such a passion!
+										"Yuck, I hate the word passion". This conversation has turned a little sour. Luckily Lucy steps in and provides an escape route by saying: "The manager will see you now".
+										*finish
+									#Comfort the designer by saying: Well I'm not a designer so what would I know!?
+										"It's okay, I understand. I just like how pretty everything is".
+										*choice
+											#Question the designer: But it isn't colourful, I thought you only liked colourful things!
+												"Actually you're right, they used to be colourful but now have reverted to more dull tones. Lately they have begun to bring colour back however". At this point Lucy steps in and says: "Excuse me ${name}, hate to barge in but the manager is ready to see you now".
+												*finish
+											#Ask: Does anybody else here work with Apple?
+												"Uh, not really. When you start working here you get your choice of Operating System (OS). I chose Apple, whereas the others went for Windows. One developer in particular asked for Linux. The manager doesn't mind as long as they are able to communicate with our development, staging and production servers. I must admit, Apple are a pain in that department".
+												*choice
+													#Ask: What does the manager use?
+														"He has knowledge in all 3 operating systems, but he currently operates Windows 10. It's the most widely supported OS for software, plus he says they recently implemented Linux as a sub-system of Windows which has "converted" him apparently. You'll have to ask him more about that when you meet him. Speaking of which, I think he's ready to see you now".
+														*finish
+													#Linux, wow you get all kinds around here.
+														"You might be surprised to know Linux is more popular than you think - it powers most of the web. Plus Ubuntu & Mac OS are quite similar in their Graphical User Interface (GUI). They are both based on UNIX after all". Suddenly Lucy approaches and says to you: "Sorry ${name}, hate to barge in but the manager is ready to see you now". You shake hands with the designer and move on.
+														*finish
+					#Ask: Would the manager let you write rude words on the wall if you wanted?
+						"Well obviously not! There is a line between slack and lenience. When needed, we all knuckle down and get on with the tasks at hand. But that doesn't stop me writing rude words outside the office...".
 						*choice
-							#Ask: What kind of fun do you get up to?
-								"Loads, the manager likes to travel so regularly takes us on the most bizarre work holidays."
+							#Encourage the designer to elaborate and say: Go on...
+								"Well, I regularly protest outside supermarkets trying to convince them to stop factory farming. I may occassionally write a few bad words on my signs".
+								*choice
+								#Ask: Are you against supermarkets?
+									"Not at all, in fact I love supermarkets".
+									*goto protesting
+								#Ask the designer why they protest?
+									*label protesting
+									"What I don't like is the way animals are battery farmed. Those poor animals don't even get to see the light of day and eventually meet their fate. Not really a life if you ask me. If only people stopped eating battery farmed animals and ate slightly less meat in their diets".
+									*choice
+										#Ask: So does anyone else here join you in your protests?
+											"No, not at all. In fact they dislike it which I can understand, it is confrontational. But the manager respects my decision and contributes to the charity 'Compassion In World Farming' (CIWF) on my behalf. He's even cut back on eating meat himself. He claims it's cut the cost of his weekly shop considerably. I'm sure he'd like to talk to you about what other charities the office contributes to. In fact he looks like he is available now".
+											*finish
+										#Ask: What made the designer choose such a path.
+											"I used to love eating meat but the more I learned, the less I wanted it. I think people have separated themselves from the reality of where their meat comes from. If you asked a random member of the public if they'd catch and prepare their own meat, I bet they'd say no. I've had this conversation countless times in the office; they don't share my views except for the manager. He respects my decision and contributes to 'Compassion In World Farming' (CIWF) on my behalf. He's even cut back on eating meat in his diet as well. I'm sure he'd like to talk to you about what other charities the office contributes to. In fact he looks available now".
+											*finish
+										#Say: I've never really thought about it. I love eating meat and have never considered stopping. It's just so damn tasty!
+											"I know and I miss meat so much! Sometimes have to fight the temptation of a juicy pulled pork sandwich. But I dare you to try BBQ pulled jack fruit and tell me it's not a close contender! The manager has tried it and he loves the taste so much he uses it as a meat substitute sometimes. I'm sure he'd like to talk to you about other awesome meat-alternative recipes. In fact he looks ready for you now".
+											*finish
+							#Ask: When does the office really knuckle down?
+								"Whenever it's necessary ${name}".
+								*goto workinghard
+					#That's a nice thing for the manager to do, he must be a cool guy.
+						"Well I think so, but I am biased I suppose being an employee! I think it's because he knows how to mix a hard working environment with a fun one".
+						*choice
+							#Ask: What kind of fun do you get up to as a company?
+								"We try to arrange a small event every month and a bigger one every year or two. We have done many activities, ranging from karaoke to trampolining to trips abroad".
+								*goto holiday
 							#Ask: How hard does he work you?
-								"Completely depends on the deadline, if there has been some slack"
+								*label workinghard
+								"It completely depends on the situation. If there is an important deadline fast approaching, then of course we all pull together and get the work done. On the other hand, if we have just completed a large project or are ahead of schedule then the pace is a little more relaxed. It is the balance between the two that makes this a great place to work. On the rare occasion that we have to stay late, there's usually a good supply of pizza and games. It's actually quite a cool atmosphere in the office at night".
+								*choice
+									#Try your luck: Is there any overtime available now? I really want some pizza!
+										"Ha! It's okay I'm sure we'll go out for a meal soon to celebrate your first day. Why don't you go and ask Chris the manager about it, he's just over there. He is ready to see you now".
+										*finish
+									#What kind of games? 
+										"All kinds. From video games such as Fifa and Shadow Of The Colossus (personal favourites of Chris') to card games such as Backpackers (another favourite of his). Whenever we get tired or stressed we can unwind in the chillout zone. We can go for a game after you're done speaking with Chris. In fact he's right over there waiting for you now".
+										*finish
 			#Comment on the lovely clothing they are wearing.
-				The designer replies: "Thanks ${name}! This is actually cheap knock-off item of clothing you find at most Asian markets, but I thought it was colourful and had to buy it! I like anything bright if you hadn't already noticed".
+				The designer replies: "Thanks ${name}! This is actually a cheap knock-off item I bought whilst abroad. I thought it was colourful and had to buy it! I like anything bright if you hadn't already noticed".
 				*choice
-					#Ask: Asian markets, you travel often?
-						"Yeah actually, the manager often takes us out on work holidays. He loves to travel and really reaches into the funds to take us to some bizarre places!"
+					#Ask: Do you travel often?
+						*label holiday
+						"The manager takes us out on work holidays sometimes. He loves to travel and really reaches into the funds to take us to some bizarre places!".
 						*choice
 							#Ask: Where have you been so far?
-								"Well so far I have been lucky enough to visit: England, Finland, France, Italy, Spain, The Netherlands, The Vatican, Turkey, Wales, Cambodia, Indonesia, Japan, Singapore, Sri Lanka, Thailand, Vietnam, USA & Australia. All over really!"
-							#Sounds like a cool place to work, perhaps I should quit my job and find one here.
-								"Haha okay!" I suppose you could contact the manager, he's not hiring but I'm sure he'll appreciate you dropping by. ${contactLink}
+								"Well so far I have been lucky enough to visit: Europe, North America, Asia and Australasia. All over really!"
 								*choice
-									#I'll do that, thanks. 
+									#Reply: Woah that's a crazy amount of continents. Why so many and so varied?
+										"I believe that travelling is the best way to gain an insight into and appreciation for other cultures. Most of my trips have been for leisure, but occasionally they have been for work and they are the best kind of team bonding exercise! We are a family now and have been through some amazing times together. Life is not just for working in my opinion". At this point Lucy steps in and says: "Excuse me ${name} the manager will see you now".
+										*finish
+									#Ask: Do you have to pay for work trips or is it included as a perk with working here?
+										"It's subsidised somewhat. Every year Chris, the manager will put a notice out saying where he plans on going next. The company will pay some money toward the flights and accommodation but the rest is up to us. I believe that travelling is the best way to gain an insight into and appreaciation for other cultures. But on top of this it's the best kind of team bonding exercise! We are a family now and have been through some crazy times together. Life is not just for working in my opinion". At this point Lucy steps in and says: "Excuse me ${name} the manager will see you now".
+										*finish
+							#Sounds like a cool place to work. I hope I can secure a full-time job here soon.
+								"Don't worry about it, you seem really cool. I'm sure the manager will love meeting you. In fact it looks like he is ready for you now". You follow the designers direction and meet with the manager.
+								*finish
 					#Say: Well I'm sure your brightness doesn't just reflect your taste in clothes...
-						"Oh my. Nobody told me you were such a smooth talker!" The designer is beginning to suspect some flirting going on.
+						*label flirting
+						"Oh my. Nobody told me you were such a smooth talker!". The designer is beginning to suspect some flirting going on.
 						*choice
 							#Keep flirting, see where it goes.
-								"Is this why you came to the office?! I am flattered but it's a little embarrassing with everyone around!"
+								"Is this why you came to the office?! I am flattered but it's a little embarrassing with everyone around!".
 								*choice
 									#Keep flirting.
-										Lucy steps in: "Okay ${name} let's move on shall we!? Let's go see the manager."
+										Lucy steps in: "Okay ${name} let's move on shall we!? Let's go see the manager".
 										*finish
 									#Apologise and make small talk.
-										"It's okay if you want we can talk more over coffee or whatever you drink?"
+										"It's okay if you want we can talk more over coffee or whatever you drink?".
 										*choice
 											#Say: Yeah sure sounds great!
-												You have acquired a date with the designer! You have a spring in your step and am ready for the your next adventure. Lucy approaches and says "The manager will see you now".
+												It's a date! You have a spring in your step and a grin on your face. Lucy approaches and says "The manager will see you now". You feel confident and ready!
 												*finish
 											#Say: No thanks, apologies for coming across like that.
-											The designer comes across embarrassed, turns around and gets on with work without making any eye contact. Lucy steps in, cutting the tension and says: "Excuse me, the manager will see you now".
-											*finish
-									#Ask the designer out on a date.
-										It's gone well, the designer agrees to your date request. You feel overwhelmed that a simple office visit could result in a date. Lucy steps in and says: "Excuse me, the manager will see you now".
+												They appear embarrassed, turn around and get on with some work without making any eye contact. The situation has become dry, but luckily Lucy steps in and cuts the tension by saying: "Excuse me, the manager will see you now". You say bye but they fail to reply.
+												*finish
+									#Ask them out on a date.
+										It's gone well, they agree to your date request. You feel overwhelmed that your first day of work experience could result in a date. Lucy steps in and says: "Excuse me, the manager will see you now". You feel confident and ready.
 										*finish
-							#Stop those thoughts straight away, remain professional and	talk about the weather.
-								
-									
-					#No no, I will stick to the agency, I prefer the to know my project is going through the right channels.
-						Safe choice
-						*finish
-			#Ask about some of the weird items on the desk
-				"This is a playlist mixer. This allows me to play any song of my choice in the office. All I need to do is think of a song, enter it in this device, magic happens and it plays throughout the office."
+							#Stop those thoughts straight away, remain professional and	talk about work.
+								They have become confused, you are giving off weird mixed signals. It's probably best to lay low for a while and let this thing blow over. At that moment Lucy approaches you and gives you a perfect exit route by saying: "The manager is available to see you now". You take this opportunity to leave.
+								*finish	
+	#The developer
+		Lucy walks you over to the developer and introduces you before leaving you to it. The developer shakes your hand and says: "Nice to meet you ${name}, where in England are you from?"
+		*choice
+			#Reply: South West of England
+				The developer replies: "Really? That's awesome! Me and Chris Rogers, the manager went to school together in the South West also. Beautiful area, Cornwall, Somerset and Dorset in particular".
+				*choice
+					#Reply: I love Dorset, especially the Jurassic Coast.
+						"Oh yeah that place rocks, Chris informed me recently that it's a UNESCO World Heritage Site if you didn't already know! Chris the manager went to University in Dorset so knows it very well".
+						*choice
+							#Say: I did know that about Dorset as I lived there for many years, but I am impressed with Chris' knowledge.
+								"Then I'm sure you'll have a lot in common with Chris".
+								*goto talktech
+							#Say: I didn't know that about Dorset, perhaps Chris could teach me other things about the place. He seems like a sound guy.
+								"Im sure he would like to show you around the area one day".
+								*goto talktech
+					#Reply: Somerset, not heard of much around there.
+						"Loads of people come from somerset including: Jenson Button, Mary Berry, Maisie Williams, Massive Attack, John Cleese and Sir Ranulph Fiennes. Oh and of course myself and Chris were born there!".
+						*choice
+							#Say: Obviously you and Chris are the coolest people mentioned!
+								"Cheers ${name} flattery will get you everywhere!".
+								*goto talktech
+							#Say: Okay wow, perhaps not such a quiet place. I may even put it on my bucket list of places to visit.
+								"Do it! Go to Bristol as well if you want to visit a trendy city. Bath is reknowned for it's history and beautiful stone buildings. Chedder for it's cheese and Glastonbury for it's festival. Mine and Chris' typical weekends involved climbing trees or mountainboarding".
+								*goto coding
+					#Reply: Ahh Cornwall.
+						"Ahh indeed ${name}, people in this office love Cornwall and regularly visit for a surf. Historically it was the pirate capital of England and it feels like a separate country. Chris also got engaged near Lands End in Cornwall".
+						*choice
+							#Reply: I love that place! I will congratulate him on getting engaged.
+								"Me too, I love the Minack Theatre".
+								*goto talktech
+							#Reply: Great choice for surfing, I've tried it a few times and love it. Will have to go with you all sometime.
+								"We love Perranporth!".
+								*goto talktech
+			#Reply: North of England
+				The developer replies: "Some good football around there, I bet there's one heck of an atmosphere when a local derby is on".
+				*goto coding
+			#Reply: Midlands
+				The developer replies: "That's really cool, Lucy the receptionist went to the University of Nottingham in the East Midlands".
+				*goto coding
+			#Reply: Around London
+				The developer replies: "Guess you've had enough of the city life for the moment. Myself and the manager Chris Rogers are country bumpkins, we love to visit the city but it can get hectic sometimes".
+				*choice	
+					#I personallly really love the city, I just wanted work experience with this company so much!
+						*label talktech
+						"That's a really great thing to hear, I'm sure Chris would appreciate you saying that. Anyhow, is there anything specific you want to know about the technical side of this office?".
+						*choice
+							#Reply: Yeah actually, why don't you show me your development set-up. How does a typical project go from start to finish?
+								"Good question. Here's a very brief run down: The first stage would be down the Sales Representative generating the lead. Once the relationship is established we would usually prepare meetings to introduce them to our team, as well as our processes. Then we'd write up a specification detailing what they wish to achieve; it's our job to be as detailed as possible before we begin the work to avoid any grey areas in the future. Then it's time for the fun bit, the development! Have you got a decent technical understanding of web development?".
+								*choice
+									#Reply: Yes, hit me with it.
+										"Love your enthusiasm ${name}".
+										*goto technical
+									#Reply: No, sorry.
+										"It's all good ${name}. Well then we would start the logic, core functionality, layout, styling, write tests, user test, staging and finally go-live".
+										*goto nontechnical
+							#Reply: Sure, show me some cool projects you've done.
+								"Okay ${name}. We've made all kinds of things from complex eCommerce sites and dating apps, right the way through to Blackberry apps and an office music system. Which would you like to hear about?".
+								*choice
+									#Ask about the eCommerce site.
+										"Chris single handedly created a Magento site from start to finish for a locksmith business looking to expand from a smaller scale company, to a scale that competes with their larger rivals. This was a custom themed site with many features in addition to Magento including: trade accounts, buy now pay 30 days later, full warehouse / supplier stock system accessible via the admin, picking lists, vouchers and reward points. It was a long and complex project but we are all proud of the outcome. Lucy then enters the conversation and says: "Sorry guys hate to barge in like this but the manager will see you now".
+										*finish
+									#Ask about the dating app.
+										"Chris created a working protoype Application Program Interface (API) for a start-up company based in London. It was a dating app based around meeting other single people on a night out. The following day it would calculate matches based on the places you visited. This protoype was built from the ground up in pure native PHP. It worked world-wide as it calculated timezones and daylight savings times. Lucy then enters the conversation and says: "Sorry guys hate to barge in like this but the manager will see you now".
+										*finish
+									#Ask about the blackberry app.
+										"Chris created a native Blackberry app for a competition held at a large event in Birmingham's NEC arena. Users would play a game using the app to win a prize. The project was a new venture for us since we were not familiar with the Qt framework; and with such a short deadline of two weeks we were contemplating our ability to complete the project. But Chris managed to pull it off and as far as we were aware, customers had no issues and the client was very happy! Lucy then enters the conversation and says: "Sorry guys hate to barge in like this but the manager will see you now".
+										*finish
+									#Ask about the office music system.
+										The developer picks up a silver box with dials on it from their desk and says: "This is a playlist mixer that Chris helped to make. It allows me to play any song of my choice in the office. Each person enters a song and the server randomly selects one song from each persons playlist. That way it remains fair".
+										*choice
+											#Ask: What kind of music do you like listening to?
+												"I love my rock and metal".
+													#Ask: How does everyone else feel about that?
+														"Well it's not everyones taste. The manager Chris likes my rock influence but metal is a little too hard. It is high energy music which is great when you're on a roll at work or surfing, but can be distracting to others in the office!".
+														*choice
+															#Ask: The manager loves surfing?
+																"Yeah loves it. He's not the best, but just loves anything water related. That's why a lot of our work trips involve the ocean in some way". At that point Lucy steps in and says: "Excuse me, sorry to intrude but the manager will see you now". You don't want to leave, but you must.
+																*finish
+															#Say: I like rock music as well.
+																"Well you'll have plenty to talk about I'm sure! In fact there he is now. Why don't you go meet him?!". You agree, shake hands with the developer and move on.
+																*finish
+													#Ask: Could that not get a little controversial? What if you play something rude?
+														"Well it has a filter for bad lyrics. Everytime a song with explicit content arises, it will moan at the user responsible and blank out the bad word so nobody can hear it. If you keep doing it then it may even report you to Chris".
+														*choice
+															#Ask: What happens if you get reported to the manager?
+																"Well not much really. It's only an issue if there's a client around or it is offensive to another employee. Only then does he get furious. Someone once did that and he got banned from playing music for a whole week! I couldn't bear that haha! Anyways ${name} it was great meeting you but it looks like the manager is looking for you over there". You say goodbye, shake hands with the developer and move on.
+																*finish
+															#Ask: Doesn't that defeat the point of freedom in terms of music choice within the office. A lot of songs contain swear words.
+																The developer replies: "True, but it's only songs marked as explicit, the odd swear words might slip through the net. But really this feature is only here to monitor bad songs whenever clients are around. The manager has a control panel upstairs and can determine the filter level from there".
+																*choice
+																	#Say: It's so nice to see an environment where you can express your views without being scorned.
+																		"Well there are limits obviously, but I think it is quite refreshing really. Chris is a pretty placid guy in that sense. Anyhow it looks like the manager is waiting for you over there. It was nice to meet you ${name}". You turn around to approach the manager.
+																		*finish
+																	#Say: I'm going to play 90's gangsta rap.
+																		"Don't! That's Chris' favourite genre and you'll set him off. Nobody wants to see a full grown man dancing in the office! Speaking of which he seems to be available now, go over and say hi. But don't mention rap music!". You shake hands with the developer before saying goodbye and moving on. 
+											#Ask: what's the story behind that?
+												"In the beginning we only had radio, and that caused so many arguements in the office. Eventually everyone decided that the music player was the best option. It's fair and allows everyone to play songs of their choice equally. It's also a fantastic way to expand your music taste and range".
+												*choice	
+													#Enquire: Can I sign up to this?
+														"Sure! It's currently only open to employees inside the office. So whilst you work here you are welcome to submit your music. It even comes with an app too!"
+														*goto internalprojects2
+													#Say: This idea is genius, I hate a silent office. It's almost creepy.
+														"Me too, there has to be background noise even if it's the dreaded pop music that some people play around here...".
+														*choice
+															#Ask: So you make internal projects like this all the time?
+																*label internalprojects2
+																"We come up with ideas like these and pitch them to Chris, if he feels it will benefit the company then he will scope out a project within work hours. Otherwise, we will arrange hackathons on the weekends if we want it enough. The vibe of those events are usually a laugh, Chris usually gets some craft ales and pizzas to fuel us during the night. You should go ask him when the next event is, he's over there waiting for you now". You shake hands with the developer before saying goodbye and moving on.
+																*finish
+															#Say: Wow, what's the next awesome app you guys are going to make?!
+																"Good question ${name}, we've toyed with some ideas but we fancy something completely different next time. Chris created a protoype online multiplayer game years ago. He's crazy about it but hasn't had the time to fit it in. We were thinking of surprising him by offering to build it together".
+																*goto internalprojects2
+					#Say: Yeah I just wanted to experience country life a little bit to get an idea, you guys seemed like the best in the area.
+						"We'll have to arrange a small tour for you. It's important to get savvy with the locals if you want to get a true idea of living in these rural areas! It's a close knit community".
+						*goto talktech
+			#Reply: Ah I'm from outside England
+				*label coding
+				The developer replies: "Nice one, it's cool that you've come from far away just for work experience with us. Anyways I hear you've come here to sharpen your web development skills?".
+				*choice
+					#Reply: Yeah that's right. I'm competent in a few areas but want to improve my skills.
+						*label technical
+						"Fantastic, then you won't mind me diving straight into it then. We operate Linux based servers here and a typical project would follow 3 stages of development. Firstly, working on our local development server. Secondly, uploading to our staging server visble only to us and the client for user testing. Then finally, deployment to the production servers. It's what myself and the manager specialise in mostly".
+						*choice
+							#Ask: What stack are you using?
+								"Linux Apache MySQL PHP (LAMP) stack. But we have used other stacks involving Nginx & NoSQL in the past and really liked them".
+								*choice
+									#Ask: What are your thoughts on full JavaScript stacks?
+										*label jsstacks
+										"They are MEAN, pardon the pun! I think if you're a front-end developer specialising in JavaScript looking to venture out into back-end, then this would be the perfect entry. You don't have to learn a new language with a new syntax, and you are already used to the event-driven nature of it. For myself and Chris, we grew up learning other languages server-side so are already proficient in PHP. Also our servers already run on different stacks so it doesn't make sense to change them at this point. However, Chris has taught himself Nginx and NoSQL individually and likes them a lot. We keep our eye out all the time but for now we feel safe in the popular LAMP stack and our clients also have no complaints. It would be an interesting conversation to bring up with Chris, however. In fact here he is now". You shake hands with the developer before saying goodbye and moving on to see the manager.
+										*finish											
+									#Ask: Why not switch over to Nginx if you like it.
+										*label nginx
+										"I love how Nginx can handle a higher concurrent volume of traffic but the main reason we haven't switched over is simply because we have more experience in Apache. Also our platforms and frameworks work with Apache out-of-the-box".
+										*choice
+											#Ask: What platforms do you use?
+												*label platforms
+												"We use many PHP based platforms for different clients depending on what they are looking for. If the client is looking for a Content Management System (CMS) then we would suggest Wordpress. If the client is looking for eCommerce then we would provide a Magento solution. Chris is proficient in Magento 1.x and has experience in Magento 2 but I'm not the biggest fan of Magento if you ask me".
+												*choice
+													#Ask: Why aren't you a fan of Magento?
+														"I just think it's too complicated for it's own good. Firstly it's bloated. There are too many configuration files which makes more room for annoying bugs. It also makes your code less concise and more difficult to debug. Secondly, the documentation is bad and you often find yourself reverse-engineering. Thirdly, it's very slow, not to mention the server costs involved in hosting such a solution. Chris would argue however that while WooCommerce or Shopify might be decent solutions for smaller companies, larger companies would require the complexities that Magento offers. Also Magento 2 solves many problems that Magento 1 had. We are currently developing our Magento 2 skills in the office. It's a tricky one but then again when has eCommerce ever been simple... Anyhow I believe Chris is waiting for you now, why don't you go and meet with him?!". You shake hands with the developer and move on.
+														*finish
+													#Ask: Aren't you afraid of the security issues around Wordpress?
+														"This is a common issue Wordpress is stigmatised with, but there are ways around it. Chris has been using a particular Wordpress stack for a while that we have come to know and love. It increases security by changing the file structure and introduces bcrypt hashed passwords. It also introduces modern web workflows such as Webpack and Sass if you like using such things. We use Wordpress for smaller clients wanting a CMS since it is beautifully simple. If a client wanted something more custom and complex then we would tap into our Laravel knowledge and look into something like October. Anyhow I believe Chris is waiting for you now, you should go and meet with him". You shake hands with the developer and move on.
+														*finish
+											#Ask: What frameworks do you use?
+												*label frameworks
+												"Chris and myself love Angular 2 and Laravel. Laravel was an obvious choice for server-side development since this office mainly works with PHP. It's Eloquent models are logical and fantastic. Their clean documentation and Model View Controller (MVC) support is refreshing. They have a brilliant templating engine and CLI out-of-the-box, it also supports Composer. Angular 2 on the other hand was a little less obvious to choose".
+												*choice
+													#Ask: Why is that, why not Angular 2?
+														"There's nothing particularly wrong with Angular 2 itself. Angular was going through a rough patch since they seemingly annoyed their community by announcing it was impossible to upgrade from versions 1 to 2 (we are suffering the same fate with Magento). But since we were coming into the framework afresh, it wasn't such an issue for us. The community also appeared to be large enough for support and the Model View Whatever (MVW) pattern works well with Laravel's MVC pattern; so we gave it a try and really liked it. Hey it looks like the manager is calling for you now". You shake hands with the developer and move on.
+														*finish
+													#Ask: I understand your point about Laravel, but why did you choose Angular 2 when there are plenty of other decent frameworks out there?
+														"Correct, there are many choices of JavaScript front-end frameworks. Initially we were deciding between React (Facebook), KnockoutJS (Microsoft-ish) and Angular 2 (Google). Other frameworks surfaced such as Aurelia, but the first and most important factor was longevity. We do not want to spend time learning a framework that will become deprecated in the near future, so Aurelia couldn't compete. The second most important thing was that the company was well established thus eliminating KnockoutJS; although it was created by a Microsoft employee it is not a Microsoft product so therefore was discounted. Finally, we liked the idea of two-way data binding which React didn't support inherently; so that left us with Angular. Angular 2's Model View Whatever (MVW) pattern works well with Laravel's MVC pattern so we gave it a try and really liked it. But anyways, it looks like the manager is calling for you now". You shake hands with the developer and move on to meet the manager.
+														*finish
+													#Say: There are other decent PHP frameworks out there other than Laravel.
+														"True, but Laravel works best for us. We were already familiar with the MVC pattern and it's documentation simplicity is most appealing. It's RESTful routing really works well with mobile apps and Angular 2 when creating Application Program Interfaces (APIs). It's also quickly become one of the most widely used PHP frameworks available". At this point Lucy steps in and says: "So sorry to barge in like this, but the manager is ready to see you now". You shake hands with the developer and follow Lucy to the managers office.
+														*finish
+									#Ask: Why not switch over to NoSQL if you like it?
+										"I've spoken with Chris over this one and in our opinion NoSQL works best with mobile apps. The de-normalised approach of NoSQL works well with apps requesting data via an Application Program Interface (API). By duplicating information, it helps improve on performance. But for websites, relational databases are still king for now. They are more widely supported, better documented and work out-of-the-box with our platforms and frameworks".
+										*choice
+											#Ask: What platforms do you use?
+												"Good question ${name}, I always say you may know the language but it doesn't mean you know the platform".
+												*goto platforms
+											#Ask: What frameworks do you use?
+												"Good question ${name}".
+												*goto frameworks
+								#Ask: You guys consider yourselves full-stack, what does that mean nowadays?
+									*label fullstack
+									"In the past it would have been considered full-stack to know LAMP, but nowadays stacks are a lot bigger. New areas are added to the definition all of the time. Myself and Chris are openly better in some areas than others. We believe what makes a true full-stack developer is having the ability and knowledge to comptetently create a website from start to finish by yourself, as well as understanding areas in which you might not be skilled but be willing to learn them when needed".
+									*choice
+										#Ask: Which areas would you consider yourselves most skilled at?
+											"Myself and Chris are very similar. We are most skilled in the creative side of front-end and programmatical side of back-end. We also have competent sys-admin skills too".
+											*choice
+												#Ask: Can you elaborate on the front-end, which areas specifically?
+													*label frontend
+													"Specifically: HTML4, HTML5, CSS as well as pre-processors, CLI web workflows, CLI package managers, JavaScript including ES5/ES6/TypeScript, RESTful integration, SEO/social implementation and front-end optimisation such as PageSpeed Insights".
+													*choice
+														#Say: There must be areas in front-end you are not so competent in.
+															"Oh of course ${name}, we'd be lying if we said we were masters in this area; you learn all the time. There are areas which we are still exploring such as: Front-end UI testing and automated testing, enhancing our UX/UI, enhancing our design skills, enhancing our TypeScript/ES6 skills, keeping track of all the extensive amount of emerging libraries/frameworks and of course the security around all of it. Anyway ${name}, it was nice to meet you but it looks like the manager is ready for you now". You shake hands and move on.
+															*finish
+														#Ask: Very nice, how about yours and Chris' back-end skills?
+															"Of course ${name}".
+															*goto backend
+														#Ask: Very nice how about yours and Chris' sys-admin skills?
+															"Of course ${name}".
+															*goto sysadmin
+												#Ask: Can you elaborate on the back-end, which areas specifically?
+													*label backend
+													"Specifically I have knowledge in: many frameworks/platforms, HTTP Request methods with a good understanding of the security around it, PHP5 and 7 languages, doing semi-complex logical calculations using the MVC Object Oriented & CRUD methodologies/patterns, Relational Database Management Systems (RDMS) including semi-complex SQL querying, sessions, cookies, creating RESTful APIs with authentication such as JSON Web Tokens (JWT), version control and aspects of testing using PHPUnit.
+													*choice
+														#Say: There must be areas in back-end you are not so competent in.
+															"Oh of course ${name}, we'd be lying if we said we were masters. The more you learn the more you realise you don't know. There are areas which we are still exploring such as: event-driven asynchronous multi-threaded server-side development, enhancing our unit testing/end-to-end/automated testing skills, continuous integration, highly complex SQL queries, big data management, enhancing our non-relational database knowledge and of course the security around all of this. Anyway ${name}, it was nice to meet you but it looks like the manager is ready for you now". You shake hands and move on.
+															*finish
+														#Ask: Very nice, how about yours and Chris' front-end skills?
+															"Of course ${name}"
+															*goto frontend
+														#Ask: Very nice how about yours and Chris' sys-admin skills?
+															"Of course ${name}"
+															*goto sysadmin
+												#Ask: Can you elaborate on your sys-admin experience?
+													*label sysadmin
+													"We are quite competent in areas such as: server deployment, server set-up, server configuration, knowledge of using many hosting companies either command line based or graphical user interface based, SSL certificates specifically LetsEncrypt, SSH, SFTP, FTP, Rsync, Linux, Nginx, Apache, Bash, backups, updates, installing, maintaining, CRON and dealing with server outages for managed servers".
+													*choice
+														#Ask: So what are the main areas you are not so competent in?
+															"Like all of these roles, they are deep enough to have specialists. There are areas which we are still exploring such as: the deep ocean of networking, the phyical side of building computers and it's components, system recovery, complex server clusters/architechures, setting up email servers, load balancers and of course the security around all of this. Anyway ${name}, it was nice to meet you but it looks like the manager is ready for you now". You shake hands and move on.
+															*finish
+														#Ask: Very nice, how about yours and Chris' front-end skills?
+															"Of course ${name}".
+															*goto frontend
+														#Ask: Very nice, how about yours and Chris' back-end skills?
+															"Of course ${name}".
+															*goto backend
+										#Ask: Which areas would you consider yourselves less skilled at?
+											"There are areas we have done before but I am not confident to say we are competent in them such as: event-driven asynchronous multi-threaded server-side development, the deep ocean of networking, the phyical side of building computers and it's components, system recovery, complex server clusters/architechures, setting up email servers, load balancers, continuous integration, highly complex SQL queries and of course the security around all of this. Anyway ${name}, it was nice to meet you but it looks like the manager is ready for you now". You shake hands and move on to meet the manager.
+											*finish
+										#Say: If it's expanded so much then surely you could argue such a role is almost impossible to fill.
+											"True, but I think you just need to know your ability and limits. Like with many projects, if we had enough time we could achieve most things. But when under the pressure of strict time constraints, it's good to know when to call for help from specialists. We'd be lying if we said we were masters in all areas, you learn all the time. Anyway ${name}, it was nice to meet you but it looks like the manager is ready for you now". You shake hands and move on to meet the manager.
+											*finish
+							#Say: I bet you're using a LAMP stack.
+								"Correct, why is there a problem with that?".
+								*choice
+									#Say: No, it was a lucky guess since it's so popular.
+										"The very reason we chose it! PHP has a huge community as well as many great platforms to choose from".
+										*goto platforms
+									#Say: I just prefer Nginx.
+										"It would be good to know why you prefer it".
+										*goto nginx
+					#Reply: Yeah, I'm a complete newbie. I have no previous experience but want to learn.
+						*label nontechnical
+						"Don't worry about that ${name}, I'll try and keep it simple. What are you most interested in: the designing of a website or the functional problem solving side of websites?".
+						*choice
+							#Reply: I like the styling and layout side of web development.
+								"A man of creativity. I love it but unfortunately there's never been a more difficult time to learn this area of web development in my opinion".
+								*choice
+									#Reply: Oh dear, why is that?
+										"Well HTML 5 is the web standard, but other mediums such as email still require the older use of tables and inline CSS because of their platforms. JavaScript keeps changing all the time and almost looks like a new language from ES5. The standards body are considered too slow. Therefore other companies have introduced things like TypeScript and transpilers to keep pushing beyond web standards. So really there's quite a mouthful to digest. Luckily Chris regularly supplies us with online material to study with. He says it's helped him considerably".
+										*choice
+											#Ask: Will I be able to use this material too?
+												*label learning
+												"Whilst you're working here we will register you with an online account to learn. Chris always encourages us to learn, in fact we get half-day Fridays so we can go away and study. Of course most people just take it off though heh heh. Don't tell Chris that though! Speaking of which, there he is now. He looks like he's looking for you". You shake hands with the developer and move on to meet the manager.
+												*finish
+											#Say: Sounds hard and off-putting.
+												"Don't be ${name}. If you love it enough you will want to learn! You have got to remember that the fundamentals are always the same. It's kind of like adding slang words to the dictionary. Speaking of which, have you taken a selfie with us yet?! Haha only kidding I hate that word. Actually the manager is right over there, he looks like he's trying to find you". You wave goodbye to the developer and move on to meet the manager.
+												*finish
+									#Say: When is it ever easy to learn? Wouldn't be a challenge otherwise.
+										"Good point. This industry is constantly on the move. But we all love it, the community is great and it's never dull".
+										*choice
+											#Say: Yeah the community is great. Stack Overflow is like Jesus to this industry.
+												"Ha! Yeah it's awesome. In this office we have reputation wars".
+												*choice
+													#Say: Well I'd be no good, I couldn't compete with you guys.
+														"Nonsense ${name}, we've only just started to be honest so there isn't much of a gap. Chris the manager is winning but he's still on less that 1000 points and if you can't compete with that there's always trophies. I have 2 golds, Chris only has 1. Be sure to remind him of that when you meet him. Speaking of which, he seems to be calling for you now". You say goodbye to the developer to meet the manager.
+														*finish
+													#Say: Ha oh yeah, who's winning?
+														"It's close, but Chris is only just ahead with just under 1000 points. There are also trophies as well. I have 2 golds, Chris only has 1. Be sure to remind him of that when you meet him. Speaking of which, he seems to be calling for you now". You say goodbye to the developer to meet the manager.
+														*finish
+											#Ask: true that, so how best can I learn?
+												"Ah good question ${name}".
+												*goto learning
+							#Reply: I prefer the problem solving.
+								"Cool then server-side would be your choice, it's more programmatical rather than mark-up. When me and Chris Rogers the manager were learning, we started out in the front-end. But as we delved deeper we wanted to expand our knowledge toward both areas and become more full-stack".
+								*choice
+									#Ask: So you guys do both sides, don't any of you specialise in one area? 
+										"I specialised more in the back-end, and Chris in the front-end initially; but we think it's better to have a full understanding. It helps other departments, for example: Chris also knows Photoshop and Search Engine Optimisation (SEO). So when meeting with either the design or the marketing department he can talk technical to them also. Speaking of which, he seems to be calling for you now". You say goodbye to the developer to meet the manager.
+										*finish
+									#Ask: What does full-stack really mean nowadays?     
+										"Really glad you brought that up ${name}".
+										*goto fullstack
+							#Reply: I like all areas and want to know them all equally.
+								"That's the talk of a full-stack developer in the making! A most employable trait. But be careful though, it's no longer a black and white phrase".
+								*goto fullstack
+	#The online marketing executive. 
+		Lucy walks you over to the marketing department and introduces you to the Search Engine Optimisation (SEO) expert. The music is loud and unconventional. You notice lots of collectables on their desk. 
+		*choice 
+			#Ask about the silver box with dials on it.
+				*label musicplayer
+				The SEO expert picks up the silver box and explains: "Thought you'd notice this first! This is a playlist mixer that Chris helped make. It allows me to play any song of my choice in the office. All I need to do is think of a song, enter it in this device, magic happens and it plays the song throughout the office!".
 				*choice
 					#Ask: What kind of music do you like listening to?
-					#Ask: Can that not get controversial, what if you
-				
-	#The developer
-		Good choice ${name}, the developer is tough but fair. Letting you know what you can achieve within your budget. Now what do you want to make?
-		*choice
-			#I want you to create a social network
-				There are lots of those
-				*finish
-			#I want to make a media sharing service
-				Okay, to start you'll need a hosting service that can handle lots of disk space. Giving your users the ability to upload media of any size will also require optimising. 
-				*finish
-			#I want to make an app that will make me millions!
-				Everyone and their dog has an app idea, what makes yours so special?
-				*choice
-					#My idea comes with a threat in the shape of this knife, make my millions or else!
-						You've taken this too far, the police have been contacted and are on their way. It's only a matter of time now. In the meantime what do you want to do?
+						"Lot's of genres, but mainly acoustic music".
+							#Ask: how does everyone else feel about that?
+								"The manager Chris doesn't mind at all. He loves acoustic music, he says it's good to chill out to whenever the day gets a little hectic from programming. Also it's good music before a surfing session".
+								*choice
+									#Ask: The manager loves surfing?
+										"Yeah loves it. He's not the best but just loves anything water related, that's why a lot of our work trips involve the ocean in some way". At that point Lucy steps in and says: "Excuse me, sorry to intrude but the manager will see you now". You don't want to leave, but you must.
+										*finish
+									#Say: I like acoustic music as well.
+										"Well you'll have plenty to talk about I'm sure! In fact there he is now. Why don't you go meet him?!". You shake hands with the SEO expert and move on.
+										*finish
+							#Ask: Could that not get a little controversial? What if you play something rude?
+								"Well it has a filter for bad lyrics. Everytime a song with explicit content arises, it will moan at the user responsible and blank out the bad word so nobody can hear it. If you keep doing it then it may even report you to the manager".
+								*choice
+									#Ask: What happens if you get reported to the manager?
+										"Well not much really. It's only an issue if there's a client around. Only then does he get furious. Jimmy once did that, I never did see him again...".
+										*choice
+											#Ask: Woah woah, where is Jimmy? Is he okay?!
+												The SEO expert tries to hold back their laughter and exclaims: "Ha, got ya! Jimmy doesn't exist, I made him up! Sorry but you should've seen the look on your face!". Lucy steps in at that moment and says: "Excuse me ${name}, the manager will see you now". You chuckle and move on.
+												*finish
+											#Ask: Why the SEO expert doesn't seem shocked about Jimmy's disappearance?
+												The SEO expert tries to hold back their laughter and exclaims: "Ha, got ya! Jimmy doesn't exist, I made him up! Sorry but you should've seen the look on your face though!". Lucy steps in at that moment and says: "Excuse me ${name}, the manager will see you now". You laugh and move on.
+												*finish
+									#Ask: Doesn't that defeat the point of freedom in terms of music choice within the office. A lot of songs contain swear words.
+										"True, but it's only songs marked as explicit; the odd swear words might slip through the net. But really this feature is only here to monitor bad songs whenever clients are around. The manager has a control panel upstairs and can determine the filter level from there."
+										*choice
+											#Say: It's so nice to see an environment where you can express yourself without being scorned.
+												"Well there are limits obviously, but it is quite refreshing really. Chris is a pretty placid guy in that sense. Anyhow it looks like the manager is waiting for you over there. It was nice to meet you ${name}". You turn around to approach the manager.
+												*finish
+					#Ask: what's the story behind that?
+						"In the beginning we only had radio, and that caused so many arguements in the office. Eventually everyone decided that the music player was the best option as it is fair and allows everyone to play songs of their choice equally. It's also a fantastic way to expand your music taste and range".
+						*choice	
+							#Enquire: Can I sign up to this?
+								"Sure! It's currently only open to employees inside the office. Whilst you work here you are welcome to submit your music. It even comes with an app too!"
+								*goto internalprojects
+							#Say: This idea is genius, I hate a silent office. It's almost creepy.
+								"At first it was a bit alien to me, but now I totally agree. It helps my creative juices and also provides very interesting conversations!".
+								*choice
+									#Ask: So you make internal projects like this all the time?
+										*label internalprojects
+										"We come up with ideas like these and pitch them to Chris. If he feels it will benefit the company then he will scope out a project within work hours. Otherwise we will arrange hackathons on the weekends if we want it enough. The vibe of those events are usually a laugh, Chris usually gets some craft ales and pizzas to fuel us during the night. You should go ask him when the next event is, he's over there waiting for you now".
+										*finish
+									#Say: Wow, what's the next awesome app you guys are going to make?!
+										"Good question ${name}, we've toyed with some ideas but we fancy something completely different next time. Chris created a protoype online multiplayer game years ago. He's crazy about it but hasn't had the time to fit it in. We were thinking of surprising him by offering to build it together".
+										*goto internalprojects
+					#Say: Cool that sounds really awesome, and what's the story behind that picture of you in the frame?
+						The SEO expert chuckles and explains: "Ha well that's an interesting story, work organised a hackathon event where we had 24 hours to make whatever we like. We opted to make voice controlled smoothie maker. But you would be surprised how often your name gets called out daily! Eventually the smoothie maker overflowed and just covered me entirely! Not your average Friday night I suppose".
 						*choice
-							#Attempt to escape, RUN!
-								Good news, you actually escaped. All those hours spent on the track during your school years served you well. But a criminal life is hard and eventually you will grow tired living life on the run. Was this really the outcome you were expecting by entering my site?
-								*finish
-							#Give in, apologise.
-								Very good, you just about managed to pull it together before something terrible happened. You get arrested but are only given 120 hours of community service. Not bad really.
-								*finish
-							#Mutilate the developer, hide the body.
-								Get off my site!!
-								*finish
-					#I've got backing. All you have to worry about is making it. Let me handle the success.
-						Can't argue with that. I look forward to bringing your dream into a reality.
-						*finish
+							#Ask: What's a hackathon?
+								"A hackathon is an event, typically lasting 24 hours for us, where the whole office meet on the weekend to engage in collaborative computer programming. The vibe is usually really great and Chris the manager will often buy some craft ales and pizza in order to fuel us during the night!"
+								*choice
+									#Ask: Why craft ales specifically?
+										*label ales
+										"Chris really loves his beers ever since he received a book about 1001 beers around the world you must try before you die. He uses any event to source some strange beers. His favourite so far is the Left Handed Milk Stout draught. You should try it! I'm sure you'll end up talking about beers together when you meet him. Speaking of which I believe he's waiting for you now". You shake hands with the SEO expert and move on to meet the manager.
+										*finish
+							#Say: That's freaking sweet! What else have you made?!
+								"Ah we have made many other things such as a drone butler, you can only imagine how that turned out! But it's not just me specifically, the whole team is involved and the developers are the real genius' behind it all. I just sell the finished product."
+								*choice
+									#Say: It isn't just selling, there is a skill behind that.
+										"Cheers ${name}. Technically it's a soft skill but with more and more software around online marketing, I think it's becoming increasingly technical".
+										*choice
+											#Say: Exactly! I came here to learn more development, but you should invite me round sometime so you can teach me this side too.
+												"Um, sure ${name} why not".
+												*goto flirting
+											#Ask: How has it become more technical?
+												"There are many aspects: analytics, social media presence, email marketing, SEO and blogs. But it's all the sofwares and monitoring around each aspect to learn that makes it more technical. The soft skill is knowing in which direction to steer these softwares that will best suit your client's needs. But I believe you have come here to learn more about coding rather than marketing right?! Chris the manager mainly develops when not running things. He looks available now, go and talk to him". You say goodbye before shaking hands and leaving to meet the manager.
+												*finish
+									#Ask about the drone butler.
+										"Yes that was actually something worth forgetting. The drone's blades ended up slicing poor Jimmy's eyes wide open and the rest of the night was spent in accident and emergency".
+										*choice
+											#Say: Oh wow! Is Jimmy okay?!
+												The SEO expert tries to hold back their laughing and exclaims: "Ha, got ya! Jimmy doesn't exist, I made him up! Man you should've seen your face! Yeah the drone never actually hurt anyone but it kept running into people! It was annoying so we stopped it". At that moment, Lucy steps in and says: "Excuse me ${name}, the manager will see you now".
+												*finish
+											#What the, how can the manager have allowed such a thing to get out of hand?!
+												The SEO expert tries to hold back their laughter and exclaims: "Ha, got ya! Jimmy doesn't exist, I made him up! Man you should've seen your face! Yeah the drone never actually hurt anyone but it kept running into people! It was annoying so we stopped it". At that moment, Lucy steps in and says: "Excuse me ${name}, the manager will see you now".
+												*finish
+							#Ask: Is that how you spend your Friday nights?
+								"The manager will provide a budget for many things including travelling, sporting days, hackathons etc. He prefers events rather than unnecessarily getting wasted because it's a Friday night."
+								*choice
+									#Say: I must say I love the drink a bit too much...
+										"Haha, I prefer drinking accompanied by an activity rather than just plain boozing".
+										*goto ales
+									#Say: I tend to agree with you actually.
+										"Awesome! We usually do some kind of event once a month. Chris will celebrate and dive into the kitty to buy some drinks and food".
+										*goto ales
+			#Ask about the loud music.
+				The SEO expert turns down the music and says: "Sorry mate, this is my jam right now and I'm right next to the controls heh heh".
+				*goto musicplayer
+			#Ask the SEO expert about the smartphone with liquid in it.
+				The SEO expert picks up the broken phone from off his desk and says: "This is a reminder of what was a fantastic marketing campaign... Well for us anyway".
+				*choice
+					#Ask: What happened?
+						*label marketing
+						"A client looking to enter the market as the worlds only fully water-proof smartphone up to 500m came to us for a marketing campaign and a website".
+						*choice
+							#Ask: How did the website go?
+								"Totally sweet ${name}! Chris created it at the time and it had it all: responsiveness, the looks, the animation, the user experience and was fully optimised for Google".
+								*choice
+									Ask: How was is optimised?
+										*label optimised
+										"One of the worst things the marketing department can receive is an inherited dead cow of a project, and this was one of them. They previously went with another company and their campaign was a mess. Luckily Chris dealt with all the redirects, cleaned it up responsively, re-indexed and managed to convince Google to remove the blacklisting. Then it just flourished! It had a 97% score from Google which is witchcraft considering the mess it was before".
+										*choice
+											#Ask: So why haven't I heard about this phone?
+												*label brokenphone
+												"Simple, it didn't work. The company claimed 500m, but in reality it never reached 10m. I took it to the local swimming pool and BOOM! Screen broke, water came rushing in. Not to mention the Android version was ancient. The campaign couldn't compete with the bad reviews. Eventually the company pulled the plug due to lack of funding".
+												*choice
+													#Ask: So what would you consider to be a good campaign?
+														"It's completely relative to the budget, so if they are spending X amount and our campaign turns over double that then I'd consider that a success. This campaign was 10X that though! It was a Leviathan! Anyway ${name} it was great getting to know you but it looks like the manager is waiting for you now". You shake hands with the SEO expert and move on to meet the manager.
+														*finish
+													#Say: Shame looks like a decent phone. 
+														"Yeah, I mean that was part of the reason it was a success. The designer found it easy to work with, it's stunning! But alas what's beauty without practicality. Anyway ${name} it was great getting to know you but it looks like the manager is waiting for you now". You shake hands with the SEO expert and move on to meet the manager.
+														*finish
+							#Ask: How was the campaign such a success?
+								"Well ${name}. As well as creating an epic, cleanly optimised site; it also had a great email, Google and Facebook ad campaign to go along with it! It scored 97% from Google which is witchcraft considering the mess it was before!".
+								*choice
+									#Ask: So why haven't I heard of this phone?
+										"Good question buddy".
+										*goto brokenphone
+									#Ask: How it was a mess before?
+										"Good question buddy".
+										*goto optimised
+									#Ask about the email campaign.
+										"Well it was an invite only system. Chris the manager developed an email newsletter sendout system. It would fire-off a template and pre-fill it with targeted information, which worked very well. I think he said the hardest part was getting the generated email to look good in old and new email clients. People run some crazy old email software!". Anyway ${name} it was great getting to know you but it looks like the manager is waiting for you now". You shake hands with the SEO expert and move on to meet the manager.
+										*finish
+					#Say: Doesn't look like it went well at all.
+						"Like I said, not for the client anyway. But for us it was one of our finest hours".
+						*goto marketing
 	#The manager
-		I'm afraid the manager is in a meeting at the moment, but he will be available shortly. In the meantime why not approach someone else.
+		Lucy says: "I'm afraid the manager is in a meeting at the moment, but he will be available shortly. In the meantime why not have a chat with someone else".
 		*goto approach
-	#Sales representative
-		Not afraid to sugar-coat the truth. Mostly there to keep you happy, but anything to put a smile on your face. Consider the sales representative as moral support. What do you need support with?
-		*choice
-			#I want support making a social network
-				Go for it.
-				*finish
-			#I want support making a media sharing service
-				Go for it.
-				*finish
-			#I want support making an app idea that will make me millions! 
-				Got for it
-				*finish

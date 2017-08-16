@@ -85,6 +85,10 @@ button:hover, button:focus, .btn-primary:hover, .btn-primary:focus {
 	padding-right: 5px;
 	padding-left: 5px;
 }
+dl, .dl {
+	margin-bottom: 0.5rem;
+	margin-top: 0.5rem;
+}
 .full-height {
 	height: 100%;
 }
@@ -92,35 +96,39 @@ button:hover, button:focus, .btn-primary:hover, .btn-primary:focus {
 	overflow-x: hidden;
 }
 .hpadding {
-	padding-left: 25px;
-	padding-right: 25px; 
+	padding-left: 1rem;
+	padding-right: 1rem; 
 }
 .vpadding {
-	padding-top: 25px;
-	padding-bottom: 25px; 
+	padding-top: 1rem;
+	padding-bottom: 1rem; 
 }
 .hspace {
-	margin-left: 25px;
-	margin-right: 25px; 
+	margin-left: 1rem;
+	margin-right: 1rem; 
 }
 .vspace {
-	margin-top: 25px;
-	margin-bottom: 25px; 
+	margin-top: 1rem;
+	margin-bottom: 1rem; 
+}
+.vspace-xs {
+	margin-top: 0.5rem;
+	margin-bottom: 0.5rem; 
 }
 .vspace-bottom {
-	margin-bottom: 25px; 
+	margin-bottom: 1rem; 
 }
 .no-padding {
 	padding: 0;
 }
 .no-scrollbars {
-	width: calc(100% + 25px);
+	width: calc(100% + 1rem);
 	height: 100%;
 	overflow-y: auto;
-	/*margin-left: 25px;*/
+	/*margin-left: 1rem;*/
 }
 .gutter-margin {
-	margin-right: 25px;
+	margin-right: 1rem;
 }
 .header {
 	border-right: 2px solid #FFF;
@@ -320,7 +328,7 @@ portfolio .icon {
 		height: calc(100% - 15px) !important;
 	}
 	.main > home {
-		height: calc(100% - 25px) !important;
+		height: calc(100% - 1rem) !important;
 	}
 	.sidebar {
 		display: none;
