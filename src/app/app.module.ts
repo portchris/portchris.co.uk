@@ -67,7 +67,7 @@ export class AppModule {
 	
 	constructor() {
 
-		this.url = "http://portchris.hades.portchris.net:8081/";
+		this.url = (window.location.href.indexOf("localhost") > -1 || window.location.href.indexOf("hades") > -1) ? "http://api.portchris.hades.portchris.net:8081/" : "http://api.portchris.co.uk/";
 	}
 
 	ngOnInit() {

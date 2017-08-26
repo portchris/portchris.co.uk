@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class PortchrisDatabaseSeeder extends Seeder
 {
@@ -27,7 +28,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'lastname' => 'Rogers',
 			'email' => 'chris@portchris.co.uk',
 			'username' => 'chris@portchris.co.uk',
-			'password' => '$1_2_3_4_5',
+			'password' => Hash::make('Guess.who$1'),
 			'stage' => 1,
 			'lat' => '0.000000',
 			'lng' => '0.000000',

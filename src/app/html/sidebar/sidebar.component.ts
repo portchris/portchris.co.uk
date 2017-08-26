@@ -196,7 +196,7 @@ export class SidebarComponent implements OnInit, OnChanges {
 	* @param 	object 	event
 	* @param 	boolean 	isChild
 	*/
-	private changeShowStatus(event, isChild = false) {
+	public changeShowStatus(event, isChild = false) {
 
 		let target = event.target.offsetParent || event.srcElement.offsetParent || event.currentTarget.offsetParent;
 		event.preventDefault();

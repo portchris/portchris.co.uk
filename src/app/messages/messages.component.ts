@@ -786,7 +786,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		this.searchBox.nativeElement.setAttribute("value", this.talkForm.value.content);
 	}
 
-	private focusInput(event) {
+	public focusInput(event) {
 
 		this.searchBox.nativeElement.focus();
 	}

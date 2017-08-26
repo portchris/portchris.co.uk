@@ -9,15 +9,12 @@ import { ColumnLayout } from "./column-layout";
 import { HeaderComponent } from "./header/header.component";
 import { SidebarComponent } from "./sidebar/sidebar.component";
 
-@NgModule({
-	declarations: [ 
-		HeaderComponent,
-		SidebarComponent
-	],
-	bootstrap: [ 
-		ColumnLayout 
-	]
-})
+// @NgModule({
+// 	declarations: [ 
+// 		HeaderComponent,
+// 		SidebarComponent
+// 	]
+// })
 
 @Component({
 	selector: 'app-column-layout',

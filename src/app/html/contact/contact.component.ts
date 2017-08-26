@@ -50,7 +50,7 @@ export class ContactComponent implements OnInit, OnChanges {
 	* If the contact service is sending
 	* @var 	boolean
 	*/
-	private sending: boolean;
+	public sending: boolean;
 
 	/**
 	* These constants are used to limit the message types allowed
