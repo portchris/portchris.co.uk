@@ -55,7 +55,11 @@ export class PortfolioComponent implements OnInit, OnChanges, OnDestroy {
 	* Router information observable
 	* @param 	Observable 	v
 	*/
-	subscriber(v) {
+	public subscriber(v) {
 
+		// if (window.hasOwnProperty('ga')) {
+		// 	window.ga('set', 'page', v.url);
+		// 	window.ga('send', 'pageview');
+		// }
 	}
 }

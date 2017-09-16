@@ -29,7 +29,7 @@ export class HeaderComponent implements OnInit, OnChanges {
 	public ngOnInit() {
 	
 		this.sub = this.router.data.subscribe((v) => {
-			console.log(v);
+			// console.log(v);
 		});	
 	}
 

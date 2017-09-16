@@ -13,6 +13,7 @@ class CreatePagesTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('pages');
         Schema::create('pages', function (Blueprint $table) {
 
             // Primary key, auto-increments

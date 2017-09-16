@@ -13,6 +13,7 @@ class CreateUsersRolesTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('users_roles');
         Schema::create('users_roles', function (Blueprint $table) {
 
             // Primary key, auto-increments

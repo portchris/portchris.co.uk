@@ -116,6 +116,10 @@ export class ContactComponent implements OnInit, OnChanges {
 	*/
 	public subscriber(v) {
 
+		// if (window.hasOwnProperty('ga')) {
+		// 	ga('set', 'page', v.url);
+		// 	ga('send', 'pageview');
+		// }
 	}
 
 	/**

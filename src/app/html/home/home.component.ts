@@ -61,5 +61,9 @@ export class HomeComponent implements AfterViewInit, OnChanges, OnDestroy {
 	*/
 	public subscriber(v) {
 
+		// if (window.hasOwnProperty('ga')) {
+		// 	window.ga('set', 'page', v.url);
+		// 	window.ga('send', 'pageview');
+		// }
 	}
 }

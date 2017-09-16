@@ -44,7 +44,7 @@ export class SidebarComponent implements OnInit, OnChanges {
 	public ngOnInit() {
 	
 		this.sub = this.router.data.subscribe((v) => {
-			console.log(v);
+			// console.log(v);
 		});	
 		this.createHelpList();
 		this.messagesService.getAdminUser().subscribe(

@@ -277,6 +277,16 @@ portfolio .icon {
 	}
 }
 @media (max-width: 767px) {
+	h1, .h1 {
+		font-size: 1.6rem;
+	}
+	h2, .h2 {
+		font-size: 1.4rem;
+	}
+	h3, .h3, h4, .h4, h5, .h5, h6, .h6, dt{
+		font-size: 1.2rem;
+		font-weight: bold;
+	}
 	.container {
 		max-width: none;
 		width: 100%;
@@ -287,7 +297,7 @@ portfolio .icon {
 	.header {
 		position: fixed;
 		top: 0;
-		height: 130px;
+		height: 110px;
 		z-index: 10;
 		border-right: 0;
 	}
@@ -296,6 +306,21 @@ portfolio .icon {
 		flex-direction: row;
 		margin-top: 0;
 		width: 100%;
+	}
+	#logo {
+		height: 47px !important;
+		max-width: 60px;
+		margin-top: -15px;
+	} 
+	#logo .icon {
+		max-width: 60px;
+	}
+	#chris-rogers {
+		max-width: 250px !important;
+		margin-left: 25px !important;
+	}
+	#chris-rogers h1 {
+		margin-top: 5px;
 	}
 	.nav-item {
 		width: 100% !important;
@@ -320,8 +345,8 @@ portfolio .icon {
 	}
 	.main {
 		position: fixed;
-		top: 130px;
-		height: calc(100% - 130px);
+		top: 100px;
+		height: calc(100% - 110px);
 		padding-top: 15px;
 	}
 	.main > * {
@@ -335,6 +360,7 @@ portfolio .icon {
 	}
 	#user-input {
 		width: calc(100% - 10px) !important;
+		bottom: 10px;
 	}
 	#contact-me .form-control {
 		max-width: none !important;

@@ -243,6 +243,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		if (valid) {
 			let data = this.talkForm.value;
 			data.user = (this.user != null) ? this.user : {};
+			data.content = (this.sanitiseContent(data.content));
 			this.talkForm.disable();
 			this.decipherMessageType(data);
 			this.decipherMessageAction(data);
@@ -276,6 +277,19 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			this.setError(this.errMsg);
 		}
 		this.talkForm.controls['content'].setValue("");
+	}
+
+	/**
+	* Limit length of users message
+	* Strip HTML
+	* @param 	string 	users content
+	* @return 	string 	users sanitised content
+	*/
+	private sanitiseContent(c) {
+
+		var tmp = document.createElement("DIV");
+		tmp.innerHTML = c.substring(0, 200);
+		return tmp.textContent || tmp.innerText || "";
 	}
 
 	/**
@@ -340,7 +354,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		} else {
 			let msg = this.createMessageTemplate();
 			let weather = this.weatherService.getWeatherData();
-			if (typeof weather === "object" && weather.time != null) {
+			if (typeof weather !== "undefined" && weather !== null && weather.time != null) {
 				msg.message = (weather.time.dark) ? "Hello! " : "Hello! ";
 			} else {
 				msg.message = "Hello!";
@@ -378,9 +392,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		let msg = this.createMessageTemplate();
 		let data = this.talkForm.value;
 		this.talkForm.disable();
-		this.user.name = data.content;
-		this.user.firstname = data.content;
-		this.user.lastname = data.content;
+		this.user.name = this.sanitiseContent(data.content);
+		this.user.firstname = this.sanitiseContent(data.content);
+		this.user.lastname = this.sanitiseContent(data.content);
 		if (this.user.name.indexOf(" ") !== -1) {
 			let split = this.user.name.split(" ");
 			this.user.firstname = split[0];
@@ -914,13 +928,14 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		} else if (this.user.email != null) {
 
 			// They have entered their email and password this is enough information to authenticate
-			this.messagesService.hashPassword(data.content).subscribe(
+			let pass = data.content.substring(0, 255);
+			this.messagesService.hashPassword(pass).subscribe(
 				(hash) => { 
 					this.user.password = hash.password; 
 					this.input_type = "text";
 					let credentials = { 
 						email: this.user.email, 
-						password: data.content
+						password: pass
 					};
 					this.messagesService.authenticate(credentials).subscribe(
 						(message) => { 

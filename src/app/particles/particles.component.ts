@@ -131,7 +131,7 @@ export class ParticlesComponent implements OnInit {
 
 	ngOnInit() {
 
-		console.log(this.settings);
+		// console.log(this.settings);
 		particlesJS(this.settings);
 	}
 }

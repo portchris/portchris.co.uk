@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateRolesTable extends Migration
+class CreateRolesTable2 extends Migration
 {
     /**
      * Run the migrations.
@@ -13,6 +13,7 @@ class CreateRolesTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('roles');
         Schema::create('roles', function (Blueprint $table) {
 
             // Primary key

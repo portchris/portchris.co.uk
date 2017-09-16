@@ -13,6 +13,7 @@ class CreateContentMetasTable extends Migration
      */
     public function up()
     {
+        Schema::dropIfExists('content_metas');
         Schema::create('content_metas', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('id_linked_content_meta');
