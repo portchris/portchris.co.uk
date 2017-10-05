@@ -25,7 +25,7 @@ export class WeatherService {
 
 	constructor(private _http: Http, private _jsonp: Jsonp, private storage: DataStorageService) { 
 		
-		this.uri = "http://api.openweathermap.org/data/2.5/weather?callback=JSONP_CALLBACK&APPID=" + WeatherService.API_KEY + "&units=metric";
+		this.uri = "https://api.openweathermap.org/data/2.5/weather?callback=JSONP_CALLBACK&APPID=" + WeatherService.API_KEY + "&units=metric";
 	}
 
 	/**

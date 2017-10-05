@@ -11,7 +11,7 @@
 <div #scrollable id="message-stream" class="no-scrollbars">
 	<div class="row no-gutters gutter-margin">
 		<div class="col-md-12 vspace-bottom">
-			<h1>Speak to me</h1>
+			<h1>Get to know me</h1>
 		</div>
 	</div>
 	<div *ngFor="let msg of messages" class="row no-gutters gutter-margin">
@@ -54,7 +54,7 @@
 					{{ question.csrf }}
 				</span> -->
 				<div class="talk" (click)="focusInput($event)">
-					<input #searchBox formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0 full-height" placeholder="Respond to my message here..." [value]="user.message">
+					<input #searchBox formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0 full-height" placeholder="Respond to my message here..." autocomplete="off" [value]="user.message">
 					<span #searchFauxInput class="talk_FauxInput" dir="rtl"></span>
 					<button type="submit" class="btn btn-primary full-height">
 						<small>&crarr;</small>
