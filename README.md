@@ -3,7 +3,7 @@
 ## Environment
 
 ### Setup
-Clone the laradock repo and structure like so:
+[Clone the laradock repo](https://github.com/Laradock/) and structure like so:
 ```
 + laradock
 + portchris.co.uk
@@ -13,7 +13,7 @@ Custom docker-compose.portchris.yml will need copying from portchris.co.uk to la
 
 ### Variables
 
-On top of the usual laradock .env sample I have made the following additions
+On top of the usual [laradock .env sample](https://laradock.io/getting-started/) I have made the following additions
 
 ```
 ### Nginx #########################################################
