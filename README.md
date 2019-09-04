@@ -16,22 +16,34 @@ Custom docker-compose.portchris.yml will need copying from portchris.co.uk to la
 On top of the usual [laradock .env sample](https://laradock.io/getting-started/) I have made the following additions
 
 ```
+### Paths #########################################################
+# Point to the path of your applications code on your host
+APP_CODE_PATH_HOST=../
+
+### Workspace #####################################################
+WORKSPACE_INSTALL_NPM_ANGULAR_CLI=true
+WORKSPACE_INSTALL_XDEBUG=true
+
 ### Nginx #########################################################
-NGINX_HOST_HTTP_PORT=8080 # Or which ever matches your custom docker-compose.yml public facing port
-NGINX_HOST_HTTPS_PORT=8443 # Or which ever matches your custom docker-compose.yml public facing port
+# HTTP port that matches your custom docker-compose.yml public facing port
+NGINX_HOST_HTTP_PORT=8080
+# HTTPS port that matches your custom docker-compose.yml public facing port
+NGINX_HOST_HTTPS_PORT=8443
 
 ### Portchris Specific ############################################
-DOCKER_COMPOSE_SERVICES="php-fpm nginx mysql"
+DOCKER_COMPOSE_SERVICES="php-fpm nginx mariadb"
 DOCKER_COMPOSE_PATH="../laradock/"
 DOCKER_COMPOSE_FILE="docker-compose.portchris.co.uk.yml"
 ```
 
 ### Scripts
-- start.sh - Copies docker-compose.portchris.yml to laradock and start containers
-- build.sh - Full rebuild of all used containers
-- stop.sh - stop running containers
-- composer.sh - run composer commands
-- shell.sh - Bash shell inside workspace container
+- `start.sh` - Copies docker-compose.portchris.yml to laradock and start containers
+- `build.sh` - Full rebuild of all used containers
+- `stop.sh` - stop running containers
+- `composer.sh` - run composer commands
+- `artisan.sh` - Runs Laravel CLI tool inside workspace container
+- `shell.sh` - Bash shell inside workspace container
+- `npm.sh` - Runs Node Package Manager inside workspace container
 
 ## Front-end Development
 
