@@ -3,7 +3,9 @@
 CURR_DIR=$(pwd)
 
 if [ -f ./.env ]; then
-	export $(grep -v '^#' ./.env | xargs)
+	set -a
+	. ./.env
+	set +a
 	cd $DOCKER_COMPOSE_PATH
 	docker-compose stop -t0
 	docker-compose rm -f
