@@ -7,7 +7,7 @@ if [ -f ./.env ]; then
 	. ./.env
 	set +a
 	cd $DOCKER_COMPOSE_PATH
-	docker-compose -f $DOCKER_COMPOSE_FILE exec -u laradock workspace composer --working-dir=$WEBROOT $@  
+	docker-compose -f $DOCKER_COMPOSE_FILE exec nginx bash -c 'cd /etc/nginx; exec "${SHELL:-sh}"'  
 else
 	echo "Please create an .env file"
 fi
