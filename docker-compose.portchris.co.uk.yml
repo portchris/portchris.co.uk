@@ -234,8 +234,8 @@ services:
         - LETSENCRYPT_TEST=${NGINX_LETSENCRYPT_TEST}
         - ENABLE_IPV6=${NGINX_ENABLE_IPV6}
       ports:
-        - "${NGINX_HOST_HTTP_PORT}:80"
-        - "${NGINX_HOST_HTTPS_PORT}:443"
+        - "${NGINX_HOST_HTTP_PORT}:${NGINX_VIRTUAL_PORT}"
+        - "${NGINX_HOST_HTTPS_PORT}:${NGINX_HOST_HTTPS_PORT}"
       expose:
         - 80
         - 443
