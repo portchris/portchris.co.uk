@@ -26,9 +26,9 @@ if [ -f ./.env ]; then
 	read -p "Use Docker cache? [Y/y]? " -n 1 -r
 	echo # (optional) move to a new line
 	if [[ $REPLY =~ ^[Yy]$ ]]; then 
-		docker-compose -f $DOCKER_COMPOSE_FILE build --build-arg UID=$USER_ID --build-arg GID=$GROUP_ID workspace $DOCKER_COMPOSE_SERVICES
+		docker-compose -f $DOCKER_COMPOSE_FILE build --build-arg UID=$USER_ID --build-arg GID=$GROUP_ID workspace $DOCKER_COMPOSE_SERVICES $@
 	else
-		docker-compose -f $DOCKER_COMPOSE_FILE build --no-cache --build-arg UID=$USER_ID --build-arg GID=$GROUP_ID workspace $DOCKER_COMPOSE_SERVICES
+		docker-compose -f $DOCKER_COMPOSE_FILE build --pull --no-cache --build-arg UID=$USER_ID --build-arg GID=$GROUP_ID workspace $DOCKER_COMPOSE_SERVICES $@
 	fi
 else
 	echo "Please create an .env file"

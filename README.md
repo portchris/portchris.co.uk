@@ -66,6 +66,29 @@ MAIL_PORT=2525
 MAIL_USERNAME="BLAH"
 MAIL_PASSWORD="BLAH"
 MAIL_ENCRYPTION=null
+
+###########################################################
+################## Laradock General Setup #################
+###########################################################
+
+## MySQL
+# Prefer latest 5 rather than 8 since laravel 5/6 is not compatible yet
+MYSQL_VERSION=5.7
+MYSQL_DATABASE=MY_USER
+MYSQL_USER=MY_DATABASE
+MYSQL_PASSWORD=MY_PASSWORD
+# Specific external port for portchris database access
+MYSQL_PORT=8306
+MYSQL_ROOT_PASSWORD=MY_ROOT_PASSWORD
+MYSQL_ENTRYPOINT_INITDB=./mysql/docker-entrypoint-initdb.d
+
+## Workspace
+WORKSPACE_INSTALL_NPM_GULP=true
+WORKSPACE_INSTALL_NPM_ANGULAR_CLI=true
+WORKSPACE_INSTALL_XDEBUG=true
+# User/Group IDs = 1000 or 1001
+WORKSPACE_PUID=1001
+WORKSPACE_PGID=1001
 ```
 
 ### Scripts
