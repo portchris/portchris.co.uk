@@ -6,20 +6,78 @@ use Illuminate\Support\Facades\Hash;
 class PortchrisDatabaseSeeder extends Seeder
 {
 	/**
-	* Run the database seeds.
-	*
-	* @return void
-	*/
-	public function run() {
+	 * Run the database seeds.
+	 *
+	 * @return void
+	 */
+	public function run()
+	{
 
 		Eloquent::unguard();
-		
+
 		// Clear out tables
-		DB::table('users')->delete();
-		DB::table('roles')->delete();
-		DB::table('pages')->delete();
-		DB::table('content_metas')->delete();
-		DB::table('users_roles')->delete();
+		Schema::dropIfExists('users');
+		if (Schema::hasTable('users')) {
+			DB::table('users')->delete();
+		} else {
+			Schema::create('users', function ($table) {
+				$table->increments('id');
+				$table->string('firstname');
+				$table->string('lastname');
+				$table->string('email');
+				$table->string('username');
+				$table->integer('stage');
+				$table->float('lat');
+				$table->float('lng');
+				$table->boolean('enabled');
+				$table->longText('conversation');
+			});
+		}
+		Schema::dropIfExists('roles');
+		if (Schema::hasTable('roles')) {
+			DB::table('roles')->delete();
+		} else {
+			Schema::create('roles', function ($table) {
+				$table->increments('id');
+				$table->string('name');
+				$table->mediumText('description');
+				$table->integer('security_level');
+				$table->boolean('enabled');
+			});
+		}
+		Schema::dropIfExists('pages');
+		if (Schema::hasTable('pages')) {
+			DB::table('pages')->delete();
+		} else {
+			Schema::create('users', function ($table) {
+				$table->increments('id');
+				$table->string('name');
+				$table->string('title');
+				$table->longText('content');
+				$table->string('slug');
+				$table->mediumText('meta_title');
+				$table->mediumText('meta_description');
+				$table->mediumText('meta_image_path');
+				$table->boolean('enabled');
+				$table->integer('user_id');
+			});
+		}
+		Schema::dropIfExists('content_metas');
+		if (Schema::hasTable('content_metas')) {
+			DB::table('content_metas')->delete();
+		} else {
+			Schema::create('content_metas', function ($table) {
+				$table->increments('id');
+				$table->string('name');
+				$table->integer('id_linked_content_meta');
+				$table->string('title');
+				$table->string('key');
+				$table->integer('stage');
+				$table->longText('content');
+				$table->integer('user_id');
+				$table->integer('page_id');
+			});
+		}
 
 		// Create all necessary users.
 		$user_portchris = App\User::create(array(
@@ -28,7 +86,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'lastname' => 'Rogers',
 			'email' => 'chris@portchris.co.uk',
 			'username' => 'chris@portchris.co.uk',
-			'password' => Hash::make('Guess.who$1'),
+			'password' => Hash::make('$1Flapjack'),
 			'stage' => 1,
 			'lat' => '0.000000',
 			'lng' => '0.000000',
@@ -101,7 +159,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'title' => "Let's get started",
 			'key' => "question",
 			'stage' => 1,
-			'content'=> "What's your name?",
+			'content' => "What's your name?",
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));
@@ -111,7 +169,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'title' => "Let's get started",
 			'key' => "question",
 			'stage' => 0,
-			'content'=> "Is there anything else I can help you with?",
+			'content' => "Is there anything else I can help you with?",
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));
@@ -121,7 +179,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'title' => "Let's get started",
 			'key' => "response",
 			'stage' => 1,
-			'content'=> "I'd like to know more about you",
+			'content' => "I'd like to know more about you",
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));
@@ -131,7 +189,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'title' => "Let's get started",
 			'key' => "response",
 			'stage' => 1,
-			'content'=> "I'm not saying",
+			'content' => "I'm not saying",
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));
@@ -141,7 +199,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'title' => "Let's get started",
 			'key' => "answer",
 			'stage' => 1,
-			'content'=> "Great! My name is Chris! But you should already know that :p",
+			'content' => "Great! My name is Chris! But you should already know that :p",
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));
@@ -151,7 +209,7 @@ class PortchrisDatabaseSeeder extends Seeder
 			'title' => "Let's get started",
 			'key' => "answer",
 			'stage' => 0,
-			'content'=> "Gotcha, well then there's no more reason to talk I suppose.",
+			'content' => "Gotcha, well then there's no more reason to talk I suppose.",
 			'user_id' => $user_portchris->id,
 			'page_id' => $page_home->id
 		));
