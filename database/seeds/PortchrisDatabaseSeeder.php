@@ -39,24 +39,27 @@ class PortchrisDatabaseSeeder extends Seeder
 					$table->float('lat')->default(0);
 					$table->float('lng')->default(0);
 					$table->boolean('enabled')->default(false);
-					$table->longText('conversation')->default(json_encode(""));
+					$table->longText('conversation')->nullable(true);
 					$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
 					$table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 				});
 
 				// Create all necessary users.
-				$user_portchris = App\User::create(array(
-					'name' => 'Chris Rogers',
-					'firstname' => 'Chris',
-					'lastname' => 'Rogers',
-					'email' => 'chris@portchris.co.uk',
-					'username' => 'chris@portchris.co.uk',
-					'password' => Hash::make('$1Flapjack'),
-					'stage' => 1,
-					'lat' => '0.000000',
-					'lng' => '0.000000',
-					'enabled' => true
-				));
+				$user_portchris = User::where('username', "chris@portchris.co.uk")->first();
+				if (!$user_portchris) {
+					$user_portchris = App\User::create(array(
+						'name' => 'Chris Rogers',
+						'firstname' => 'Chris',
+						'lastname' => 'Rogers',
+						'email' => 'chris@portchris.co.uk',
+						'username' => 'chris@portchris.co.uk',
+						'password' => Hash::make('$1Flapjack'),
+						'stage' => 1,
+						'lat' => '0.000000',
+						'lng' => '0.000000',
+						'enabled' => true
+					));
+				}
 				$this->command->info('Hello! User Chris reporting for duty sir!');
 			} catch (Exception $e) {
 				$this->command->error($e->getMessage());
@@ -149,6 +152,15 @@ class PortchrisDatabaseSeeder extends Seeder
 			));
 			$this->command->info('Main pages are now ready!');
 		}
+		if (!Schema::hasTable('users_roles')) {
+			Schema::create('users_roles', function ($table) {
+				$table->increments('id');
+				$table->integer('user_id');
+				$table->integer('role_id');
+				$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+				$table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
+			});
+		}
 		if (!Schema::hasTable('content_metas') && $user_portchris) {
 			Schema::create('content_metas', function ($table) {
 				$table->increments('id');
@@ -156,6 +168,7 @@ class PortchrisDatabaseSeeder extends Seeder
 				$table->integer('id_linked_content_meta');
 				$table->string('title');
 				$table->string('key');
+				$table->string('goto');
 				$table->integer('stage');
 				$table->longText('content');
 				$table->integer('user_id');
@@ -163,68 +176,7 @@ class PortchrisDatabaseSeeder extends Seeder
 				$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
 				$table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));
 			});
-			// Create dummy content metas.
-			$meta_q = App\ContentMeta::create(array(
-				'name' => 'Q1 Stage 1',
-				'id_linked_content_meta' => 0,
-				'title' => "Let's get started",
-				'key' => "question",
-				'stage' => 1,
-				'content' => "What's your name?",
-				'user_id' => $user_portchris->id,
-				'page_id' => $page_home->id
-			));
-			$meta_q2 = App\ContentMeta::create(array(
-				'name' => 'Q1 Stage 0',
-				'id_linked_content_meta' => 0,
-				'title' => "Let's get started",
-				'key' => "question",
-				'stage' => 0,
-				'content' => "Is there anything else I can help you with?",
-				'user_id' => $user_portchris->id,
-				'page_id' => $page_home->id
-			));
-			$meta_r = App\ContentMeta::create(array(
-				'name' => 'R1 Stage 1',
-				'id_linked_content_meta' => $meta_q->id, // This is how the site answers questions
-				'title' => "Let's get started",
-				'key' => "response",
-				'stage' => 1,
-				'content' => "I'd like to know more about you",
-				'user_id' => $user_portchris->id,
-				'page_id' => $page_home->id
-			));
-			$meta_r2 = App\ContentMeta::create(array(
-				'name' => 'R2 Stage 1',
-				'id_linked_content_meta' => $meta_q->id, // This is how the site answers questions
-				'title' => "Let's get started",
-				'key' => "response",
-				'stage' => 1,
-				'content' => "I'm not saying",
-				'user_id' => $user_portchris->id,
-				'page_id' => $page_home->id
-			));
-			$meta_a = App\ContentMeta::create(array(
-				'name' => 'A1 Stage 1',
-				'id_linked_content_meta' => $meta_r->id, // This is how the site answers questions
-				'title' => "Let's get started",
-				'key' => "answer",
-				'stage' => 1,
-				'content' => "Great! My name is Chris! But you should already know that :p",
-				'user_id' => $user_portchris->id,
-				'page_id' => $page_home->id
-			));
-			$meta_a2 = App\ContentMeta::create(array(
-				'name' => 'A1 Stage 0',
-				'id_linked_content_meta' => $meta_r2->id, // This is how the site answers questions
-				'title' => "Let's get started",
-				'key' => "answer",
-				'stage' => 0,
-				'content' => "Gotcha, well then there's no more reason to talk I suppose.",
-				'user_id' => $user_portchris->id,
-				'page_id' => $page_home->id
-			));
-			$this->command->info('Inserted some dummy questions and answers for ya!');
+			$this->command->info('Created the messages table, Let the stories begin!');
 		}
 		if ($user_portchris && $role_admin) {
 			$user_portchris->roles()->attach($role_admin->id);
