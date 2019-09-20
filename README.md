@@ -91,6 +91,78 @@ WORKSPACE_PUID=1001
 WORKSPACE_PGID=1001
 ```
 
+## Nginx
+Portchris adds to and uses the default laradock nginx configurations, I have manipulated the docker and env config to work with [Docker Nginx Proxy](https://github.com/jwilder/nginx-proxy) & [Docker Letsencrypt Nginx Proxy Companion](https://github.com/JrCs/docker-letsencrypt-nginx-proxy-companion)
+
+In the laradock container `../laradock/nginx/sites` (typically) we to add config for both the frontend and backend:
+
+Angular JS App (frontend) - portchris.co.uk.app.conf:
+```
+server {
+
+    listen <MY_NGINX_VIRTUAL_PORT_ENV_VAR>;
+    listen [::]:<MY_NGINX_VIRTUAL_PORT_ENV_VAR>;
+
+    server_name portchris.portchris.co.uk;
+    root /var/www/portchris.co.uk/dist;
+    index index.html index.htm;
+
+    location / {
+         try_files $uri $uri/ /index.html$is_args$args;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    error_log /var/log/nginx/app_error.log;
+    access_log /var/log/nginx/app_access.log;
+}
+
+```
+
+Laravel (backend) - portchris.co.uk.laravel.conf
+```
+server {
+
+    listen <MY_NGINX_VIRTUAL_PORT_ENV_VAR>;
+    listen [::]:<MY_NGINX_VIRTUAL_PORT_ENV_VAR>;
+
+    # For https
+    # listen 443 ssl;
+    # listen [::]:443 ssl ipv6only=on;
+    # ssl_certificate /etc/nginx/ssl/default.crt;
+    # ssl_certificate_key /etc/nginx/ssl/default.key;
+
+    server_name api.portchris.portchris.co.uk;
+    root /var/www/portchris.co.uk/public;
+    index index.php index.html index.htm;
+
+    location / {
+         try_files $uri $uri/ /index.php$is_args$args;
+    }
+
+    location ~ \.php$ {
+        try_files $uri /index.php =404;
+        fastcgi_pass php-upstream;
+        fastcgi_index index.php;
+        fastcgi_buffers 16 16k;
+        fastcgi_buffer_size 32k;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        #fixes timeouts
+        fastcgi_read_timeout 600;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+
+    error_log /var/log/nginx/laravel_error.log;
+    access_log /var/log/nginx/laravel_access.log;
+}
+```
+
 ### Scripts
 - `start.sh` - Copies docker-compose.portchris.yml to laradock and start containers
 - `build.sh` - Full rebuild of all used containers
@@ -114,9 +186,17 @@ Create the JSON Web Token for the API
 ./laravel.sh jwt:generate
 ```
 
-Seed the DB after migration with the basic info
+Seed the DB with the basic table
 ```
-./laravel.sh migrate:install
+./laravel.sh db:seed
+```
+
+Import your story. Portchris conforms to the [ChoiceScript JS format](https://choicescriptdev.fandom.com/wiki/Script), So please refer to this structure for your stories. I have the following stories by default (in order):
+
+```
+./storage/story/startup.txt
+./storage/story/manager.txt
+./storage/story/ending.txt
 ```
 
 ## Front-end Development
@@ -138,15 +218,10 @@ npm install
 ```
 npm install bootstrap@next
 ```
-- Download [laravel-api](https://github.com/eliyas5044/laravel-api), which i used as a RESTful api.
+- Download [laravel-api](https://github.com/eliyas5044/laravel-api), which I've used as a RESTful api.
 - Run your `angular` app by this command
 ```
 ng serve -o
 ```
-and run your `laravel` api by this command
-```
-php artisan serve
-```
-You will see this app will load data from your api.
 
 Enjoy!
