@@ -1,12 +1,12 @@
 {
-  "name": "angular",
-  "version": "0.0.0",
+  "name": "portchris",
+  "version": "1.0.1",
   "private": true,
   "license": "MIT",
   "angular-cli": {},
   "scripts": {
     "ng": "ng",
-    "start": "ng serve --host 127.0.0.1",
+    "start": "ng serve --host 0.0.0.0 --disable-host-check",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",

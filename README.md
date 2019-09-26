@@ -31,6 +31,7 @@ NGINX_LETSENCRYPT_EMAIL=my@email.com
 NGINX_LETSENCRYPT_HOST=my.domain.com,api.my.domain.com
 NGINX_LETSENCRYPT_TEST=true
 NGINX_ENABLE_IPV6=true
+WORKSPACE_NPM_PORT=4200
 
 ###########################################################
 ################## Laravel General Setup ##################
@@ -212,16 +213,23 @@ First you have to install [angular-cli](https://github.com/angular/angular-cli).
 - First clone via `git bash` or download.
 - Go to your root folder and run this command
 ```
-npm install
+./npm.sh install
 ```
 - After `npm install` again run this command to install `bootstrap, tether and jquery`
 ```
-npm install bootstrap@next
+./npm.sh install bootstrap@next
 ```
 - Download [laravel-api](https://github.com/eliyas5044/laravel-api), which I've used as a RESTful api.
 - Run your `angular` app by this command
 ```
-ng serve -o
+./npm.sh start
+```
+
+## Deployment
+
+```
+./shell.sh
+ng build --prod
 ```
 
 Enjoy!

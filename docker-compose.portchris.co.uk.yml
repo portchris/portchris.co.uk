@@ -97,6 +97,7 @@ services:
         - "dockerhost:${DOCKER_HOST_IP}"
       ports:
         - "${WORKSPACE_SSH_PORT}:22"
+        - "${WORKSPACE_NPM_PORT}:${WORKSPACE_NPM_PORT}"
       tty: true
       environment:
         - PHP_IDE_CONFIG=${PHP_IDE_CONFIG}
@@ -104,6 +105,7 @@ services:
       networks:
         - frontend
         - backend
+        - default
       links:
         - docker-in-docker
 
@@ -239,6 +241,7 @@ services:
       expose:
         - 80
         - 443
+        - ${WORKSPACE_NPM_PORT}
       depends_on:
         - php-fpm
       networks:
