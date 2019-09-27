@@ -33,7 +33,10 @@
 }
 .social {
 	padding: 10px;
-	text-align: center;
+	text-align: left;
+}
+#github-contact {
+	max-width: 55px;
 }
 #linkedin-contact:hover {
 	background-color: #4875B4; 
@@ -52,4 +55,14 @@
 #email-contact:hover {
 	background-color: #74A345;
 	border-color: #74A345;
+}
+.svg-invert {
+	-webkit-filter: invert(100%); /* safari 6.0 - 9.0 */
+	filter: invert(100%);
+	transition: 0.2s 100ms ease-in-out;
+}
+.svg-invert:hover {
+	-webkit-filter: invert(0); /* safari 6.0 - 9.0 */
+	filter: invert(0);
+	transition: 0.2s 100ms ease-in-out;
 }
