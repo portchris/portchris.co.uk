@@ -3,6 +3,7 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Http, HttpModule, JsonpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
+import { isDevMode } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app.routes';
 import { AppComponent } from './app.component';
@@ -67,7 +68,8 @@ export class AppModule {
 	
 	constructor() {
 
-		this.url = (window.location.href.indexOf("localhost") > -1 || window.location.href.indexOf("hades") > -1) ? "https://api.portchris.hades.portchris.net:8081/" : "https://api.portchris.co.uk/";
+		// I'm sorry I had to do it!
+		this.url = (isDevMode) ? "https://api.portchris.portchris.co.uk:80/" : "https://api.portchris.co.uk/";
 	}
 
 	ngOnInit() {
