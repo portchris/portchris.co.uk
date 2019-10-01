@@ -38,3 +38,7 @@ header .p-2 {
 .navbar a, .navbar a:active, .navbar a:focus, .navbar a.active {
 	color: #FFF;
 }
+.navbar-nav .nav-link {
+	padding-left: 5px;
+	padding-right: 5px;
+}

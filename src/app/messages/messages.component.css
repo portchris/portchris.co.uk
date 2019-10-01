@@ -24,6 +24,10 @@
 .msg {
 	min-width: 70%;
 }
+.msg p {
+	padding-left: 5px;
+	padding-right: 5px;
+}
 .msg blockquote {
 	border: 0;
 	border-radius: 7px;
