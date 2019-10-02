@@ -9,8 +9,8 @@ import { ContactService } from "./contact.service";
 import { slideInOutAnimation } from '../../animations/slideinout.animation';
 import { popInOutAnimation } from '../../animations/popinout.animation';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable }  from 'rxjs/Observable';
-import 'rxjs/add/operator/debounceTime';
+import { Observable }  from 'rxjs';
+
 
 @Component({
 	selector: 'contact',

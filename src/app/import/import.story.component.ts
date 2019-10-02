@@ -8,8 +8,8 @@ import { ImportStory } from "./import.story";
 import { ImportStoryService } from "./import.story.service";
 import { slideInOutAnimation } from '../animations/slideinout.animation';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable }  from 'rxjs/Observable';
-import 'rxjs/add/operator/debounceTime';
+import { Observable }  from 'rxjs';
+
 
 @Component({
 	selector: 'import.story',

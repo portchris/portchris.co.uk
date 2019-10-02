@@ -5,9 +5,10 @@
 * @since 	2017-05-14
 */
 
+
+import {throwError as observableThrowError,  Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
 import { Http, Response } from "@angular/http";
-import { Observable } from "rxjs";
 import { AppModule as App } from "../app.module";
 import { User } from "./user";
 
@@ -40,9 +41,9 @@ export class UserService {
 
 		if (error.status < 400 || error.status === 500) {
 			console.error(errMsg);
-			return Observable.throw(errMsg);
+			return observableThrowError(errMsg);
 		} else {
-			return Observable.throw(errMsg);
+			return observableThrowError(errMsg);
 		}
 	}
 
