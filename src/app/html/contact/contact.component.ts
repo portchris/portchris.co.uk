@@ -4,12 +4,13 @@
 */
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Contact } from "./contact";
-import { ContactService } from "./contact.service";
+import { Contact } from './contact';
+import { ContactService } from './contact.service';
 import { slideInOutAnimation } from '../../animations/slideinout.animation';
 import { popInOutAnimation } from '../../animations/popinout.animation';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable }  from 'rxjs';
+import { Observable } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 
 @Component({
@@ -39,7 +40,7 @@ export class ContactComponent implements OnInit, OnChanges {
 	* @var 	ActivatedRoute
 	*/
 	private router: any;
-	
+
 	/**
 	* Subscriber to the router 
 	* @var 	Observable
@@ -67,7 +68,7 @@ export class ContactComponent implements OnInit, OnChanges {
 	* @param 	JSON object
 	*/
 	public contactForm = this.formBuilder.group({
-		name: ["", Validators.compose([Validators.required, Validators.minLength(1)])], 
+		name: ["", Validators.compose([Validators.required, Validators.minLength(1)])],
 		email: ["", Validators.compose([Validators.required, Validators.minLength(1), Validators.email])],
 		message: ["", Validators.compose([Validators.required, Validators.minLength(1)])],
 		leaveBlank: ["", Validators.maxLength(0)]
@@ -80,7 +81,7 @@ export class ContactComponent implements OnInit, OnChanges {
 	* @param 	ContactService 	contactService
 	* @param 	FormBuilder 	formBuilder
 	*/
-	constructor(private route: ActivatedRoute, private contactService: ContactService, public formBuilder: FormBuilder) { 
+	constructor(private route: ActivatedRoute, private contactService: ContactService, public formBuilder: FormBuilder) {
 
 		this.router = route;
 	}
@@ -89,10 +90,12 @@ export class ContactComponent implements OnInit, OnChanges {
 	* When view is initialized
 	*/
 	public ngOnInit() {
-	
+
 		this.router.snapshot.params['messages'];
 		this.sub = this.router.data.subscribe((v) => { this.subscriber(v) });
-		this.contactForm.valueChanges.debounceTime(1000).subscribe((data) => { this.contactFormChanged(data) });
+		this.contactForm.valueChanges.pipe(
+			debounceTime(1000)
+		).subscribe((data) => { this.contactFormChanged(data) });
 		this.fillContactForm();
 	}
 
@@ -104,7 +107,7 @@ export class ContactComponent implements OnInit, OnChanges {
 		let d = this.contactService.getContactFormData();
 		if (d != null) {
 			for (var prop in d) {
-				if (d[prop] != null && d[prop].length > 0 && this.contactForm.controls.hasOwnProperty(prop)) 
+				if (d[prop] != null && d[prop].length > 0 && this.contactForm.controls.hasOwnProperty(prop))
 					this.contactForm.controls[prop].setValue(d[prop]);
 			}
 		}

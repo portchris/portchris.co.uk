@@ -4,7 +4,7 @@
 */
 import { Component, OnInit, OnChanges, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Sidebar } from "./sidebar";
+import { Sidebar } from './sidebar';
 import { MessagesComponent } from '../../messages/messages.component';
 import { MessagesService } from '../../messages/messages.service';
 import { WeatherService } from './weather.service';
@@ -19,9 +19,9 @@ export class SidebarComponent implements OnInit, OnChanges {
 	/**
 	* Refernce to a child element
 	*/
-	@ViewChild('weatherPanel') private weatherPanel: ElementRef;
-	@ViewChild('helpPanel') private helpPanel: ElementRef;
-	@ViewChild('cvPanel') private cvPanel: ElementRef;
+	@ViewChild('weatherPanel', { static: false }) private weatherPanel: ElementRef;
+	@ViewChild('helpPanel', { static: false }) private helpPanel: ElementRef;
+	@ViewChild('cvPanel', { static: false }) private cvPanel: ElementRef;
 
 	router: any;
 	sub: any;
@@ -35,24 +35,24 @@ export class SidebarComponent implements OnInit, OnChanges {
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
-	constructor(private route: ActivatedRoute, private weatherService: WeatherService, private messagesService: MessagesService) { 
+	constructor(private route: ActivatedRoute, private weatherService: WeatherService, private messagesService: MessagesService) {
 
 		this.router = route;
 		this.help = [];
 	}
 
 	public ngOnInit() {
-	
+
 		this.sub = this.router.data.subscribe((v) => {
 			// console.log(v);
-		});	
+		});
 		this.createHelpList();
 		this.messagesService.getAdminUser().subscribe(
-			(success) => { 
-				this.adminUser = success; 
+			(success) => {
+				this.adminUser = success;
 				if (this.adminUser && this.adminUser.lat && this.adminUser.lng) {
 					this.weatherService.getWeatherByCoordinates(this.adminUser.lat, this.adminUser.lng).subscribe(
-						(w) => { 
+						(w) => {
 							if (w.hasOwnProperty("weather") && w.hasOwnProperty("name") && w.hasOwnProperty("main")) {
 								this.weatherService.getTimezoneByCoordinates(this.adminUser.lat, this.adminUser.lng).subscribe(
 									(t) => {
@@ -62,20 +62,20 @@ export class SidebarComponent implements OnInit, OnChanges {
 										this.hideWeatherPanel();
 										console.error(error);
 									}
-								); 
+								);
 							}
 						},
-						(error) => { 
-							this.hideWeatherPanel(); 
-							console.error(error); 
+						(error) => {
+							this.hideWeatherPanel();
+							console.error(error);
 						}
 					);
 				} else {
 					this.hideWeatherPanel();
 				}
 			},
-			(error) => { 
-				console.error(error); 
+			(error) => {
+				console.error(error);
 			}
 		);
 	}
@@ -152,41 +152,41 @@ export class SidebarComponent implements OnInit, OnChanges {
 			switch (icon) {
 				case "thunderstorm":
 					this.weather.icon = "#flash";
-				break;
+					break;
 				case "drizzle":
 				case "rain":
 					this.weather.icon = "#raining";
-				break;
+					break;
 				case "snow":
 					this.weather.icon = "#snowflake";
-				break;
+					break;
 				case "atmosphere":
 					this.weather.icon = "#wind";
-				break;
+					break;
 				case "clear":
 					this.weather.icon = "#sun-sunny-day-weather-symbol";
-				break;
+					break;
 				case "clouds":
 					switch (desc) {
 						case "fewclouds":
 						case "scatteredclouds":
 							this.weather.icon = "#cloudy-day-outlined-weather-interface-symbol";
-						break;
+							break;
 						case "brokenclouds":
 						case "overcastclouds":
 							this.weather.icon = "#cloud-outline";
-						break;
+							break;
 						default:
 							this.weather.icon = "#cloudy-day-outlined-weather-interface-symbol";
-						break;
+							break;
 					}
-				break;
+					break;
 				case "extreme":
 					this.weather.icon = "#wind";
-				break;
+					break;
 				default:
 					this.weather.icon = "#cloud-outline";
-				break;
+					break;
 			}
 		}
 	}

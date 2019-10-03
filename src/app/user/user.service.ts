@@ -6,29 +6,30 @@
 */
 
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response } from "@angular/http";
-import { AppModule as App } from "../app.module";
-import { User } from "./user";
+import { Http, Response } from '@angular/http';
+import { AppModule as App } from '../app.module';
+import { User } from './user';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class UserService {
 
 	uri: string;
 
-	constructor(private _http: Http) { 
-		
+	constructor(private _http: Http) {
+
 		this.uri = new App().url + 'api/user';
 	}
 
-	identifyUser():Observable<User[]>{
+	identifyUser(): Observable<User[]> {
 
-		return this._http.get(this.uri + '/identify').map(res => res.json()).catch(this.handleError);
+		return this._http.get(this.uri + '/identify').pipe(map(res => res.json()), catchError(this.handleError));
 	}
 
-	private handleError (error: Response | any) {
-		
+	private handleError(error: Response | any) {
+
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
 		if (error instanceof Response) {

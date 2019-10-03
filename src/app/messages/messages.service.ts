@@ -6,14 +6,12 @@
 */
 
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers } from "@angular/http";
-
-
-// import { Observable } from "rxjs";
-import { AppModule as App } from "../app.module";
-import { Messages } from "./messages";
+import { Http, Response, Headers } from '@angular/http';
+import { map, catchError } from 'rxjs/operators';
+import { AppModule as App } from '../app.module';
+import { Messages } from './messages';
 import { DataStorageService } from '../app.storage.service';
 
 @Injectable()
@@ -22,8 +20,8 @@ export class MessagesService {
 	uri: string;
 	token: string;
 
-	public constructor(private _http: Http, public storage: DataStorageService) { 
-		
+	public constructor(private _http: Http, public storage: DataStorageService) {
+
 		this.uri = new App().url + 'api/message';
 		this.token = "";
 	}
@@ -32,9 +30,9 @@ export class MessagesService {
 	* Get all the messages from users stream
 	* @return 	Response 	req
 	*/
-	public getMessages():Observable<Messages[]>{
+	public getMessages(): Observable<Messages[]> {
 
-		let req = this._http.get(this.uri).map(res => res.json()).catch(this.handleError);
+		let req = this._http.get(this.uri).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -43,12 +41,16 @@ export class MessagesService {
 	* @param 	object 	data
 	* @param 	Response 	req
 	*/
-	public getResponse(data):Observable<Messages[]>{
-		
+	public getResponse(data): Observable<Messages[]> {
+
 		let d = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(this.uri + "?token=" + this.getToken(), d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		const req = this._http.post(
+			this.uri + "?token=" + this.getToken(),
+			d, 
+			{ headers: h }
+		).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -63,7 +65,7 @@ export class MessagesService {
 		let creds = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -77,7 +79,7 @@ export class MessagesService {
 		let uri = new App().url + 'api/user/' + userId + "?token=" + this.getToken();
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.get(uri, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -87,7 +89,7 @@ export class MessagesService {
 		let creds = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -102,7 +104,7 @@ export class MessagesService {
 		let creds = JSON.stringify(username);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -110,7 +112,7 @@ export class MessagesService {
 	* Destroy the JWT token client and server side.
 	* @return 	JSON 	req
 	*/
-	public logOut(data):Observable<Messages[]> {
+	public logOut(data): Observable<Messages[]> {
 
 		let uri = new App().url + 'api/user/logout';
 		let d = JSON.stringify(data);
@@ -121,7 +123,7 @@ export class MessagesService {
 			token: null
 		});
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -129,13 +131,13 @@ export class MessagesService {
 	* Destroy the JWT token client and server side and set the users progress back to stage 0.
 	* @return 	JSON 	req
 	*/
-	public reset(data):Observable<Messages[]> {
+	public reset(data): Observable<Messages[]> {
 
 		let uri = new App().url + 'api/user/reset';
 		let d = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -143,13 +145,13 @@ export class MessagesService {
 	* Destroy the JWT token client and server side. Remove the user from our records.
 	* @return 	JSON 	req
 	*/
-	public remove(data):Observable<Messages[]> {
+	public remove(data): Observable<Messages[]> {
 
 		let uri = new App().url + 'api/user/remove';
 		let d = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -189,7 +191,7 @@ export class MessagesService {
 		let d = JSON.stringify({ password: password });
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -202,7 +204,7 @@ export class MessagesService {
 		let uri = new App().url + 'api/adminuser';
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.get(uri, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -229,10 +231,10 @@ export class MessagesService {
 	* @param 	array 	info
 	*/
 	public storeUserInfo(info: any) {
-		
-		this.storage.setItem('currentUser', JSON.stringify({ 
-			token: info.token, 
-			user: info.user 
+
+		this.storage.setItem('currentUser', JSON.stringify({
+			token: info.token,
+			user: info.user
 		}));
 	}
 
@@ -255,7 +257,7 @@ export class MessagesService {
 	* @param 	Response | any 	error
 	*/
 	private handleError(error: Response | any) {
-		
+
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
 		const body = error.json() || '';
@@ -267,7 +269,7 @@ export class MessagesService {
 		}
 
 		if (error.status < 400 || error.status === 500) {
-			
+
 			// This issue is fatal, cause console error
 			console.error(errMsg);
 			return observableThrowError(errMsg);

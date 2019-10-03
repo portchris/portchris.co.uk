@@ -4,11 +4,11 @@
 */
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap } from '@angular/router';
-import { ImportStory } from "./import.story";
-import { ImportStoryService } from "./import.story.service";
+import { ImportStory } from './import.story';
+import { ImportStoryService } from './import.story.service';
 import { slideInOutAnimation } from '../animations/slideinout.animation';
 import { FormBuilder, Validators } from '@angular/forms';
-import { Observable }  from 'rxjs';
+import { Observable } from 'rxjs';
 
 
 @Component({
@@ -38,7 +38,7 @@ export class ImportStoryComponent implements OnInit {
 	* @var 	ActivatedRoute
 	*/
 	private router: any;
-	
+
 	/**
 	* Subscriber to the router 
 	* @var 	Observable
@@ -58,7 +58,7 @@ export class ImportStoryComponent implements OnInit {
 	* @param 	ImportStoryService 	importStoryService
 	* @param 	FormBuilder 	formBuilder
 	*/
-	constructor(private route: ActivatedRoute, private importStoryService: ImportStoryService) { 
+	constructor(private route: ActivatedRoute, private importStoryService: ImportStoryService) {
 
 		this.router = route;
 	}
@@ -67,7 +67,7 @@ export class ImportStoryComponent implements OnInit {
 	* When view is initialized
 	*/
 	public ngOnInit() {
-	
+
 		this.sub = this.route.params.subscribe(
 			(params) => { this.sceneId = params['id']; }
 		);

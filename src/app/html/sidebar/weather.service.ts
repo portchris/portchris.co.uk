@@ -8,24 +8,25 @@
 */
 
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, Jsonp } from "@angular/http";
-import { AppModule as App } from "../../app.module";
-import { Weather } from "./weather";
+import { Http, Response, Headers, Jsonp } from '@angular/http';
+import { AppModule as App } from '../../app.module';
+import { Weather } from './weather';
 import { DataStorageService } from '../../app.storage.service';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class WeatherService {
 
 	uri: string;
 	key: string;
-	
+
 	private static readonly API_KEY: string = "5eeb97790d4f6cf008d3613ef077098f";
 	private static readonly GOOGLE_API_KEY: string = "AIzaSyDNBoqalASIHil1YXDFpYvMrsGgB--26Yc";
 
-	constructor(private _http: Http, private _jsonp: Jsonp, private storage: DataStorageService) { 
-		
+	constructor(private _http: Http, private _jsonp: Jsonp, private storage: DataStorageService) {
+
 		this.uri = "https://api.openweathermap.org/data/2.5/weather?callback=JSONP_CALLBACK&APPID=" + WeatherService.API_KEY + "&units=metric";
 	}
 
@@ -35,12 +36,12 @@ export class WeatherService {
 	* @param 	float 	lng
 	* @return 	JSON
 	*/
-	public getWeatherByCoordinates(lat, lng):Observable<Weather[]>{
+	public getWeatherByCoordinates(lat, lng): Observable<Weather[]> {
 
 		let u = this.uri + "&lat=" + lat + "&lon=" + lng;
 		let h = new Headers();
 		h.append('Content-Type', 'application/javascript');
-		return this._jsonp.get(u, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return this._jsonp.get(u, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 	}
 
 	/**
@@ -49,7 +50,7 @@ export class WeatherService {
 	* @param 	float 	lng
 	* @return 	JSON
 	*/
-	public getTimezoneByCoordinates(lat, lng):Observable<Weather[]>{
+	public getTimezoneByCoordinates(lat, lng): Observable<Weather[]> {
 
 		let uri = new App().url + 'api/timezone';
 		let creds = JSON.stringify({
@@ -58,7 +59,7 @@ export class WeatherService {
 		});
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).map(res => res.json()).catch(this.handleError);
+		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -84,7 +85,7 @@ export class WeatherService {
 	}
 
 	private handleError(error: Response | any) {
-		
+
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
 		if (error instanceof Response) {

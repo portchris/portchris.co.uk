@@ -4,7 +4,7 @@
 */
 import { Component, OnInit, OnChanges } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Header } from "./header";
+import { Header } from './header';
 
 @Component({
 	selector: 'app-header',
@@ -21,16 +21,16 @@ export class HeaderComponent implements OnInit, OnChanges {
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
-	public constructor(private route: ActivatedRoute) { 
+	public constructor(private route: ActivatedRoute) {
 
 		this.router = route;
 	}
 
 	public ngOnInit() {
-	
+
 		this.sub = this.router.data.subscribe((v) => {
 			// console.log(v);
-		});	
+		});
 	}
 
 	/**

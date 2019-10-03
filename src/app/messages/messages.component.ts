@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { MessagesService } from "./messages.service";
+import { MessagesService } from './messages.service';
 import { WeatherService } from '../html/sidebar/weather.service';
-import { Messages } from "./messages";
+import { Messages } from './messages';
 import { DataStorageService } from '../app.storage.service';
 import { slideUpAnimation } from '../animations/slideup.animation';
 import { popInOutAnimation } from '../animations/popinout.animation';
 
 enum TYPE {
-	USER = 0, 
+	USER = 0,
 	MESSAGE = 1
 }
 
@@ -26,17 +26,17 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	/**
 	* Refernce to a child element
 	*/
-	@ViewChild('scrollable') private scrollContainer: ElementRef;
-	@ViewChild('searchFauxInput') private searchFauxInput: ElementRef;
-	@ViewChild('searchBox') private searchBox: ElementRef;
-	@ViewChild('shadow') private shadowBox: ElementRef;
+	@ViewChild('scrollable', { static: false }) private scrollContainer: ElementRef;
+	@ViewChild('searchFauxInput', { static: false }) private searchFauxInput: ElementRef;
+	@ViewChild('searchBox', { static: false }) private searchBox: ElementRef;
+	@ViewChild('shadow', { static: false }) private shadowBox: ElementRef;
 
 	/**
 	* Message stream
 	* @var 	array
 	*/
 	messages: Messages[];
-	
+
 	/**
 	* Current question object
 	* @var 	object
@@ -182,7 +182,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @param 	JSON object
 	*/
 	public talkForm = this.formBuilder.group({
-		
+
 		id_linked_content_meta: ["", Validators.required],
 		name: ["", Validators.required],
 		title: ["", Validators.required],
@@ -250,26 +250,26 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			this.createUserMessage(data);
 			try {
 				let magicMethod = this.hasMagicWords(data.content);
-				if (!magicMethod) { 
-						if (this.messageType === MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id) {
+				if (!magicMethod) {
+					if (this.messageType === MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id) {
 
-							// User related message
-							this.executeMethod(this.messageAction);
-						} else {
+						// User related message
+						this.executeMethod(this.messageAction);
+					} else {
 
-							// Game related message
-							this.userScrolling = false;
-							this.scrollToBottom();
-							this.messagesService.getResponse(data).subscribe(
-								(message) => { this.getMessagesSuccess(message) },
-								(error) => { this.getMessagesFail(error) },
-								() => { this.getMessagesComplete() }
-							);
-						}
+						// Game related message
+						this.userScrolling = false;
+						this.scrollToBottom();
+						this.messagesService.getResponse(data).subscribe(
+							(message) => { this.getMessagesSuccess(message) },
+							(error) => { this.getMessagesFail(error) },
+							() => { this.getMessagesComplete() }
+						);
+					}
 				} else {
 					this.executeMethod(magicMethod);
 				}
-			} catch(e) {
+			} catch (e) {
 				console.error(e);
 			}
 		} else {
@@ -299,40 +299,40 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public executeMethod(method) {
 
-		switch(method) {
+		switch (method) {
 			case 'toSaveOrNotToSave':
 				this.toSaveOrNotToSave();
-			break;
+				break;
 			case 'welcome':
 				this.welcome();
-			break;
+				break;
 			case 'teaCoffeeOrWater':
 				this.teaCoffeeOrWater();
-			break;
+				break;
 			case 'authenticate':
 				this.authenticate();
-			break;
+				break;
 			case 'getMessages':
 				this.getMessages();
-			break;
+				break;
 			case 'registerAccount':
 				this.registerAccount();
-			break;
+				break;
 			case 'continueAsGuest':
 				this.continueAsGuest();
-			break;
+				break;
 			case 'logOut':
 				this.logOut();
-			break;
+				break;
 			case 'startOver':
 				this.startOver("Okay I'm logging you out and starting over. Don't worry if you've signed the guestbook, your progress will be safe.");
-			break;
+				break;
 			case 'reset':
 				this.reset("Okay I'm logging you out for the day and resetting your progress back to stage 0.");
-			break;
+				break;
 			case 'remove':
 				this.remove("Okay I'm removing you from the guestbook and any future records.");
-			break;
+				break;
 		}
 	}
 
@@ -367,9 +367,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			msg.answer.method = "welcome";
 			msg.user.stage = 0;
 			this.messagesService.createMessage(msg)
-					.then((message) => { this.getMessagesSuccess(message); })
-					.catch((error) => { this.getMessagesFail(error); })
-					.then(() => { this.getMessagesComplete(); });
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
 		}
 
 		// Add focus to input to guide users eyes
@@ -410,9 +410,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		this.messageAction = msg.answer.method;
 		msg.user.stage = 0;
 		this.messagesService.createMessage(msg)
-				.then((message) => { this.getMessagesSuccess(message); })
-				.catch((error) => { this.getMessagesFail(error); })
-				.then(() => { this.getMessagesComplete(); });
+			.then((message) => { this.getMessagesSuccess(message); })
+			.catch((error) => { this.getMessagesFail(error); })
+			.then(() => { this.getMessagesComplete(); });
 	}
 
 	/**
@@ -439,9 +439,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		msg.user.stage = 0;
 		this.messageAction = msg.answer.method;
 		this.messagesService.createMessage(msg)
-				.then((message) => { this.getMessagesSuccess(message); })
-				.catch((error) => { this.getMessagesFail(error); })
-				.then(() => { this.getMessagesComplete(); });
+			.then((message) => { this.getMessagesSuccess(message); })
+			.catch((error) => { this.getMessagesFail(error); })
+			.then(() => { this.getMessagesComplete(); });
 	}
 
 	/**
@@ -485,11 +485,11 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 
 	public ngAfterViewChecked() {
-		
+
 		if (!this.userScrolling || this.typing) {
 			this.scrollToBottom();
 		}
-	} 
+	}
 
 	// @HostListener('scroll')
 	public isScrolling = (): void => {
@@ -509,7 +509,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	public scrollToBottom(): void {
 
 		try {
-			let pos = this.scrollContainer.nativeElement.scrollTop; 
+			let pos = this.scrollContainer.nativeElement.scrollTop;
 			let dest = this.scrollContainer.nativeElement.scrollHeight;
 			this.scrollContainer.nativeElement.scrollTop = dest;
 			// if (pos < dest) {
@@ -519,16 +519,16 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			// } else {
 			// 	clearTimeout(tO);   
 			// }
-		} catch(err) {
+		} catch (err) {
 			console.error(err);
-		}                 
+		}
 	}
 
 	/**
 	* Get the users messages, if user exists and previous conversation exists
 	*/
 	public getMessages() {
-		
+
 		this.messagesService.getMessages().subscribe(
 			(message) => { this.getMessagesSuccess(message) },
 			(error) => { this.getMessagesFail(error) },
@@ -542,7 +542,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @param 	boolean	delay
 	*/
 	private getMessagesSuccess(message, delay = true) {
-		
+
 		let m = message[message.length - 1];
 		if (m) {
 			this.typing = (m.key === "user") ? false : true;
@@ -591,7 +591,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @param 	any 	error
 	*/
 	private getMessagesFail(error: any) {
-		
+
 		this.talkForm.enable();
 		let errMsg = error;
 		console.error(error);
@@ -624,7 +624,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @var 	e 	string
 	*/
 	private setError(e: string) {
-		
+
 		this.err = e;
 		if (e.length > 0) {
 			setTimeout(() => {
@@ -638,7 +638,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @var 	s 	string
 	*/
 	private setSuccess(s: string) {
-		
+
 		this.success = s;
 		if (s.length > 0) {
 			setTimeout(() => {
@@ -683,7 +683,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		};
 		this.messagesService.logOut(data).subscribe(
 			(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
-			(error) => { 
+			(error) => {
 				let msg = this.createMessageTemplate();
 				console.error(error);
 				msg.message = "Wow, something really bad happened. I cannot even make a request. Error reads: " + error;
@@ -694,9 +694,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				msg.answer.method = "authenticate";
 				msg.user.stage = 0;
 				this.messagesService.createMessage(msg)
-				.then((message) => { this.getMessagesSuccess(message); })
-				.catch((error) => { console.error(error) })
-				.then(() => { this.getMessagesComplete(); });
+					.then((message) => { this.getMessagesSuccess(message); })
+					.catch((error) => { console.error(error) })
+					.then(() => { this.getMessagesComplete(); });
 			},
 			() => { this.getMessagesComplete() }
 		);
@@ -714,7 +714,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		};
 		this.messagesService.reset(data).subscribe(
 			(message) => {
-				this.getMessagesSuccess(message); 
+				this.getMessagesSuccess(message);
 				this.messagesService.logOut({}).subscribe(
 					(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
 					(error) => { this.getMessagesFail(error) },
@@ -738,7 +738,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		};
 		this.messagesService.remove(data).subscribe(
 			(message) => {
-				this.getMessagesSuccess(message); 
+				this.getMessagesSuccess(message);
 				this.messagesService.logOut({}).subscribe(
 					(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
 					(error) => { this.getMessagesFail(error) },
@@ -756,7 +756,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @return boolean|method
 	*/
 	private hasMagicWords(content) {
-		
+
 		let r = false;
 		let str1 = content.replace(/\s+/g, '').toLowerCase();
 		for (var i = MessagesComponent.MAGIC_WORDS.length - 1; i >= 0; i--) {
@@ -764,7 +764,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			let str2 = word.phrase.replace(/\s+/g, '').toLowerCase();
 			if (str1 === str2) {
 				r = word.method;
-				break;	
+				break;
 			}
 		}
 		return r;
@@ -788,14 +788,14 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			msg.user.id = this.user.id;
 			msg.user.stage = this.user.stage;
 			this.messagesService.createMessage(msg)
-					.then((message) => { this.getMessagesSuccess(message); })
-					.catch((error) => { this.getMessagesFail(error); })
-					.then(() => { this.getMessagesComplete(); });
+				.then((message) => { this.getMessagesSuccess(message); })
+				.catch((error) => { this.getMessagesFail(error); })
+				.then(() => { this.getMessagesComplete(); });
 		}
 	}
 
 	private copyInput(event) {
-		
+
 		this.searchFauxInput.nativeElement.textContent = this.talkForm.value.content;
 		this.searchBox.nativeElement.setAttribute("value", this.talkForm.value.content);
 	}
@@ -804,7 +804,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 		this.searchBox.nativeElement.focus();
 	}
-	
+
 	/**
 	* Method called whenever user emits keydown event.
 	* @param 	KeyboardEvent	event
@@ -828,14 +828,14 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 		let m: any = {
 			message: "",
-			answer: { 
+			answer: {
 				name: "",
 				title: "",
 				key: "",
 				type: MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].id,
 				method: MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.MESSAGE].actions[0]
 			},
-			page: { 
+			page: {
 				id: 0
 			},
 			user: {
@@ -873,7 +873,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @param 	object 	data
 	*/
 	private decipherMessageAction(data) {
-		
+
 		for (var i = MessagesComponent.MSG_ACTIONS.length - 1; i >= 0; i--) {
 			let action = MessagesComponent.MSG_ACTIONS[i];
 			if (this.messageType === action.id && action.actions.indexOf(data.method) !== -1) {
@@ -905,7 +905,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		msg.answer.method = data.method;
 		msg.page.id = data.page_id
 		msg.user.id = data.user_id,
-		msg.user.stage = data.stage;
+			msg.user.stage = data.stage;
 		if (this.user.name == null) {
 
 			// The user is requesting authentication but we don't even know their name! How rude.
@@ -930,17 +930,17 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			// They have entered their email and password this is enough information to authenticate
 			let pass = data.content.substring(0, 255);
 			this.messagesService.hashPassword(pass).subscribe(
-				(hash) => { 
-					this.user.password = hash.password; 
+				(hash) => {
+					this.user.password = hash.password;
 					this.input_type = "text";
-					let credentials = { 
-						email: this.user.email, 
+					let credentials = {
+						email: this.user.email,
 						password: pass
 					};
 					this.messagesService.authenticate(credentials).subscribe(
-						(message) => { 
-							this.getMessagesSuccess(message); 
-							this.messagesService.setToken(message[0].title); 
+						(message) => {
+							this.getMessagesSuccess(message);
+							this.messagesService.setToken(message[0].title);
 							this.user.id = message[0].user_id;
 						},
 						(error) => { this.getMessagesFail(error); },
@@ -980,8 +980,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private nl2br(str, isXhtml) {
 
-		var breakTag = (isXhtml || typeof isXhtml === 'undefined') ? '<br />' : '<br>';    
-		return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1'+ breakTag +'$2');
+		var breakTag = (isXhtml || typeof isXhtml === 'undefined') ? '<br />' : '<br>';
+		return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
 	}
 
 	/**
@@ -990,7 +990,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @param 	string 	str
 	*/
 	private convertChoiceScriptTemplate(str) {
-		
+
 		let re = /\${(.*?)\}/;
 		let i = 0;
 		do {
@@ -1010,9 +1010,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 		let data = this.talkForm.value;
 		let msg = this.createMessageTemplate();
-		let params = { 
-			username: (this.user.name != null) ? this.user.name : "Guest", 
-			password: "Guest" 
+		let params = {
+			username: (this.user.name != null) ? this.user.name : "Guest",
+			password: "Guest"
 		};
 		this.user.id = 0;
 		this.user.name = "Guest";
@@ -1029,8 +1029,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		msg.user.id = data.user_id;
 		msg.user.stage = 1;
 		this.messagesService.createMessage(msg)
-				.then((message) => { this.getMessagesSuccess(message, false); this.typing = true; this.userScrolling = false; })
-				.catch((error) => { this.getMessagesFail(error); });
+			.then((message) => { this.getMessagesSuccess(message, false); this.typing = true; this.userScrolling = false; })
+			.catch((error) => { this.getMessagesFail(error); });
 		this.messagesService.createGuestAccount(params).subscribe(
 			(message) => { this.getMessagesSuccess(message); this.messagesService.setToken(message[0].title); },
 			(error) => { this.getMessagesFail(error) },
@@ -1049,8 +1049,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				name: this.user.name,
 				firstname: this.user.firstname,
 				lastname: this.user.lastname,
-				email: this.user.email, 
-				username: this.user.email, 
+				email: this.user.email,
+				username: this.user.email,
 				password: this.user.password,
 				stage: 1,
 				lat: 0.00,
@@ -1060,14 +1060,14 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 				// Allowed access to location
 				(position) => {
-					this.user.lat = position.coords.latitude; 
+					this.user.lat = position.coords.latitude;
 					this.user.lng = position.coords.longitude;
 					params.lat = this.user.lat;
 					params.lng = this.user.lng;
 					this.messagesService.createUserAccount(params).subscribe(
-						(message) => { 
-							this.getMessagesSuccess(message); 
-							this.messagesService.setToken(message[0].title); 
+						(message) => {
+							this.getMessagesSuccess(message);
+							this.messagesService.setToken(message[0].title);
 							this.user.id = message[0].user_id;
 						},
 						(error) => { this.getMessagesFail(error) },

@@ -6,21 +6,22 @@
 */
 
 
-import {throwError as observableThrowError,  Observable } from 'rxjs';
+import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers } from "@angular/http";
-import { AppModule as App } from "../../app.module";
-import { Contact } from "./contact";
+import { Http, Response, Headers } from '@angular/http';
+import { AppModule as App } from '../../app.module';
+import { Contact } from './contact';
 import { DataStorageService } from '../../app.storage.service';
+import { map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class ContactService {
 
 	uri: string;
-	key:string;
+	key: string;
 
-	constructor(private _http: Http, private storage: DataStorageService) { 
-		
+	constructor(private _http: Http, private storage: DataStorageService) {
+
 		this.uri = new App().url + "api/enquiry";
 	}
 
@@ -28,12 +29,12 @@ export class ContactService {
 	* Send enquiry to Wufoo. Requires Wufoo ready data
 	* @param 	object 	data
 	*/
-	public sendEnquiry(data):Observable<Contact[]>{
+	public sendEnquiry(data): Observable<Contact[]> {
 
 		let d = JSON.stringify(data);
 		let h = new Headers();
 		h.append('Content-Type', 'application/json');
-		return this._http.post(this.uri, d, { headers: h }).map(res => res.json()).catch(this.handleError);
+		return this._http.post(this.uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 	}
 
 	/**
@@ -55,8 +56,8 @@ export class ContactService {
 		this.storage.setItem('contactData', JSON.stringify(data));
 	}
 
-	private handleError (error: Response | any) {
-		
+	private handleError(error: Response | any) {
+
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
 		if (error instanceof Response) {

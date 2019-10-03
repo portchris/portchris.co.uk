@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { UserService } from "./user.service";
-import { User } from "./user";
-// import { Messages } from "../messages/messages";
+import { UserService } from './user.service';
+import { User } from './user';
+// import { Messages } from '../messages/messages';
 
 @Component({
 	selector: 'app-user',
@@ -22,7 +22,7 @@ export class UserComponent implements OnInit {
 	}
 
 	getUser() {
-		
+
 		console.log(this.userService.identifyUser().subscribe(
 			users => this.users = users,
 			error => this.errMesg = <any>error

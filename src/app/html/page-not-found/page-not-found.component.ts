@@ -4,7 +4,7 @@
 */
 import { Component, OnInit, OnChanges, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { PageNotFound } from "./page-not-found";
+import { PageNotFound } from './page-not-found';
 import { Waves } from './Waves';
 
 
@@ -18,7 +18,7 @@ export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
 	/**
 	* Refernce to a child canvas element
 	*/
-	@ViewChild('canvas') private canvas: ElementRef;
+	@ViewChild('canvas', { static: false }) private canvas: ElementRef;
 
 	router: any;
 	sub: any;
@@ -29,7 +29,7 @@ export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
-	constructor(private route: ActivatedRoute) { 
+	constructor(private route: ActivatedRoute) {
 
 		this.router = route;
 	}
@@ -38,12 +38,12 @@ export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
 
 		this.sub = this.router.data.subscribe((v) => {
 			console.log(v);
-		});	
+		});
 		this.loadCanvas();
 	}
 
 	public loadCanvas() {
-		
+
 		this.waves = new Waves(this.canvas.nativeElement, 1200, 700);
 		setInterval(() => { this.run() }, 50);
 	}

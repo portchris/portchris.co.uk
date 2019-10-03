@@ -16,7 +16,7 @@ import { slideInOutAnimation } from '../../animations/slideinout.animation';
 })
 export class HomeComponent implements AfterViewInit, OnChanges, OnDestroy {
 
-	@ViewChild("childComponent") messages: MessagesComponent;
+	@ViewChild("childComponent", { static: false }) messages: MessagesComponent;
 
 	storage: any;
 	router: any;
@@ -27,7 +27,7 @@ export class HomeComponent implements AfterViewInit, OnChanges, OnDestroy {
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
-	public constructor(private route: ActivatedRoute) { 
+	public constructor(private route: ActivatedRoute) {
 
 		this.router = route;
 	}
