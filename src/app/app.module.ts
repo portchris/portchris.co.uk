@@ -69,7 +69,7 @@ export class AppModule {
 	constructor() {
 
 		// I'm sorry I had to do it!
-		this.url = (isDevMode) ? "https://api.portchris.portchris.co.uk:80/" : "https://api.portchris.co.uk/";
+		this.url = (isDevMode) ? "http://api.portchris.portchris.co.uk/" : "https://api.portchris.co.uk/";
 	}
 
 	ngOnInit() {

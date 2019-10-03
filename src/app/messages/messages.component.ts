@@ -375,8 +375,12 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		// Add focus to input to guide users eyes
 		// this.searchBox.nativeElement.classList.add("js");
 		// this.searchFauxInput.nativeElement.classList.add("js");
-		this.searchBox.nativeElement.focus();
-		this.scrollContainer.nativeElement.addEventListener('scroll', this.isScrolling, true);
+		if (this.searchBox) {
+			this.searchBox.nativeElement.focus();
+		}
+		if (this.scrollContainer) {
+			this.scrollContainer.nativeElement.addEventListener('scroll', this.isScrolling, true);
+		}
 	}
 
 	public ngOnDestroy() {
@@ -574,7 +578,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				this.talkForm.controls['csrf'].setValue(this.question.csrf);
 				this.typing = false;
 				this.talkForm.enable();
-				this.searchBox.nativeElement.focus();
+				if (this.searchBox) {
+					this.searchBox.nativeElement.focus();
+				}
 				this.userScrolling = false;
 				this.scrollToBottom();
 			};
@@ -795,14 +801,16 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	}
 
 	private copyInput(event) {
-
-		this.searchFauxInput.nativeElement.textContent = this.talkForm.value.content;
-		this.searchBox.nativeElement.setAttribute("value", this.talkForm.value.content);
+		if (this.searchFauxInput && this.searchBox) {
+			this.searchFauxInput.nativeElement.textContent = this.talkForm.value.content;
+			this.searchBox.nativeElement.setAttribute("value", this.talkForm.value.content);
+		}
 	}
 
 	public focusInput(event) {
-
-		this.searchBox.nativeElement.focus();
+		if (this.searchBox) {
+			this.searchBox.nativeElement.focus();
+		}
 	}
 
 	/**
@@ -1096,6 +1104,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private getCurrentLocation(success, fail) {
 
+		console.log("Where are you user?");
 		if (navigator.geolocation) {
 			navigator.geolocation.getCurrentPosition(success, fail);
 		}

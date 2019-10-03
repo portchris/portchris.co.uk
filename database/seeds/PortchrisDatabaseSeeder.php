@@ -33,12 +33,13 @@ class PortchrisDatabaseSeeder extends Seeder
 					$table->increments('id');
 					$table->string('firstname')->default("Joe");
 					$table->string('lastname')->default("Bloggs");
+					$table->string('name')->default("Joe Bloggs");
 					$table->string('email')->default("joe@bloggs.com");
 					$table->string('username')->default("joebloggs");
-					$table->integer('stage')->default(0);
+					$table->string('password')->default("");
 					$table->float('lat')->default(0);
 					$table->float('lng')->default(0);
-					$table->boolean('enabled')->default(false);
+					$table->integer('stage')->default(0);
 					$table->longText('conversation')->nullable(true);
 					$table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
 					$table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'));

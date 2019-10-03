@@ -49,14 +49,11 @@
     "karma-coverage-istanbul-reporter": "^2.1.0",
     "karma-jasmine": "^2.0.1",
     "laravel-elixir": "^6.0.0-18",
-    "laravel-elixir-vue-2": "^0.3.0",
     "laravel-elixir-webpack-official": "^1.0.10",
     "lodash": "^4.17.15",
     "protractor": "^5.4.2",
     "ts-node": "^8.4.1",
     "tslint": "^5.20.0",
-    "typescript": "^3.5.3",
-    "vue": "^2.0.1",
-    "vue-resource": "^1.0.3"
+    "typescript": "^3.5.3"
   }
 }
