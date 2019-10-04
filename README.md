@@ -184,6 +184,7 @@ Create app key, store this in .env:
 
 Create the JSON Web Token for the API
 ```
+./laravel.sh vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider" 
 ./laravel.sh jwt:generate
 ```
 

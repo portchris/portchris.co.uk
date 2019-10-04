@@ -1,10 +1,12 @@
 <?php
+
 /**
-* The heart of the text based adventure
-*
-* @author 	Chris Rogers
-* @since 	1.0.0 <2017-05-01>
-*/
+ * The heart of the text based adventure
+ *
+ * @author 	Chris Rogers
+ * @since 	1.0.0 <2017-05-01>
+ */
+
 namespace App\Http\Controllers;
 
 use App\User;
@@ -15,6 +17,8 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreMessageRequest;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class MessageStreamController extends Controller
 {
@@ -24,7 +28,8 @@ class MessageStreamController extends Controller
 	private $token;
 	private $request;
 
-	public function __construct() {
+	public function __construct()
+	{
 
 		// Require the user to be verified first
 		// $this->middleware('jwt-auth');
@@ -32,36 +37,37 @@ class MessageStreamController extends Controller
 		$this->request = app('request');
 		$this->is_guest = false;
 		if (!\App::runningInConsole()) {
-			try { 
+			try {
 				JWTAuth::parseToken();
 				$this->token = JWTAuth::getToken()->get();
 				$this->user = JWTAuth::authenticate($this->token);
 				if (!$this->user && $this->isVerifiedGuest() && $this->request->input('user')) {
-					$this->setUser((array)$this->request->input('user'));
+					$this->setUser((array) $this->request->input('user'));
 				}
-			} catch (\Tymon\JWTAuth\Exceptions\TokenExpiredException $e) {
+			} catch (TokenExpiredException $e) {
 				if (!$this->isVerifiedGuest()) {
-					throw new \Tymon\JWTAuth\Exceptions\TokenExpiredException($e->getMessage(), $e->getStatusCode());
+					throw new TokenExpiredException($e->getMessage(), $e->getCode());
 				}
-			} catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+			} catch (JWTException $e) {
 				if (!$this->isVerifiedGuest()) {
-					throw new \Tymon\JWTAuth\Exceptions\JWTException($e->getMessage(), $e->getStatusCode());
+					throw new JWTException($e->getMessage(), $e->getCode());
 				}
-			} catch (\Tymon\JWTAuth\Exceptions\TokenInvalidException $e) {
+			} catch (TokenInvalidException $e) {
 				if (!$this->isVerifiedGuest()) {
-					throw new \Tymon\JWTAuth\Exceptions\TokenInvalidException($e->getMessage(), $e->getStatusCode());
+					throw new TokenInvalidException($e->getMessage(), $e->getCode());
 				}
 			}
 		}
 	}
 
 	/**
-	* Get current user, progress and current question
-	*
-	* @since 	1.0.0
-	* @return 	array 	User | Question | Stage
-	*/
-	public function index() {
+	 * Get current user, progress and current question
+	 *
+	 * @since 	1.0.0
+	 * @return 	array 	User | Question | Stage
+	 */
+	public function index()
+	{
 
 		$q = Messages::getNextQuestion($this->user->stage);
 		return response()->json(Messages::create([
@@ -73,27 +79,29 @@ class MessageStreamController extends Controller
 	}
 
 	/**
-	* Get the message by ID (could be question or answer)
-	*
-	* @return 	int 	$question_id
-	* @since 	1.0.0
-	*/
-	public function show($question_id) {
-		
+	 * Get the message by ID (could be question or answer)
+	 *
+	 * @return 	int 	$question_id
+	 * @since 	1.0.0
+	 */
+	public function show($question_id)
+	{
+
 		return Messages::find($question_id) ?? $this->error("No messages found!");
 	}
 
 	/**
-	* Submit answer to question and update users progress (stage)
-	*
-	* @param 	StoreMessageRequest 	$request 	
-	* @return 	JSON 	$return
-	* @since 	1.0.0
-	*/
-	public function store(StoreMessageRequest $request) {
+	 * Submit answer to question and update users progress (stage)
+	 *
+	 * @param 	StoreMessageRequest 	$request 	
+	 * @return 	JSON 	$return
+	 * @since 	1.0.0
+	 */
+	public function store(StoreMessageRequest $request)
+	{
 
 		$return = $this->error("Could not submit answer");
-		$data = (array)$request->all();
+		$data = (array) $request->all();
 
 		// Respond to users message
 		$return = $this->doRespond($data);
@@ -136,16 +144,17 @@ class MessageStreamController extends Controller
 	}
 
 	/**
-	* The user has submitted
-	*
-	* @since 	1.0.0
-	*/
-	protected function doRespond($data) {
+	 * The user has submitted
+	 *
+	 * @since 	1.0.0
+	 */
+	protected function doRespond($data)
+	{
 
 		$return = [];
 		extract($data);
 		$response = Messages::respond($id_linked_content_meta, $content);
-		if (!empty((array)$response)) {
+		if (!empty((array) $response)) {
 			$content = "";
 			$a = $response->getAnswer();
 			if (!$a) {
@@ -154,7 +163,7 @@ class MessageStreamController extends Controller
 
 				// Convert ChoiceScript variables 
 				$content = Messages::convertChoiceScriptVariables($a->content, $this->user);
-				
+
 				// Update the users progress
 				User::where("id", $user["id"])->update(["stage" => $a->id]);
 
@@ -191,42 +200,42 @@ class MessageStreamController extends Controller
 	}
 
 	/**
-	* Get users progress
-	*
-	* @return 	int $stage
-	* @since 	1.0.0
-	*/
-	protected function stage() {
-
-	}
-
-	/**
-	* Set users progress
-	*
-	* @return 	int $stage
-	* @since 	1.0.0
-	*/
-	protected function setStage() {
-
-	}
+	 * Get users progress
+	 *
+	 * @return 	int $stage
+	 * @since 	1.0.0
+	 */
+	protected function stage()
+	{ }
 
 	/**
-	* Attempt to try and retreive the current user from session or database 
-	*
-	* @return 	object 	$user
-	* @since 	1.0.0
-	*/
-	private function getUser() {
+	 * Set users progress
+	 *
+	 * @return 	int $stage
+	 * @since 	1.0.0
+	 */
+	protected function setStage()
+	{ }
+
+	/**
+	 * Attempt to try and retreive the current user from session or database 
+	 *
+	 * @return 	object 	$user
+	 * @since 	1.0.0
+	 */
+	private function getUser()
+	{
 
 		return $this->user;
 	}
 
 	/**
-	* Set a new user object for guests if request has user data
-	*
-	* @param 	array 	$data
-	*/
-	private function setUser(array $data) {
+	 * Set a new user object for guests if request has user data
+	 *
+	 * @param 	array 	$data
+	 */
+	private function setUser(array $data)
+	{
 
 		$this->user = new User;
 		$this->user->id = $data['id'] ?? 0;
@@ -239,12 +248,13 @@ class MessageStreamController extends Controller
 	}
 
 	/**
-	* Create JSON error response 
-	*
-	* @return 	JSON object 	$response
-	* @since 	1.0.0
-	*/
-	public function error($msg) {
+	 * Create JSON error response 
+	 *
+	 * @return 	JSON object 	$response
+	 * @since 	1.0.0
+	 */
+	public function error($msg)
+	{
 
 		return response()->json(Messages::create([
 			'content' => __($msg),
@@ -257,14 +267,15 @@ class MessageStreamController extends Controller
 	}
 
 	/**
-	* If the user typed 'Continue as guest' then a key should be present, else they are not verified
-	* NOTE: session is not working so frontend uses HTML local storage instead
-	*
-	* @return 	boolean
-	*/
-	private function isVerifiedGuest() {
+	 * If the user typed 'Continue as guest' then a key should be present, else they are not verified
+	 * NOTE: session is not working so frontend uses HTML local storage instead
+	 *
+	 * @return 	boolean
+	 */
+	private function isVerifiedGuest()
+	{
 
-		$t = (string)$this->token ?? (string)$this->request->input('token');
+		$t = (string) $this->token ?? (string) $this->request->input('token');
 		// $k = (string)session('key');
 		// $this->is_guest = (strlen($t) > 0 && strlen($k) > 0 && $t === $k) ? true : false;
 		$this->is_guest = (strlen($t) > 0) ? true : false;

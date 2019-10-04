@@ -1,101 +1,109 @@
 <?php
+
 /**
-* Users need no explanation, here it is.
-*
-* @author   Chris Rogers
-* @since    1.0.0 (2017-04-27)
-*/
+ * Users need no explanation, here it is.
+ *
+ * @author   Chris Rogers
+ * @since    1.0.0 (2017-04-27)
+ */
 
 namespace App;
 
 use Auth;
+use JWTAuth;
+use Illuminate\Http\Request;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use App\ContentMeta as Messages;
-use JWTAuth;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Http\Request;
 
-class User extends Authenticatable
+
+
+class User extends Authenticatable implements JWTSubject
 {
 	use Notifiable;
 
 	/**
-	* My game so I'm admin :)
-	*/
+	 * My game so I'm admin :)
+	 */
 	public const ADMIN_EMAIL = "chris@portchris.co.uk";
 
 	/**
-	* The attributes that are mass assignable.
-	*
-	* @var array
-	*/
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
 	protected $fillable = [
-		'name', 
-		'firstname', 
-		'lastname', 
-		'email', 
-		'username', 
-		'password', 
-		'lat', 
-		'lng', 
-		'stage', 
+		'name',
+		'firstname',
+		'lastname',
+		'email',
+		'username',
+		'password',
+		'lat',
+		'lng',
+		'stage',
 		'conversation'
 	];
 
 	/**
-	* The attributes that should be hidden for arrays.
-	*
-	* @var array
-	*/
+	 * The attributes that should be hidden for arrays.
+	 *
+	 * @var array
+	 */
 	protected $hidden = [
-		'password', 
-		'remember_token', 
+		'password',
+		'remember_token',
 		'enabled'
 	];
 
 	/**
-	* Auth check made available to other calling classes
-	*
-	* @var  boolean 
-	*/
+	 * Auth check made available to other calling classes
+	 *
+	 * @var  boolean 
+	 */
 	// public $isLoggedIn;
 
 	/**
-	* Set up variables
-	*/
-	public function __construct() {
+	 * Set up variables
+	 */
+	public function __construct()
+	{
 
 		// $this->isLoggedIn = Auth::check();
 	}
 
 	/**
-	* Roles can have many users. Equally users can have many roles. This is a many-to-many relationship 
-	*
-	* @return   object  role
-	*/
-	public function roles() {
+	 * Roles can have many users. Equally users can have many roles. This is a many-to-many relationship 
+	 *
+	 * @return   object  role
+	 */
+	public function roles()
+	{
 
 		return $this->belongsToMany('App\Role', 'users_roles', 'user_id', 'role_id');
 	}
 
 	/**
-	* Pages are owned by a single user. This is a one-to-many relationship
-	*
-	* @return   object  Page
-	*/
-	public function pages() {
+	 * Pages are owned by a single user. This is a one-to-many relationship
+	 *
+	 * @return   object  Page
+	 */
+	public function pages()
+	{
 
 		return $this->hasMany('Page');
 	}
 
 	/**
-	* Try and log the user in using JSON web tokens
-	*
-	* @param 	Request $request
-	* @return 	array 	$msg
-	*/
-	public static function authenticate(Request $request) {
+	 * Try and log the user in using JSON web tokens
+	 *
+	 * @param 	Request $request
+	 * @return 	array 	$msg
+	 */
+	public static function authenticate(Request $request)
+	{
 
 		// Grab credentials from the request
 		$credentials = $request->only('email', 'password');
@@ -116,7 +124,7 @@ class User extends Authenticatable
 				$title = __("User not found");
 				$type = Messages::TYPES['User'];
 				$key = Messages::KEY_TYPE_QUESTION;
-				$method = "authenticate";	
+				$method = "authenticate";
 			} else {
 				$user_id = $user->id;
 				$title = $token;
@@ -145,9 +153,10 @@ class User extends Authenticatable
 				$msg = $User->messageUserAuthorised($user, $nextQ);
 			}
 		} catch (JWTException $e) {
-			
+
 			// Something went wrong whilst attempting to encode the token
-			$msg = "Sorry I must've missed something. Please try again or say 'Continue as guest' to continue as a guest.";
+			// $msg = "Sorry I must've missed something. Please try again or say 'Continue as guest' to continue as a guest.";
+			$msg = $e->getMessage();
 			$code = 500;
 		}
 		return Messages::create([
@@ -164,37 +173,62 @@ class User extends Authenticatable
 	}
 
 	/**
-	* Message to display when user is not verified
-	*
-	* @return 	string
-	*/
-	public function messageUserNotFound() {
+	 * Message to display when user is not verified
+	 *
+	 * @return 	string
+	 */
+	public function messageUserNotFound()
+	{
 
 		return sprintf(__("Your name hasn't appeared in our guestbook before.%s> To sign it, type 'Create an account'.%s> If you don't want to sign it, type 'Continue as guest'.%s> If you have signed the guestbook before, then perhaps there has been a mis-typed email or password. Please try again by entering your email address."), PHP_EOL . PHP_EOL, PHP_EOL . PHP_EOL, PHP_EOL . PHP_EOL);
 	}
 
 	/**
-	* Message to display when user has been succesfully verified
-	*
-	* @param 	User 			$user
-	* @param 	ContentMeta 	$question
-	* @return 	string
-	*/
-	public function messageUserAuthorised($user, $question) {
+	 * Message to display when user has been succesfully verified
+	 *
+	 * @param 	User 			$user
+	 * @param 	ContentMeta 	$question
+	 * @return 	string
+	 */
+	public function messageUserAuthorised($user, $question)
+	{
 
 		$content = Messages::convertChoiceScriptVariables($question->content, $user);
 		return sprintf(__("Ah yes I can see your name in our guestbook. Welcome back to the office %s. Let's pick up where you left off at stage %s of scene \"%s\":%sRemember, if you need any assistance then ask me anything from the \"Helper Commands\" reference at any time. It is located to the right.%s%s"), $user->name, $question->stage, $question->name, PHP_EOL . PHP_EOL, PHP_EOL . PHP_EOL, $content);
 	}
 
 	/**
-	* Get the logged in user via token
-	* 
-	* @param 	string 	$token
-	* @return 	
-	*/
-	public function getAuthenticatedUser(string $token) {
+	 * Get the logged in user via token
+	 * 
+	 * @param 	string 	$token
+	 * @return 	
+	 */
+	public function getAuthenticatedUser(string $token)
+	{
 
 		$user = JWTAuth::authenticate($token);
 		return $user;
+	}
+
+	// Rest omitted for brevity
+
+	/**
+	 * Get the identifier that will be stored in the subject claim of the JWT.
+	 *
+	 * @return mixed
+	 */
+	public function getJWTIdentifier()
+	{
+		return $this->getKey();
+	}
+
+	/**
+	 * Return a key value array, containing any custom claims to be added to the JWT.
+	 *
+	 * @return array
+	 */
+	public function getJWTCustomClaims()
+	{
+		return [];
 	}
 }

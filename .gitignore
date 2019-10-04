@@ -45,6 +45,7 @@ yarn-error.log
 npm-debug.log
 testem.log
 /typings
+*.tar.gz
 
 # e2e
 /e2e/*.js

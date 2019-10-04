@@ -11,6 +11,7 @@ return [
      |
      */
     'supportsCredentials' => false,
+    'allowedOriginsPatterns' => [],
     'allowedOrigins' => ['*'],
     'allowedHeaders' => ['*'],
     'allowedMethods' => ['*'],

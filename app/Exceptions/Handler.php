@@ -6,6 +6,9 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use App\ContentMeta as Messages;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,9 +49,9 @@ class Handler extends ExceptionHandler
 	public function render($request, Exception $exception) {
 
 		if (
-			$exception instanceof \Tymon\JWTAuth\Exceptions\TokenExpiredException
-			|| $exception instanceof \Tymon\JWTAuth\Exceptions\JWTException
-			|| $exception instanceof \Tymon\JWTAuth\Exceptions\TokenInvalidException
+			$exception instanceof TokenExpiredException
+			|| $exception instanceof JWTException
+			|| $exception instanceof TokenInvalidException
 			) {
 			
 			// Token expired they must login again
@@ -56,12 +59,12 @@ class Handler extends ExceptionHandler
 				'content' => __("Do I recognise you? Can you remind me by giving me your email address?"), 
 				'key' => "answer", 
 				'name' => "warning", 
-				'title' => get_class($exception) . ", code: " . $exception->getStatusCode(), 
+				'title' => get_class($exception) . ", code: " . $exception->getCode(), 
 				'stage' => 0, 
 				'type' => Messages::TYPES["User"],
 				'method' => "authenticate"
 			]);
-			return response()->json($msg, $exception->getStatusCode());
+			return response()->json($msg, 401);
 		} else if ($exception instanceof \Illuminate\Validation\ValidationException) {
 
 			// Validation of user or message request failed
