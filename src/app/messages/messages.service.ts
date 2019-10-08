@@ -32,7 +32,7 @@ export class MessagesService {
 	*/
 	public getMessages(): Observable<Messages[]> {
 
-		let req = this._http.get(this.uri).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.get(this.uri).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -43,12 +43,12 @@ export class MessagesService {
 	*/
 	public getResponse(data): Observable<Messages[]> {
 
-		let d = JSON.stringify(data);
-		let h = new Headers();
+		const d = JSON.stringify(data);
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
 		const req = this._http.post(
 			this.uri + "?token=" + this.getToken(),
-			d, 
+			d,
 			{ headers: h }
 		).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
@@ -61,11 +61,11 @@ export class MessagesService {
 	*/
 	public authenticate(data) {
 
-		let uri = new App().url + 'api/user/identify';
-		let creds = JSON.stringify(data);
-		let h = new Headers();
+		const uri = new App().url + 'api/user/identify';
+		const creds = JSON.stringify(data);
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -76,20 +76,20 @@ export class MessagesService {
 	*/
 	public login(userId) {
 
-		let uri = new App().url + 'api/user/' + userId + "?token=" + this.getToken();
-		let h = new Headers();
+		const uri = new App().url + 'api/user/' + userId + "?token=" + this.getToken();
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
 	public createUserAccount(data) {
 
-		let uri = new App().url + 'api/user';
-		let creds = JSON.stringify(data);
-		let h = new Headers();
+		const uri = new App().url + 'api/user';
+		const creds = JSON.stringify(data);
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -100,11 +100,11 @@ export class MessagesService {
 	*/
 	public createGuestAccount(username) {
 
-		let uri = new App().url + 'api/user/guest';
-		let creds = JSON.stringify(username);
-		let h = new Headers();
+		const uri = new App().url + 'api/user/guest';
+		const creds = JSON.stringify(username);
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -114,16 +114,16 @@ export class MessagesService {
 	*/
 	public logOut(data): Observable<Messages[]> {
 
-		let uri = new App().url + 'api/user/logout';
-		let d = JSON.stringify(data);
-		let h = new Headers();
+		const uri = new App().url + 'api/user/logout';
+		const d = JSON.stringify(data);
+		const h = new Headers();
 		this.token = "";
 		this.storeUserInfo({
 			user: null,
 			token: null
 		});
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -133,11 +133,11 @@ export class MessagesService {
 	*/
 	public reset(data): Observable<Messages[]> {
 
-		let uri = new App().url + 'api/user/reset';
-		let d = JSON.stringify(data);
-		let h = new Headers();
+		const uri = new App().url + 'api/user/reset';
+		const d = JSON.stringify(data);
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -147,11 +147,11 @@ export class MessagesService {
 	*/
 	public remove(data): Observable<Messages[]> {
 
-		let uri = new App().url + 'api/user/remove';
-		let d = JSON.stringify(data);
-		let h = new Headers();
+		const uri = new App().url + 'api/user/remove';
+		const d = JSON.stringify(data);
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -162,7 +162,7 @@ export class MessagesService {
 
 		return new Promise((resolve, reject) => {
 			if (data != null && data.answer != null && data.page != null && data.user != null) {
-				let msg = [{
+				const msg = [{
 					name: data.answer.name,
 					title: data.answer.title,
 					key: data.answer.key,
@@ -187,11 +187,11 @@ export class MessagesService {
 	*/
 	public hashPassword(password) {
 
-		let uri = new App().url + 'api/user/password';
-		let d = JSON.stringify({ password: password });
-		let h = new Headers();
+		const uri = new App().url + 'api/user/password';
+		const d = JSON.stringify({ password: password });
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -201,10 +201,10 @@ export class MessagesService {
 	*/
 	public getAdminUser() {
 
-		let uri = new App().url + 'api/adminuser';
-		let h = new Headers();
+		const uri = new App().url + 'api/adminuser';
+		const h = new Headers();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		const req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
 		return req;
 	}
 
@@ -275,7 +275,7 @@ export class MessagesService {
 			return observableThrowError(errMsg);
 		} else {
 
-			// This error is not fatal, let the user know.
+			// This error is not fatal, const the user know.
 			return JSON.parse("[" + err + "]");
 		}
 	}
@@ -286,8 +286,8 @@ export class MessagesService {
 	* *@return 	string 	str
 	*/
 	private serialise(obj) {
-		var str = [];
-		for (var p in obj) {
+		const str = [];
+		for (const p in obj) {
 			if (obj.hasOwnProperty(p)) {
 				str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
 			}
@@ -301,9 +301,9 @@ export class MessagesService {
 	*/
 	private getMethods(obj) {
 
-		var res = [];
-		for (var m in obj) {
-			if (typeof obj[m] == "function") {
+		const res = [];
+		for (const m in obj) {
+			if (typeof obj[m] === "function") {
 				res.push(m)
 			}
 		}

@@ -17,4 +17,4 @@ Route::get('/', function () {
 });
 
 // User, login, registration
-Route::get('import/{id}', 'ImportStoryController');
+// Route::get('import/{id}', 'ImportStoryController');

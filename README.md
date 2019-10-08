@@ -200,6 +200,14 @@ Import your story. Portchris conforms to the [ChoiceScript JS format](https://ch
 ./storage/story/manager.txt
 ./storage/story/ending.txt
 ```
+`startup` is the ChoiceScript definition for the beginning of the story, all stories should begin with this chapter
+
+They are imported into Laravel using a custom command like so:
+```
+./laravel.sh portchris:story:import startup
+./laravel.sh portchris:story:import manager
+./laravel.sh portchris:story:import ending
+```
 
 ## Front-end Development
 
