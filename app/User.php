@@ -106,7 +106,7 @@ class User extends Authenticatable implements JWTSubject
 	{
 
 		// Grab credentials from the request
-		$credentials = $request->only('email', 'password');
+		$credentials = request(['email', 'password']);
 		$msg = $title = $token = "";
 		$id = $user_id = $code = $stage = $title = 0;
 		$type = Messages::TYPES["ContentMeta"];
@@ -116,8 +116,8 @@ class User extends Authenticatable implements JWTSubject
 
 			// Attempt to verify the credentials and create a token for the user
 			$User = new self();
-			$token = JWTAuth::attempt($credentials);
-			$user = (!$token) ? false : $User->getAuthenticatedUser($token);
+			$token = auth()->attempt($credentials);
+			$user = (!$token) ? false : Auth::user();
 			if (!$user) {
 				$msg = $User->messageUserNotFound();
 				$code = 401;
@@ -206,7 +206,8 @@ class User extends Authenticatable implements JWTSubject
 	public function getAuthenticatedUser(string $token)
 	{
 
-		$user = JWTAuth::authenticate($token);
+		// $user = JWTAuth::authenticate($token);
+		$user = $this->jwt->User();
 		return $user;
 	}
 
@@ -230,5 +231,15 @@ class User extends Authenticatable implements JWTSubject
 	public function getJWTCustomClaims()
 	{
 		return [];
+	}
+
+	public function setPasswordAttribute($password)
+	{
+		$p = $password;
+		if (!empty($password)) {
+			$p = bcrypt($password);
+			$this->attributes['password'] = $p;
+		}
+		return $p;
 	}
 }

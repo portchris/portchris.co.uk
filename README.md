@@ -32,6 +32,7 @@ NGINX_LETSENCRYPT_HOST=my.domain.com,api.my.domain.com
 NGINX_LETSENCRYPT_TEST=true
 NGINX_ENABLE_IPV6=true
 WORKSPACE_NPM_PORT=4200
+JWT_SECRET=<MY_SECRET>
 
 ###########################################################
 ################## Laravel General Setup ##################

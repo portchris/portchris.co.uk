@@ -20,15 +20,16 @@ class UserController extends Controller
 	use RegistersUsers;
 
 	/**
-	* Request object
-	* @var 	Request 	$request
-	*/
+	 * Request object
+	 * @var 	Request 	$request
+	 */
 	private $request;
 
 	/**
-	* Since I cannot figure out why Reqest isn't being sent, get it manually on construct
-	*/
-	public function __construct() {
+	 * Since I cannot figure out why Reqest isn't being sent, get it manually on construct
+	 */
+	public function __construct()
+	{
 
 		$this->request = app('request');
 	}
@@ -38,7 +39,8 @@ class UserController extends Controller
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function index() {
+	public function index()
+	{
 		// 
 	}
 
@@ -47,10 +49,8 @@ class UserController extends Controller
 	 *
 	 * @return \Illuminate\Http\Response
 	 */
-	public function create() {
-
-
-	}
+	public function create()
+	{ }
 
 	/**
 	 * Store a newly created User in storage.
@@ -58,7 +58,8 @@ class UserController extends Controller
 	 * @param  \App\Http\Requests\Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function store(StoreUserRequest $request) {
+	public function store(StoreUserRequest $request)
+	{
 
 		$id = 0;
 		$msg = $code = "";
@@ -80,7 +81,7 @@ class UserController extends Controller
 			$q = Messages::getNextQuestion(0);
 			if (!$q) {
 				throw new \Exception("Error: could not find next question.");
-			} 
+			}
 			$id = $q->id;
 			$msg = [
 				'id' => $id,
@@ -93,7 +94,7 @@ class UserController extends Controller
 				'method' => 'talk'
 			];
 			$code = 200;
-		} catch(\Illuminate\Database\QueryException $e) {
+		} catch (\Illuminate\Database\QueryException $e) {
 			$msg = [
 				'content' => $e->getMessage(),
 				'type' => Messages::TYPES['User'],
@@ -103,7 +104,7 @@ class UserController extends Controller
 				'method' => 'authenticate'
 			];
 			$code = 500;
-		} catch(\Exception $e) {
+		} catch (\Exception $e) {
 			$msg = [
 				'content' => $e->getMessage(),
 				'type' => Messages::TYPES['User'],
@@ -118,23 +119,24 @@ class UserController extends Controller
 	}
 
 	/**
-	* Hash a password for subsequent requests, also open to the API
-	*
-	* @return 	Request 	$request
-	*/
-	public function hashPassword(Request $request) {
-
-		$p = ["password" => Hash::make($request->input("password"))];
+	 * Hash a password for subsequent requests, also open to the API
+	 *
+	 * @return 	Request 	$request
+	 */
+	public function hashPassword(Request $request)
+	{
+		$user = new User();
+		$p = ["password" => $user->setPasswordAttribute($request->input("password"))];
 		return response()->json($p);
 	}
 
 	/**
-	* Log the user out. Simple right.
-	*
-	* @return 	Response 	JSON
-	*/
-	public function logOut(Request $request) {
-
+	 * Log the user out. Simple right.
+	 *
+	 * @return 	Response 	JSON
+	 */
+	public function logOut(Request $request)
+	{
 		$msg = "";
 		try {
 			$token = (JWTAuth::getToken()) ? JWTAuth::getToken()->get() : false;
@@ -145,7 +147,7 @@ class UserController extends Controller
 			$msg = __("Done! Successfully signed out of our guestbook.");
 		}
 		return response()->json(Messages::create([
-			'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : $msg,
+			'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : $msg,
 			'type' => Messages::TYPES['User'],
 			'key' => Messages::KEY_TYPE_ANSWER,
 			'name' => 'Log out',
@@ -160,16 +162,17 @@ class UserController extends Controller
 	 * @param  Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function reset(Request $request) {
-		
+	public function reset(Request $request)
+	{
+
 		$msg = "Cannot reset, your name does not appear in the visitors guestbook!";
 		$r = $this->error($msg);
 		$userId = $request->input("user_id");
-		if ($userId && (int)$userId > 0 && is_numeric($userId)) {
+		if ($userId && (int) $userId > 0 && is_numeric($userId)) {
 			User::where("id", $userId)->update(["stage" => 1]);
 			$msg = "Okay, you've been signed out of our guestbook and your progress has been reset back to stage 1.";
 			$r = response()->json(Messages::create([
-				'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : __($msg),
+				'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : __($msg),
 				'type' => Messages::TYPES['User'],
 				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => __('Reset'),
@@ -187,18 +190,19 @@ class UserController extends Controller
 	 * @param  Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function remove(Request $request) {
-		
+	public function remove(Request $request)
+	{
+
 		$msg = "Cannot remove you, your name does not appear in the visitors guestbook!";
 		$r = $this->error($msg);
 		$userId = $request->input("user_id");
-		if ($userId && (int)$userId > 0 && is_numeric($userId)) {
+		if ($userId && (int) $userId > 0 && is_numeric($userId)) {
 			try {
 				$deleted = User::where("id", $userId)->delete();
 				if ($deleted) {
 					$msg = "Okay, we have removed your name from the guestbook. As if we never met... :(";
 					$r = response()->json(Messages::create([
-						'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : __($msg),
+						'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : __($msg),
 						'type' => Messages::TYPES['User'],
 						'key' => Messages::KEY_TYPE_ANSWER,
 						'name' => __('Reset'),
@@ -208,11 +212,10 @@ class UserController extends Controller
 					]));
 				} else {
 					throw new \Exception($msg, 1);
-					
 				}
 			} catch (Exception $e) {
 				$r = response()->json(Messages::create([
-					'content' => (strlen((string)$request->input("message")) > 0) ? $request->input("message") : __($msg),
+					'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : __($msg),
 					'type' => Messages::TYPES['User'],
 					'key' => Messages::KEY_TYPE_ERROR,
 					'name' => __('Reset'),
@@ -231,7 +234,8 @@ class UserController extends Controller
 	 * @param  Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function getAdminUser(Request $request) {
+	public function getAdminUser(Request $request)
+	{
 
 		$r = [];
 		$admin = User::where("email", "=", User::ADMIN_EMAIL)->firstOrFail();
@@ -254,12 +258,13 @@ class UserController extends Controller
 	 * @param  Request  $request
 	 * @return \Illuminate\Http\Response
 	 */
-	public function getNearestTimezone(Request $request) {
+	public function getNearestTimezone(Request $request)
+	{
 
 		$time_zone = '';
 		$tz_distance = 0;
-		$cur_lat = $request->lat; 
-		$cur_long = $request->lng; 
+		$cur_lat = $request->lat;
+		$cur_long = $request->lng;
 		$country_code = $request->country_code ?? '';
 		$time_format = $request->time_format ?? 'H:i';
 		$date_format = $request->date_format ?? 'd/m/Y';
@@ -283,7 +288,7 @@ class UserController extends Controller
 					if (!$time_zone || $tz_distance > $distance) {
 						$time_zone   = $timezone_id;
 						$tz_distance = $distance;
-					} 
+					}
 				}
 			}
 			$r = new \DateTime("now", new \DateTimeZone($time_zone));
@@ -308,8 +313,9 @@ class UserController extends Controller
 	 * @param  \App\User  $user
 	 * @return \Illuminate\Http\Response
 	 */
-	public function show(User $user) {
-		
+	public function show(User $user)
+	{
+
 		$r = [];
 		JWTAuth::parseToken();
 		$token = JWTAuth::getToken()->get();
@@ -360,8 +366,9 @@ class UserController extends Controller
 	 * @param  \App\User  $user
 	 * @return \Illuminate\Http\Response
 	 */
-	public function edit(User $user) {
-		
+	public function edit(User $user)
+	{
+
 		//
 	}
 
@@ -372,8 +379,9 @@ class UserController extends Controller
 	 * @param  \App\User  $user
 	 * @return \Illuminate\Http\Response
 	 */
-	public function update(Request $request, User $user) {
-		
+	public function update(Request $request, User $user)
+	{
+
 		//
 	}
 
@@ -383,19 +391,21 @@ class UserController extends Controller
 	 * @param  \App\User  $user
 	 * @return \Illuminate\Http\Response
 	 */
-	public function destroy(User $user) {
-		
+	public function destroy(User $user)
+	{
+
 		//
 	}
 
 	/**
-	* Attempt to log the user in using JSON Web Tokens. 
-	* Try catch custom exceptions as opposed to leaving it up to app/Exceptions/Handler
-	*
-	* @return 	JSON 	$msg
-	*/
-	public function authenticate(AuthenticateUserRequest $request) {
-		
+	 * Attempt to log the user in using JSON Web Tokens. 
+	 * Try catch custom exceptions as opposed to leaving it up to app/Exceptions/Handler
+	 *
+	 * @return 	JSON 	$msg
+	 */
+	public function authenticate(AuthenticateUserRequest $request)
+	{
+
 		$msg = "";
 		$code = 200;
 		$method = "authenticate";
@@ -405,11 +415,11 @@ class UserController extends Controller
 		} catch (\Exception $e) {
 			$code = ($e->getCode() !== 0) ? $e->getCode() : 401;
 			$msg = Messages::create([
-				'content' => __($e->getMessage()) . " " . $e->getFile() . "::" . $e->getLine(), 
-				'key' => Messages::KEY_TYPE_ANSWER, 
+				'content' => __($e->getMessage()) . " " . $e->getFile() . "::" . $e->getLine(),
+				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => Messages::RESPONSE_ERROR,
-				'title' => "Error, code: " . $code,  
-				'code' => $code, 
+				'title' => "Error, code: " . $code,
+				'code' => $code,
 				'stage' => 0,
 				'type' => $type,
 				'method' => "authenticate"
@@ -421,12 +431,13 @@ class UserController extends Controller
 	}
 
 	/**
-	* Get a validator for an incoming registration request.
-	*
-	* @param  array  $data
-	* @return \Illuminate\Contracts\Validation\Validator
-	*/
-	protected function validator(array $data) {
+	 * Get a validator for an incoming registration request.
+	 *
+	 * @param  array  $data
+	 * @return \Illuminate\Contracts\Validation\Validator
+	 */
+	protected function validator(array $data)
+	{
 
 		return Validator::make($data, [
 			'username' => 'required|max:20',
@@ -436,18 +447,19 @@ class UserController extends Controller
 	}
 
 	/**
-	* Silly, the user has opted out of creating an account. Oh well, they can still play on a guest token.
-	*
-	* @param 	Request 	$request
-	* @return 	JSON
-	*/
-	public function createGuestToken(Request $request) {
+	 * Silly, the user has opted out of creating an account. Oh well, they can still play on a guest token.
+	 *
+	 * @param 	Request 	$request
+	 * @return 	JSON
+	 */
+	public function createGuestToken(Request $request)
+	{
 
 		$id = 0;
 		$cookie = false;
 		$msg = $key = $title = $name = $code = $stage = $type = $method = "";
 		try {
-			$claims = $request->all();	
+			$claims = $request->all();
 			$payload = $this->createJWTPayload(
 				$claims,
 				$claims["username"],
@@ -494,11 +506,11 @@ class UserController extends Controller
 		}
 		$m = Messages::create([
 			'id' => $id,
-			'content' => $msg,  
-			'key' => $key, 
+			'content' => $msg,
+			'key' => $key,
 			'name' => $name,
 			'title' => $title,
-			'stage' => $stage, 
+			'stage' => $stage,
 			'type' => $type,
 			'method' => $method
 		]);
@@ -506,19 +518,20 @@ class UserController extends Controller
 	}
 
 	/**
-	* Create all required fields for JSON Web Token 
-	* 
-	* @param 	array 		$cus Custom extra payloads
-	* @param 	string 		$sub Subject - This holds the identifier for the token (defaults to user id)
-	* @param 	timestamp 	$iat Issued At - When the token was issued (unix timestamp)
-	* @param  	timestamp 	$exp Expiry - The token expiry date (unix timestamp)
-	* @param  	timestamp 	$nbf Not Before - The earliest point in time that the token can be used (unix timestamp)
-	* @param  	string 		$iss Issuer - The issuer of the token (defaults to the request url)
-	* @param  	string 		$jti JWT Id - A unique identifier for the token (md5 of the sub and iat claims)
-	* @param  	string 		$aud Audience - The intended audience for the token (not required by default)
-	* @return 	array 		payload
-	*/
-	private function createJWTPayload($cus, $sub, $iat, $exp, $nbf, $iss, $jti = "Lucy Wood", $aud = "") {
+	 * Create all required fields for JSON Web Token 
+	 * 
+	 * @param 	array 		$cus Custom extra payloads
+	 * @param 	string 		$sub Subject - This holds the identifier for the token (defaults to user id)
+	 * @param 	timestamp 	$iat Issued At - When the token was issued (unix timestamp)
+	 * @param  	timestamp 	$exp Expiry - The token expiry date (unix timestamp)
+	 * @param  	timestamp 	$nbf Not Before - The earliest point in time that the token can be used (unix timestamp)
+	 * @param  	string 		$iss Issuer - The issuer of the token (defaults to the request url)
+	 * @param  	string 		$jti JWT Id - A unique identifier for the token (md5 of the sub and iat claims)
+	 * @param  	string 		$aud Audience - The intended audience for the token (not required by default)
+	 * @return 	array 		payload
+	 */
+	private function createJWTPayload($cus, $sub, $iat, $exp, $nbf, $iss, $jti = "Lucy Wood", $aud = "")
+	{
 
 		$claims = [
 			'sub' => $sub,
@@ -534,12 +547,13 @@ class UserController extends Controller
 	}
 
 	/**
-	* Create JSON error response 
-	*
-	* @return 	JSON object 	$response
-	* @since 	1.0.0
-	*/
-	public function error($msg, $errCode = 500) {
+	 * Create JSON error response 
+	 *
+	 * @return 	JSON object 	$response
+	 * @since 	1.0.0
+	 */
+	public function error($msg, $errCode = 500)
+	{
 
 		return response()->json(Messages::create([
 			'content' => __($msg),
