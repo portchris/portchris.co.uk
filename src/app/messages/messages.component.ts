@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewChecked, ViewChild, ElementRef, Input, HostListener } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { MessagesService } from './messages.service';
 import { WeatherService } from '../html/sidebar/weather.service';
@@ -12,16 +12,110 @@ enum TYPE {
 	MESSAGE = 1
 }
 
+enum SCREEN_WIDTH {
+	MOBILE = 768,
+	TABLET = 1024,
+	DESKTOP = 1200
+}
+
 @Component({
 	selector: 'app-messages',
 	templateUrl: './messages.component.html',
 	styleUrls: ['./messages.component.css'],
-	inputs: ['storage'],
-	animations: [slideUpAnimation, popInOutAnimation],
-	host: { '(window:keypress)': 'handleKeyboardEvent($event)' }
+	// inputs: ['storage'],
+	animations: [slideUpAnimation, popInOutAnimation]
+	// host: { '(window:keypress)': 'handleKeyboardEvent($event)' }
 })
 
-export class MessagesComponent implements OnInit, AfterViewChecked {
+export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
+
+	/**
+* These constants are used to limit the message types allowed
+* @const 	object
+*/
+	static readonly MSG_ACTIONS: any = [
+		{
+			id: "user",
+			actions: [
+				"authenticate",
+				"welcome"
+			]
+		},
+		{
+			id: "message",
+			actions: [
+				"talk"
+			]
+		}
+	];
+
+	/**
+	* This places the enum above into this exported class.
+	* This only maps the iterative position of MSG_ACTIONS 
+	* @const 	enum
+	*/
+	static readonly TYPES = TYPE;
+
+	/**
+	* This places the enum above into this exported class.
+	* @const 	enum
+	*/
+	static readonly SCREEN_WIDTHS = SCREEN_WIDTH;
+
+	/**
+	* Magic words that create custom functionality
+	* @const 	object
+	*/
+	static readonly MAGIC_WORDS: any = [
+		{
+			phrase: "Continue as guest",
+			method: "continueAsGuest"
+		},
+		{
+			phrase: "Continue as a guest",
+			method: "continueAsGuest"
+		},
+		{
+			phrase: "Guest",
+			method: "continueAsGuest"
+		},
+		{
+			phrase: "Register",
+			method: "registerAccount"
+		},
+		{
+			phrase: "Create an account",
+			method: "registerAccount"
+		},
+		{
+			phrase: "Create account",
+			method: "registerAccount"
+		},
+		{
+			phrase: "Log out",
+			method: "logOut"
+		},
+		{
+			phrase: "Log off",
+			method: "logOut"
+		},
+		{
+			phrase: "Start over",
+			method: "startOver"
+		},
+		{
+			phrase: "Reset",
+			method: "reset"
+		},
+		{
+			phrase: "Forget about me",
+			method: "remove"
+		},
+		{
+			phrase: "Remove me from the guestbook",
+			method: "remove"
+		}
+	];
 
 	/**
 	* Refernce to a child element
@@ -92,90 +186,21 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 	/**
 	* Display the typing bubble when computer is writing a response
+	* @var 	boolean
 	*/
 	typing: boolean;
 
 	/**
-	* These constants are used to limit the message types allowed
-	* @const 	object
-	*/
-	static readonly MSG_ACTIONS: any = [
-		{
-			id: "user",
-			actions: [
-				"authenticate",
-				"welcome"
-			]
-		},
-		{
-			id: "message",
-			actions: [
-				"talk"
-			]
-		}
-	];
+	 * Is current device a touch device
+	 * @var boolean
+	 */
+	touchDevice: boolean;
 
 	/**
-	* This places the enum above into this exported class.
-	* This only maps the iterative position of MSG_ACTIONS 
-	* @const 	enum
-	*/
-	static readonly TYPES = TYPE;
-
-	/**
-	* Magic words that create custom functionality
-	* @const 	object
-	*/
-	static readonly MAGIC_WORDS: any = [
-		{
-			phrase: "Continue as guest",
-			method: "continueAsGuest"
-		},
-		{
-			phrase: "Continue as a guest",
-			method: "continueAsGuest"
-		},
-		{
-			phrase: "Guest",
-			method: "continueAsGuest"
-		},
-		{
-			phrase: "Register",
-			method: "registerAccount"
-		},
-		{
-			phrase: "Create an account",
-			method: "registerAccount"
-		},
-		{
-			phrase: "Create account",
-			method: "registerAccount"
-		},
-		{
-			phrase: "Log out",
-			method: "logOut"
-		},
-		{
-			phrase: "Log off",
-			method: "logOut"
-		},
-		{
-			phrase: "Start over",
-			method: "startOver"
-		},
-		{
-			phrase: "Reset",
-			method: "reset"
-		},
-		{
-			phrase: "Forget about me",
-			method: "remove"
-		},
-		{
-			phrase: "Remove me from the guestbook",
-			method: "remove"
-		}
-	];
+	 * Device screen width
+	 * @var any
+	 */
+	deviceWidth: any;
 
 	/**
 	* The form builder validator. Handles the form submission of the text-based adventure
@@ -203,7 +228,11 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	* @param 	object 	MessagesService
 	* @param 	object 	FormBuilder
 	*/
-	public constructor(private messagesService: MessagesService, public formBuilder: FormBuilder, private weatherService: WeatherService) {
+	public constructor(
+		private messagesService: MessagesService,
+		public formBuilder: FormBuilder,
+		private weatherService: WeatherService
+	) {
 
 		this.messages = [];
 		this.user = {
@@ -229,8 +258,39 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		this.class_selector = "col-xs-9 offset-xs-3";
 		this.typing = false;
 		this.userScrolling = false;
+		this.touchDevice = false;
+		this.deviceWidth = MessagesComponent.SCREEN_WIDTHS.DESKTOP;
 		this.talkForm.enable();
 		this.keyboardActions = [];
+	}
+
+	/**
+	* Method called whenever user emits keydown event.
+	* @param 	KeyboardEvent	event
+	*/
+	// @HostListener('document:keypress', ['$event'])
+	@HostListener('window:keypress', ['$event'])
+	handleKeyboardEvent(event: KeyboardEvent) {
+
+		// let key = event.key;
+		// this.keyboardActions.push(key);
+		// if (this.keyboardActions.length > 5) {
+		// 	this.keyboardActions.pop();
+		// }
+		this.userScrolling = false;
+	}
+
+	@HostListener('ontouchstart')
+	onTouchStart() {
+		this.touchDevice = true;
+	}
+
+	@HostListener('window:resize', ['$event'])
+	onResize(event) {
+		this.debounce(() => {
+			this.deviceWidth = event.target.innerWidth;
+			console.log(this.deviceWidth);
+		}, 1000);
 	}
 
 	/**
@@ -241,7 +301,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	public doRespond(event: any, valid: boolean) {
 
 		if (valid) {
-			let data = this.talkForm.value;
+			const data = this.talkForm.value;
 			data.user = (this.user != null) ? this.user : {};
 			data.content = (this.sanitiseContent(data.content));
 			this.talkForm.disable();
@@ -249,7 +309,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			this.decipherMessageAction(data);
 			this.createUserMessage(data);
 			try {
-				let magicMethod = this.hasMagicWords(data.content);
+				const magicMethod = this.hasMagicWords(data.content);
 				if (!magicMethod) {
 					if (this.messageType === MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id) {
 
@@ -287,7 +347,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private sanitiseContent(c) {
 
-		var tmp = document.createElement("DIV");
+		const tmp = document.createElement("DIV");
 		tmp.innerHTML = c.substring(0, 200);
 		return tmp.textContent || tmp.innerText || "";
 	}
@@ -343,7 +403,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 		this.typing = true;
 		this.talkForm.disable();
-		let storage = this.messagesService.getStoredUserInfo();
+		const storage = this.messagesService.getStoredUserInfo();
 		if (storage != null && storage.user != null && storage.user.id != null && storage.user.id !== 0 && storage.token.length) {
 			this.user = storage.user;
 			this.messagesService.login(this.user.id).subscribe(
@@ -352,8 +412,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				() => { this.getMessagesComplete(); }
 			);
 		} else {
-			let msg = this.createMessageTemplate();
-			let weather = this.weatherService.getWeatherData();
+			const msg = this.createMessageTemplate();
+			const weather = this.weatherService.getWeatherData();
 			if (typeof weather !== "undefined" && weather !== null && weather.time != null) {
 				msg.message = (weather.time.dark) ? "Hello! " : "Hello! ";
 			} else {
@@ -376,7 +436,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		// this.searchBox.nativeElement.classList.add("js");
 		// this.searchFauxInput.nativeElement.classList.add("js");
 		if (this.searchBox) {
-			this.searchBox.nativeElement.focus();
+			setTimeout(this.searchBox.nativeElement.focus(), 2000);
 		}
 		if (this.scrollContainer) {
 			this.scrollContainer.nativeElement.addEventListener('scroll', this.isScrolling, true);
@@ -393,14 +453,14 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public welcome() {
 
-		let msg = this.createMessageTemplate();
-		let data = this.talkForm.value;
+		const msg = this.createMessageTemplate();
+		const data = this.talkForm.value;
 		this.talkForm.disable();
 		this.user.name = this.sanitiseContent(data.content);
 		this.user.firstname = this.sanitiseContent(data.content);
 		this.user.lastname = this.sanitiseContent(data.content);
 		if (this.user.name.indexOf(" ") !== -1) {
-			let split = this.user.name.split(" ");
+			const split = this.user.name.split(" ");
 			this.user.firstname = split[0];
 			split.splice(0, 1);
 			this.user.lastname = split.join(" ");
@@ -424,8 +484,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public teaCoffeeOrWater() {
 
-		let msg = this.createMessageTemplate();
-		let drink = this.talkForm.value.content.toLowerCase();
+		const msg = this.createMessageTemplate();
+		const drink = this.talkForm.value.content.toLowerCase();
 		if (drink.indexOf("tea") !== -1 || drink.indexOf("coffee") !== -1 || drink.indexOf("water") !== -1) {
 			msg.message = "Enjoy, " + this.user.name + ". Whilst you enjoy your " + drink + ", would you like to sign the vistors guestbook so we remember you next time?";
 			msg.answer.method = "toSaveOrNotToSave";
@@ -454,8 +514,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public toSaveOrNotToSave() {
 
-		let msg = this.createMessageTemplate();
-		let answer = this.talkForm.value.content.toLowerCase();
+		const msg = this.createMessageTemplate();
+		const answer = this.talkForm.value.content.toLowerCase();
 		this.talkForm.disable();
 		if (answer.indexOf("no") !== -1) {
 			this.continueAsGuest();
@@ -513,8 +573,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	public scrollToBottom(): void {
 
 		try {
-			let pos = this.scrollContainer.nativeElement.scrollTop;
-			let dest = this.scrollContainer.nativeElement.scrollHeight;
+			const pos = this.scrollContainer.nativeElement.scrollTop;
+			const dest = this.scrollContainer.nativeElement.scrollHeight;
 			this.scrollContainer.nativeElement.scrollTop = dest;
 			// if (pos < dest) {
 			// 	var tO = setTimeout(() => {
@@ -547,12 +607,11 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private getMessagesSuccess(message, delay = true) {
 
-		let m = message[message.length - 1];
+		const m = message[message.length - 1];
 		if (m) {
 			this.typing = (m.key === "user") ? false : true;
 			this.talkForm.disable();
 			const fnc = () => {
-				// m.content = this.convertChoiceScriptTemplate(m.content);
 				this.messages = this.messages.concat(m);
 				this.user.id = m.user_id;
 				this.user.stage = m.stage;
@@ -577,12 +636,18 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 				this.talkForm.controls['method'].setValue(this.question.method);
 				this.talkForm.controls['csrf'].setValue(this.question.csrf);
 				this.typing = false;
-				this.talkForm.enable();
-				if (this.searchBox) {
-					this.searchBox.nativeElement.focus();
-				}
 				this.userScrolling = false;
 				this.scrollToBottom();
+				if (this.searchBox && this.deviceWidth >= MessagesComponent.SCREEN_WIDTHS.TABLET && !this.touchDevice) {
+					this.talkForm.enable();
+					this.searchBox.nativeElement.focus();
+				} else {
+					setTimeout(() => {
+						this.talkForm.enable();
+						this.searchBox.nativeElement.focus();
+					}, 4000);
+				}
+				
 			};
 			if (m.key === "user" || !delay) {
 				fnc();
@@ -684,24 +749,24 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public startOver(msg: string) {
 
-		let data = {
+		const data = {
 			message: msg
 		};
 		this.messagesService.logOut(data).subscribe(
 			(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
 			(error) => {
-				let msg = this.createMessageTemplate();
+				const m = this.createMessageTemplate();
 				console.error(error);
-				msg.message = "Wow, something really bad happened. I cannot even make a request. Error reads: " + error;
-				msg.answer.name = "error";
-				msg.answer.title = msg.answer.name;
-				msg.answer.key = msg.answer.name;
-				msg.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
-				msg.answer.method = "authenticate";
-				msg.user.stage = 0;
-				this.messagesService.createMessage(msg)
+				m.message = "Wow, something really bad happened. I cannot even make a request. Error reads: " + error;
+				m.answer.name = "error";
+				m.answer.title = m.answer.name;
+				m.answer.key = m.answer.name;
+				m.answer.type = MessagesComponent.MSG_ACTIONS[MessagesComponent.TYPES.USER].id;
+				m.answer.method = "authenticate";
+				m.user.stage = 0;
+				this.messagesService.createMessage(m)
 					.then((message) => { this.getMessagesSuccess(message); })
-					.catch((error) => { console.error(error) })
+					.catch((err) => { console.error(err) })
 					.then(() => { this.getMessagesComplete(); });
 			},
 			() => { this.getMessagesComplete() }
@@ -714,7 +779,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public reset(msg: string) {
 
-		let data = {
+		const data = {
 			user_id: this.user.id,
 			message: msg
 		};
@@ -722,7 +787,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			(message) => {
 				this.getMessagesSuccess(message);
 				this.messagesService.logOut({}).subscribe(
-					(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
+					(m) => { this.getMessagesSuccess(m); this.ngOnInit(); },
 					(error) => { this.getMessagesFail(error) },
 					() => { this.getMessagesComplete() }
 				);
@@ -738,7 +803,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	public remove(msg: string) {
 
-		let data = {
+		const data = {
 			user_id: this.user.id,
 			message: msg
 		};
@@ -746,7 +811,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 			(message) => {
 				this.getMessagesSuccess(message);
 				this.messagesService.logOut({}).subscribe(
-					(message) => { this.getMessagesSuccess(message); this.ngOnInit(); },
+					(m) => { this.getMessagesSuccess(m); this.ngOnInit(); },
 					(error) => { this.getMessagesFail(error) },
 					() => { this.getMessagesComplete() }
 				);
@@ -764,10 +829,10 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	private hasMagicWords(content) {
 
 		let r = false;
-		let str1 = content.replace(/\s+/g, '').toLowerCase();
-		for (var i = MessagesComponent.MAGIC_WORDS.length - 1; i >= 0; i--) {
-			let word = MessagesComponent.MAGIC_WORDS[i];
-			let str2 = word.phrase.replace(/\s+/g, '').toLowerCase();
+		const str1 = content.replace(/\s+/g, '').toLowerCase();
+		for (let i = MessagesComponent.MAGIC_WORDS.length - 1; i >= 0; i--) {
+			const word = MessagesComponent.MAGIC_WORDS[i];
+			const str2 = word.phrase.replace(/\s+/g, '').toLowerCase();
 			if (str1 === str2) {
 				r = word.method;
 				break;
@@ -783,7 +848,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	private createUserMessage(data) {
 
 		if (this.input_type !== "password") {
-			let msg = this.createMessageTemplate();
+			const msg = this.createMessageTemplate();
 			msg.message = data.content;
 			msg.answer.name = "User's input";
 			msg.answer.title = this.user.name + " writes message";
@@ -809,23 +874,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 
 	public focusInput(event) {
 		if (this.searchBox) {
-			this.searchBox.nativeElement.focus();
+			setTimeout(this.searchBox.nativeElement.focus(), 2000);
 		}
-	}
-
-	/**
-	* Method called whenever user emits keydown event.
-	* @param 	KeyboardEvent	event
-	*/
-	// @HostListener('document:keypress', ['$event'])
-	private handleKeyboardEvent(event: KeyboardEvent) {
-
-		// let key = event.key;
-		// this.keyboardActions.push(key);
-		// if (this.keyboardActions.length > 5) {
-		// 	this.keyboardActions.pop();
-		// }
-		this.userScrolling = false;
 	}
 
 	/**
@@ -834,7 +884,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private createMessageTemplate() {
 
-		let m: any = {
+		const m: any = {
 			message: "",
 			answer: {
 				name: "",
@@ -861,8 +911,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private decipherMessageType(data) {
 
-		for (var i = MessagesComponent.MSG_ACTIONS.length - 1; i >= 0; i--) {
-			let type = MessagesComponent.MSG_ACTIONS[i];
+		for (let i = MessagesComponent.MSG_ACTIONS.length - 1; i >= 0; i--) {
+			const type = MessagesComponent.MSG_ACTIONS[i];
 			if (data.type === type.id) {
 				this.messageType = type.id;
 				break;
@@ -882,8 +932,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private decipherMessageAction(data) {
 
-		for (var i = MessagesComponent.MSG_ACTIONS.length - 1; i >= 0; i--) {
-			let action = MessagesComponent.MSG_ACTIONS[i];
+		for (let i = MessagesComponent.MSG_ACTIONS.length - 1; i >= 0; i--) {
+			const action = MessagesComponent.MSG_ACTIONS[i];
 			if (this.messageType === action.id && action.actions.indexOf(data.method) !== -1) {
 				this.messageAction = data.method;
 				break;
@@ -903,8 +953,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private authenticate() {
 
-		let data = this.talkForm.value;
-		let msg = this.createMessageTemplate();
+		const data = this.talkForm.value;
+		const msg = this.createMessageTemplate();
 		msg.message = "";
 		msg.answer.name = data.name;
 		msg.answer.title = data.title;
@@ -936,12 +986,12 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 		} else if (this.user.email != null) {
 
 			// They have entered their email and password this is enough information to authenticate
-			let pass = data.content.substring(0, 255);
+			const pass = data.content.substring(0, 255);
 			this.messagesService.hashPassword(pass).subscribe(
 				(hash) => {
 					this.user.password = hash.password;
 					this.input_type = "text";
-					let credentials = {
+					const credentials = {
 						email: this.user.email,
 						password: pass
 					};
@@ -975,7 +1025,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private validateEmail(email) {
 
-		var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		const re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 		return re.test(email);
 	}
 
@@ -988,27 +1038,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private nl2br(str, isXhtml) {
 
-		var breakTag = (isXhtml || typeof isXhtml === 'undefined') ? '<br />' : '<br>';
+		const breakTag = (isXhtml || typeof isXhtml === 'undefined') ? '<br />' : '<br>';
 		return (str + '').replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + breakTag + '$2');
-	}
-
-	/**
-	* To import my story I have chosen the popular ChoiceScript templating format which
-	* uses ${} for their variables. This will convert that to useful user info.   
-	* @param 	string 	str
-	*/
-	private convertChoiceScriptTemplate(str) {
-
-		let re = /\${(.*?)\}/;
-		let i = 0;
-		do {
-			var m = re.exec(str);
-			if (m) {
-				let info = eval("this.user." + m[1]);
-				str = (info) ? str.replace(m[0], info) : str.replace(m[0], "");
-			}
-		} while (m);
-		return str;
 	}
 
 	/**
@@ -1016,9 +1047,9 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	*/
 	private continueAsGuest() {
 
-		let data = this.talkForm.value;
-		let msg = this.createMessageTemplate();
-		let params = {
+		const data = this.talkForm.value;
+		const msg = this.createMessageTemplate();
+		const params = {
 			username: (this.user.name != null) ? this.user.name : "Guest",
 			password: "Guest"
 		};
@@ -1047,13 +1078,41 @@ export class MessagesComponent implements OnInit, AfterViewChecked {
 	}
 
 	/**
+	 * Returns a function, that, as long as it continues to be invoked, will not
+	 * be triggered. The function will be called after it stops being called for
+	 * N milliseconds. If `immediate` is passed, trigger the function on the
+	 * leading edge, instead of the trailing.
+	 * @param func 
+	 * @param wait 
+	 * @param immediate 
+	 */
+	private debounce(func, wait, immediate = false) {
+		let timeout;
+		return () => {
+			const context = this, args = arguments;
+			const later = () => {
+				timeout = null;
+				if (!immediate) {
+					func.apply(context, args);
+				}
+			};
+			const callNow = immediate && !timeout;
+			clearTimeout(timeout);
+			timeout = setTimeout(later, wait);
+			if (callNow) {
+				func.apply(context, args);
+			}
+		};
+	};
+
+	/**
 	* User has decided to create an account and save his/her progress. Fine choice
 	*/
 	private registerAccount() {
 
 		if (this.user != null && this.user.email != null && this.user.password != null) {
-			let data = this.talkForm.value;
-			let params = {
+			const data = this.talkForm.value;
+			const params = {
 				name: this.user.name,
 				firstname: this.user.firstname,
 				lastname: this.user.lastname,
