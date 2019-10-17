@@ -233,7 +233,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 		public formBuilder: FormBuilder,
 		private weatherService: WeatherService
 	) {
-
+		const width = (window.innerWidth > 0) ? window.innerWidth : screen.width;
 		this.messages = [];
 		this.user = {
 			id: 0,
@@ -259,8 +259,8 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 		this.typing = false;
 		this.userScrolling = false;
 		this.touchDevice = false;
-		this.deviceWidth = MessagesComponent.SCREEN_WIDTHS.DESKTOP;
-		this.talkForm.enable();
+		this.setDeviceWidth(width);
+		this.talkForm.disable();
 		this.keyboardActions = [];
 	}
 
@@ -288,9 +288,16 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 	@HostListener('window:resize', ['$event'])
 	onResize(event) {
 		this.debounce(() => {
-			this.deviceWidth = event.target.innerWidth;
-			console.log(this.deviceWidth);
+			this.setDeviceWidth(event.target.innerWidth);
+			console.log("Device width: " + this.deviceWidth);
 		}, 1000);
+	}
+
+	/**
+	 * @param int width 
+	 */
+	private setDeviceWidth(width) {
+		this.deviceWidth = width;
 	}
 
 	/**
@@ -435,9 +442,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 		// Add focus to input to guide users eyes
 		// this.searchBox.nativeElement.classList.add("js");
 		// this.searchFauxInput.nativeElement.classList.add("js");
-		if (this.searchBox) {
-			setTimeout(this.searchBox.nativeElement.focus(), 2000);
-		}
+		this.reEnableTalkInput();
 		if (this.scrollContainer) {
 			this.scrollContainer.nativeElement.addEventListener('scroll', this.isScrolling, true);
 		}
@@ -638,16 +643,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 				this.typing = false;
 				this.userScrolling = false;
 				this.scrollToBottom();
-				if (this.searchBox && this.deviceWidth >= MessagesComponent.SCREEN_WIDTHS.TABLET && !this.touchDevice) {
-					this.talkForm.enable();
-					this.searchBox.nativeElement.focus();
-				} else {
-					setTimeout(() => {
-						this.talkForm.enable();
-						this.searchBox.nativeElement.focus();
-					}, 4000);
-				}
-				
+				this.reEnableTalkInput();
 			};
 			if (m.key === "user" || !delay) {
 				fnc();
@@ -657,13 +653,35 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 		}
 	}
 
+	private reEnableTalkInput() {
+		setTimeout(() => {
+			this.talkForm.enable();
+			this.unfocusInput();
+			if (this.deviceWidth >= MessagesComponent.SCREEN_WIDTHS.TABLET && !this.touchDevice) {
+				this.focusInput();
+			}
+		}, 2000);
+	}
+
+	private unfocusInput() {
+		if (this.searchBox) {
+			this.searchBox.nativeElement.blur();
+		}
+	}
+
+	private focusInput() {
+		if (this.searchBox) {
+			setTimeout(this.searchBox.nativeElement.focus(), 2000);
+		}
+	}
+
 	/**
 	* Observable / promise error method
 	* @param 	any 	error
 	*/
 	private getMessagesFail(error: any) {
 
-		this.talkForm.enable();
+		this.reEnableTalkInput();
 		let errMsg = error;
 		console.error(error);
 		if (errMsg instanceof Error) {
@@ -862,19 +880,6 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 				.then((message) => { this.getMessagesSuccess(message); })
 				.catch((error) => { this.getMessagesFail(error); })
 				.then(() => { this.getMessagesComplete(); });
-		}
-	}
-
-	private copyInput(event) {
-		if (this.searchFauxInput && this.searchBox) {
-			this.searchFauxInput.nativeElement.textContent = this.talkForm.value.content;
-			this.searchBox.nativeElement.setAttribute("value", this.talkForm.value.content);
-		}
-	}
-
-	public focusInput(event) {
-		if (this.searchBox) {
-			setTimeout(this.searchBox.nativeElement.focus(), 2000);
 		}
 	}
 
@@ -1088,21 +1093,19 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 	 */
 	private debounce(func, wait, immediate = false) {
 		let timeout;
-		return () => {
-			const context = this, args = arguments;
-			const later = () => {
-				timeout = null;
-				if (!immediate) {
-					func.apply(context, args);
-				}
-			};
-			const callNow = immediate && !timeout;
-			clearTimeout(timeout);
-			timeout = setTimeout(later, wait);
-			if (callNow) {
+		const context = this, args = arguments;
+		const later = () => {
+			timeout = null;
+			if (!immediate) {
 				func.apply(context, args);
 			}
 		};
+		const callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) {
+			func.apply(context, args);
+		}
 	};
 
 	/**

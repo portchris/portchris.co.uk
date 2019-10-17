@@ -253,25 +253,28 @@ You applied for work experience and the PortChris office was happy to give you a
 						"Fantastic, then you won't mind me diving straight into it then. We operate Linux based servers here and a typical project would follow 3 stages of development. Firstly, working on our local development server. Secondly, uploading to our staging server visble only to us and the client for user testing. Then finally, deployment to the production servers. It's what myself and the manager specialise in mostly".
 						*choice
 							#Ask: What stack are you using?
-								"Linux Apache MySQL PHP (LAMP) stack. But we have used other stacks involving Nginx & NoSQL in the past and really liked them".
+								"Linux Nginx MySQL PHP (LEMP) stack. But we have used other stacks involving Apache & NoSQL in the past and really liked them".
 								*choice
 									#Ask: What are your thoughts on full JavaScript stacks?
 										*label jsstacks
 										"They are MEAN, pardon the pun! I think if you're a front-end developer specialising in JavaScript looking to venture out into back-end, then this would be the perfect entry. You don't have to learn a new language with a new syntax, and you are already used to the event-driven nature of it. For myself and Chris, we grew up learning other languages server-side so are already proficient in PHP. Also our servers already run on different stacks so it doesn't make sense to change them at this point. However, Chris has taught himself Nginx and NoSQL individually and likes them a lot. We keep our eye out all the time but for now we feel safe in the popular LAMP stack and our clients also have no complaints. It would be an interesting conversation to bring up with Chris, however. In fact here he is now". You shake hands with the developer before saying goodbye and moving on to see the manager.
+										*finish
+									#Ask: Why Linux?
+										"A question for upstairs, generally the web is powered mostly by Linux and there is no point going against the wheel here. Oh it looks like Chris is ready to see you now!"
 										*finish											
-									#Ask: Why not switch over to Nginx if you like it.
+									#Ask: Why not switch over to Apache if you like it.
 										*label nginx
-										"I love how Nginx can handle a higher concurrent volume of traffic but the main reason we haven't switched over is simply because we have more experience in Apache. Also our platforms and frameworks work with Apache out-of-the-box".
+										"I love how Nginx can handle a higher concurrent volume of traffic, Nginx is newer and we have more experience in it. The main downside though is that most our platforms and frameworks support Apache out-of-the-box".
 										*choice
 											#Ask: What platforms do you use?
 												*label platforms
-												"We use many PHP based platforms for different clients depending on what they are looking for. If the client is looking for a Content Management System (CMS) then we would suggest Wordpress. If the client is looking for eCommerce then we would provide a Magento solution. Chris is proficient in Magento 1.x and Magento 2 but I'm not the biggest fan of it if you ask me".
+												"We use many PHP based platforms for different clients depending on what they are looking for. PHP tends to lead the way for Content Management Systems (CMS) like Wordpress. If the client is looking for eCommerce then we would provide a Magento solution. Chris is proficient in Magento 1.x and Magento 2 but I'm not the biggest fan of it if you ask me".
 												*choice
 													#Ask: Why aren't you a fan of Magento?
 														"I just think it's too complicated for it's own good. Firstly it's bloated. There are too many configuration files which makes more room for annoying bugs. It also makes your code less concise and more difficult to debug. Secondly, the documentation is bad and you often find yourself reverse-engineering. Thirdly, it's very slow, not to mention the server costs involved in hosting such a solution. Chris would argue however that while WooCommerce or Shopify might be decent solutions for smaller companies, larger companies would require the complexities that Magento offers. Also Magento 2 solves many problems that Magento 1 had. It's a tricky one but then again when has eCommerce ever been simple... Anyhow I believe Chris is waiting for you now, why don't you go and meet with him?!". You shake hands with the developer and move on.
 														*finish
 													#Ask: Aren't you afraid of the security issues around Wordpress?
-														"This is a common issue Wordpress is stigmatised with, but there are ways around it. Chris has been using a particular Wordpress stack for a while that we have come to know and love. It increases security by changing the file structure and introduces bcrypt hashed passwords. It also introduces modern web workflows such as Webpack and Sass if you like using such things. We use Wordpress for smaller clients wanting a CMS since it is beautifully simple. If a client wanted something more custom and complex then we would tap into our Laravel knowledge and look into something like October. Anyhow I believe Chris is waiting for you now, you should go and meet with him". You shake hands with the developer and move on.
+														"This is a common issue Wordpress is stigmatised with, but there are ways around it. Chris has been using a particular Wordpress stack for a while that we have come to know and love. It increases security by changing the file structure and introduces bcrypt hashed passwords. It also introduces modern web workflows such as Webpack and Sass if you like using such things. The main thing is you keep it up to date. We use Wordpress for smaller clients wanting a CMS since it is beautifully simple. If a client wanted something more custom and complex then we would tap into our Laravel knowledge and look into something like October. Anyhow I believe Chris is waiting for you now, you should go and meet with him". You shake hands with the developer and move on.
 														*finish
 											#Ask: What frameworks do you use?
 												*label frameworks

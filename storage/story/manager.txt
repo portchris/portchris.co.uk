@@ -23,9 +23,9 @@ As you walk upstairs, you notice the sudden drop in temperature. Photos of emplo
 				*choice
 					#Say: I look forward to the finished product.
 						*label business
-						"Yeah hopefully soon this place will look complete! But enough of that, let's get down to business. You have arrived here to progress your development skills. Well, you're in great hands here. What is it you wish to expand in particular?".
+						"Yeah hopefully soon this place will look complete! But enough of that, let's get down to business. You have arrived here to learn more about myself and Portchris. Well, you're in great hands here. What is it you wish to expand in particular?".
 						*choice
-							#Say: My front-end skills.
+							#Say: Tell me about your front-end skills.
 								*label shadowing
 								"Awesome! I'm highly comptetent in this area, hopefully I can show you a thing or two".
 								*choice
@@ -33,7 +33,7 @@ As you walk upstairs, you notice the sudden drop in temperature. Photos of emplo
 										"Great, well then it's probably best you shadow me for the moment".
 										*choice 
 											#Say: Great! Where do we begin?
-												"Well let's start with you ${name}, what is it you wish to achieve with this role?".
+												"Well let's start with your ${name}, what is it you wish to achieve with this role?".
 												*choice
 													#Say: To get more experience on the CV.
 														"Well I guarantee you'll leave this office with a unique experience ${name}. We might be relatively small but we use that to our advantage to make it quirky".
