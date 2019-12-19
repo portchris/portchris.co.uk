@@ -53,7 +53,7 @@
 				<!-- span *ngIf="question.csrf">
 					{{ question.csrf }}
 				</span> -->
-				<div class="talk" (click)="focusInput($event)">
+				<div class="talk" (click)="focusInput()">
 					<input #searchBox formControlName="content" [type]="input_type" name="content" class="inline form-control mb-2 mr-sm-2 mb-sm-0 full-height" placeholder="Respond to my message here..." autocomplete="off" [value]="user.message">
 					<span #searchFauxInput class="talk_FauxInput" dir="rtl"></span>
 					<button type="submit" class="btn btn-primary full-height">

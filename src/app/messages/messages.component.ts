@@ -663,13 +663,13 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 		}, 2000);
 	}
 
-	private unfocusInput() {
+	public unfocusInput() {
 		if (this.searchBox) {
 			this.searchBox.nativeElement.blur();
 		}
 	}
 
-	private focusInput() {
+	public focusInput() {
 		if (this.searchBox) {
 			setTimeout(this.searchBox.nativeElement.focus(), 2000);
 		}

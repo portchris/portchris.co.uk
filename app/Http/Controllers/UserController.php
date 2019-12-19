@@ -530,7 +530,7 @@ class UserController extends Controller
 	 * @param  	string 		$aud Audience - The intended audience for the token (not required by default)
 	 * @return 	array 		payload
 	 */
-	private function createJWTPayload($cus, $sub, $iat, $exp, $nbf, $iss, $jti = "Lucy Wood", $aud = "")
+	private function createJWTPayload($cus, $sub, $iat, $exp, $nbf, $iss, $jti = "Lucy Rogers", $aud = "")
 	{
 
 		$claims = [
