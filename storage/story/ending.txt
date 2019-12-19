@@ -3,4 +3,4 @@
 	manager
 	ending
 
-Well ${name}, I hope you enjoyed speaking with me and the team and I hope you got what you information you wanted. Thank you for playing the story. If you would like to enquire further then contact me here: ${contactLink} otherwise you can always start the story again and go down a different path! 
+"Well ${name}, I hope you enjoyed speaking with me and the team and I hope you got what you information you wanted". Thank you for playing the story. If you would like to enquire further then contact me here: ${contactLink} otherwise you can always type "Start over" to begin the story again and try a different path! 
