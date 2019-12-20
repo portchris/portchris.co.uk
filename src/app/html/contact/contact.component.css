@@ -57,11 +57,12 @@
 	background-color: #74A345;
 	border-color: #74A345;
 }
+#stack-icon .icon {
+	padding: 5px;
+}
 #stackoverflow-contact:hover {
-	-webkit-filter: none; /* safari 6.0 - 9.0 */
-	filter: none;
 	transition: 0.2s 100ms ease-out;
-	background-color: #FE7A16;
+	background-color: #0085E9; /* filter opposite of #FE7A16 */
 }
 .svg-invert, #stackoverflow-contact {
 	-webkit-filter: invert(100%); /* safari 6.0 - 9.0 */

@@ -50,7 +50,8 @@ class UserController extends Controller
 	 * @return \Illuminate\Http\Response
 	 */
 	public function create()
-	{ }
+	{
+	}
 
 	/**
 	 * Store a newly created User in storage.
@@ -454,12 +455,22 @@ class UserController extends Controller
 	 */
 	public function createGuestToken(Request $request)
 	{
-
+		$t = time();
 		$id = 0;
-		$cookie = false;
+		// $cookie = false;
 		$msg = $key = $title = $name = $code = $stage = $type = $method = "";
 		try {
 			$claims = $request->all();
+			// if (!isset($claims["firstname"]) || !isset($claims["lastname"]) || !isset($claims["name"])) {
+			// 	$claims["firstname"] = (isset($claims["username"])) ? $claims["username"] : __("my friend");
+			// 	$claims["lastname"] = "";
+			// 	$claims["name"] = $claims["firstname"];
+			// }
+			// if (!isset($claims["lat"]) || !isset($claims["lng"]) || !isset($claims["stage"])) {
+			// 	$claims["lat"] = 0;
+			// 	$claims["lng"] = 0;
+			// 	$claims["stage"] = 0;
+			// }
 			$payload = $this->createJWTPayload(
 				$claims,
 				$claims["username"],
@@ -468,7 +479,25 @@ class UserController extends Controller
 				time(),
 				Route::current()->getName()
 			);
+			// $token = $this->quickRandom() . time();
+			// $user = new User;
+			// $user->firstname = $request->username;
+			// $user->lastname = "";
+			// $user->name = $request->username;
+			// $user->email = sprintf("dev-%s@portchris.co.uk", $t);
+			// $user->username = $claims["username"] + $t;
+			// $user->password = $claims["password"] + $t;
+			// $user->lat = 0;
+			// $user->lng = 0;
+			// $user->stage = 0;
+			// $user->conversation = "";
+			// $user->save();
+			// $user = User::find($user->id);
+			// $token = JWTAuth::fromUser($user);
+			// $user = auth()->setToken($token)->user();
+			// $name = $request->username;
 			$token = JWTAuth::encode($payload);
+
 			if (!$token) {
 				$msg = __("Could not create guest record please try again");
 				$code = 500;
@@ -487,12 +516,12 @@ class UserController extends Controller
 				$msg = sprintf(__("Okay %s! Now let's begin. %s%sNote: If you ever get stuck, you can refer to the \"Helper Commands\" box - you can type any of those commands in at any point."), $claims["username"], $q->content, PHP_EOL . PHP_EOL);
 				$code = 200;
 				$name = "success";
-				$title = $token->get();
+				$title = $token;
 				$key = Messages::KEY_TYPE_QUESTION;
 				$stage = 1;
 				$type = Messages::TYPES['ContentMeta'];
 				$method = "talk";
-				session(['key' => $token->get()]);
+				session(['key' => $token]);
 			}
 		} catch (\Exception $e) {
 			$msg = __($e->getMessage());
@@ -532,7 +561,6 @@ class UserController extends Controller
 	 */
 	private function createJWTPayload($cus, $sub, $iat, $exp, $nbf, $iss, $jti = "Lucy Rogers", $aud = "")
 	{
-
 		$claims = [
 			'sub' => $sub,
 			'iat' => $iat,
@@ -542,8 +570,19 @@ class UserController extends Controller
 			'jti' => $jti,
 			'aud' => $aud
 		];
-		$claims = array_merge($claims, $cus);
-		return JWTFactory::make($claims);
+		// $claims = array_merge($claims, $cus);
+		$payload = JWTFactory::make($claims);
+		return $payload;
+	}
+
+	/**
+	 * @param int $length
+	 * @return string
+	 */
+	public static function quickRandom($length = 16)
+	{
+		$pool = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		return substr(str_shuffle(str_repeat($pool, 5)), 0, $length);
 	}
 
 	/**
