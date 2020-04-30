@@ -26,7 +26,7 @@
     "@angular/router": "^8.2.9",
     "bootstrap": "^4.0.0-alpha.6",
     "core-js": "^3.2.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "rxjs": "^6.5.3",
     "tether": "^1.4.7",
     "ts-helpers": "^1.1.2",
