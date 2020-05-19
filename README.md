@@ -46,7 +46,7 @@ APP_URL=http://api.my.domain.com/
 LOG_CHANNEL=stack
 
 DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
+DB_HOST=mysql
 DB_PORT=3306 # Internal port inside container
 DB_DATABASE=portchris
 DB_USERNAME=portchris
@@ -58,7 +58,7 @@ QUEUE_CONNECTION=sync
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
 
-REDIS_HOST=127.0.0.1
+REDIS_HOST=redis
 REDIS_PASSWORD=null
 REDIS_PORT=8379
 
@@ -178,6 +178,11 @@ server {
 ## Laravel 
 
 ### Setup
+Install dependencies
+```
+./composer.sh install
+```
+
 Create app key, store this in .env:
 ```
 ./laravel.sh key:generate
