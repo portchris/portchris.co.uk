@@ -238,7 +238,7 @@ services:
         - ENABLE_IPV6=${NGINX_ENABLE_IPV6}
       ports:
         - "${NGINX_HOST_HTTP_PORT}:${NGINX_VIRTUAL_PORT}"
-        - "${NGINX_HOST_HTTPS_PORT}:${NGINX_HOST_HTTPS_PORT}"
+        - "${NGINX_HOST_HTTPS_PORT}:${NGINX_VIRTUAL_PORT}"
       expose:
         - 80
         - 443
