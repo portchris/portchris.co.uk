@@ -15,17 +15,17 @@ use Illuminate\Http\Request;
 // header('Access-Control-Allow-Origin:*');
 // header('Access-Control-Allow-Methods:GET, POST, PUT, DELETE, OPTIONS');
 
-Route::get('/user', function(Request $request) {
+Route::get('/user', function (Request $request) {
 
 	return $request->user();
 })->middleware('auth:api');
 
-Route::group(['middleware' => ['web', 'cors']], function() {
+Route::group(['middleware' => ['web', 'cors']], function () {
 
-	Route::resource('book','BookController');
-	
+	Route::resource('book', 'BookController');
+
 	// Pages
-	Route::resource('page','PagesController');
+	Route::resource('page', 'PagesController');
 
 	// User, login, registration
 	Route::resource('user', 'UserController', [
@@ -46,7 +46,7 @@ Route::group(['middleware' => ['web', 'cors']], function() {
 	Route::post('/timezone', 'UserController@getNearestTimezone');
 
 	// Text based adventure
-	Route::resource('message','MessageStreamController', [
+	Route::resource('message', 'MessageStreamController', [
 		'except' => [
 			'create', 'edit', 'update', 'destroy'
 		]
@@ -55,3 +55,12 @@ Route::group(['middleware' => ['web', 'cors']], function() {
 	// Send enquiry form
 	Route::post('enquiry', 'SendEnquiryController');
 });
+
+
+// Toggl Integration
+Route::resource('toggl', 'TogglController');
+
+// Google Sheets Integration
+Route::resource('sheets', 'SheetsController')->only([
+    'index', 'show'
+]);

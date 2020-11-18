@@ -1,6 +1,8 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+###################
 # Laravel
+###################
 /public/hot
 /public/storage
 /storage/*.key
@@ -14,10 +16,75 @@ yarn-error.log
 .env.local
 .env.live
 .env.dev
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+/storage/credentials.json
 
+# Laravel 4 specific
+bootstrap/compiled.php
+app/storage/
+
+# Laravel 5 & Lumen specific
+public/storage
+public/hot
+
+# Laravel 5 & Lumen specific with changed public path
+public_html/storage
+public_html/hot
+
+storage/*.key
+.env
+Homestead.yaml
+Homestead.json
+/.vagrant
+.phpunit.result.cache
+
+####################
+# Angular.JS
+####################
 # compiled output
 /dist
 /tmp
+/out-tsc
+
+# dependencies
+/node_modules
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+testem.log
+/typings
+
+# e2e
+/e2e/*.js
+/e2e/*.map
+
+# System Files
+.DS_Store
+Thumbs.db
+tmp
 
 # dependencies
 /node_modules
@@ -50,8 +117,3 @@ testem.log
 # e2e
 /e2e/*.js
 /e2e/*.map
-
-# System Files
-.DS_Store
-Thumbs.db
-

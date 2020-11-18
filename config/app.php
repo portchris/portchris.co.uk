@@ -183,6 +183,7 @@ return [
          */
         Collective\Html\HtmlServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
+        PulkitJalan\Google\GoogleServiceProvider::class,
 
         /*
          * Laravel
@@ -203,7 +204,6 @@ return [
     */
 
     'aliases' => [
-
         'App' => Illuminate\Support\Facades\App::class,
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
@@ -239,7 +239,8 @@ return [
         'Html' => Collective\Html\HtmlFacade::class,
         'Form' => Collective\Html\FormFacade::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
-        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class
+        'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
+        'Google' => PulkitJalan\Google\Facades\Google::class
     ],
 
 ];

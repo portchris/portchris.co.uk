@@ -33,13 +33,19 @@ NGINX_LETSENCRYPT_TEST=true
 NGINX_ENABLE_IPV6=true
 WORKSPACE_NPM_PORT=4200
 JWT_SECRET=<MY_SECRET>
+GOOGLE_CLIENT_ID=<MY_GOOGLE_SHEETS_API_CLIENT_ID>
+GOOGLE_CLIENT_SECRET=<MY_GOOGLE_SHEETS_API_CLIENT_SECRET>
+POST_SPREADSHEET_ID=<MY_GOOGLE_SHEETS_SPREADSHEET_ID>
+GOOGLE_SERVICE_ENABLED=true
+GOOGLE_SERVICE_ACCOUNT_JSON_LOCATION=../storage/credentials.json
+
 
 ###########################################################
 ################## Laravel General Setup ##################
 ###########################################################
 APP_NAME="Chris Rogers Full-stack Web Developer"
 APP_ENV=local
-APP_KEY="MY_BASE64_KEY"
+APP_KEY=<MY_BASE64_KEY>
 APP_DEBUG=true
 APP_URL=http://api.my.domain.com/
 
@@ -68,6 +74,9 @@ MAIL_PORT=2525
 MAIL_USERNAME="BLAH"
 MAIL_PASSWORD="BLAH"
 MAIL_ENCRYPTION=null
+
+WORKSPACE_INSTALL_PYTHON=true
+WORKSPACE_INSTALL_PYTHON3=true
 
 ###########################################################
 ################## Laradock General Setup #################
