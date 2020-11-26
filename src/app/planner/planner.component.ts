@@ -35,8 +35,8 @@ export class PlannerComponent implements OnInit, OnDestroy {
 	@ViewChild('shadow', { static: false }) private shadowBox: ElementRef;
 
 	/**
- 	 * Scheduled planner for the week
- 	 * @var {Object}
+	   * Scheduled planner for the week
+	   * @var {Object}
 	 */
 	resourcePlanner: Planner;
 
@@ -112,18 +112,11 @@ export class PlannerComponent implements OnInit, OnDestroy {
 		if (plans.data != null && plans.success) {
 			this.resourcePlanner = new Planner();
 			for (let i in this.days) {
-				if (plans.data[this.days[i]] != null) {
-					let plan = [];
-					for (let x = 1; x < plans.data[this.days[i]].length; x++) {
-						if (x % 2 === 0) {
-							plan.push(plans.data[this.days[i]][x-1] + " " + plans.data[this.days[i]][x-2]);
-						}
-					}
-					console.log(plan);
+				if (this.days[i] in plans.data && plans.data[this.days[i]] != null) {
 					this.resourcePlanner[this.days[i]] = {
 						name: this.days[i],
 						active: (this.today === this.days[i]) ? true : false,
-						plans: plan.join(", ")
+						plans: plans.data[this.days[i]]
 					};
 				}
 			}
