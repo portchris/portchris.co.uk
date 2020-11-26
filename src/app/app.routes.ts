@@ -7,6 +7,7 @@ import { PageNotFoundComponent } from './html/page-not-found/page-not-found.comp
 import { PortfolioComponent } from './html/portfolio/portfolio.component';
 import { ColumnLayoutComponent } from './html/column-layout.component';
 import { ImportStoryComponent } from './import/import.story.component';
+import { ResourcePlannerComponent } from './html/resource-planner/resource-planner.component';
 
 const Router: Routes = [
 	{
@@ -37,6 +38,10 @@ const Router: Routes = [
 			{
 				path: "contact",
 				component: ContactComponent
+			},
+			{
+				path: "resource-planner",
+				component: ResourcePlannerComponent
 			},
 			{
 				path: "import/:id",

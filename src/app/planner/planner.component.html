@@ -1,0 +1,40 @@
+<!-- <div class="row" *ngIf="err || success">
+	<div @popInOutAnimation class="col-md-12 notification">
+		<div class="alert alert-danger" *ngIf="err">
+			{{ err }}
+		</div>
+		<div class="alert alert-success" *ngIf="success">
+			{{ success }}
+		</div>
+	</div>
+</div> -->
+<div id="resource-planner" class="" *ngIf="success">
+	<div class="monday">
+		<h3>{{ resourcePlanner.Monday.name }}</h3>
+		<p>{{ resourcePlanner.Monday.plans }}</p>
+	</div>
+	<div class="day tuesday">
+		<h3>{{ resourcePlanner.Tuesday.name }}</h3>
+		<p>{{ resourcePlanner.Tuesday.plans }}</p>
+	</div>
+	<div class="day wednesday">
+		<h3>{{ resourcePlanner.Wednesday.name }}</h3>
+		<p>{{ resourcePlanner.Wednesday.plans }}</p>
+	</div>
+	<div class="day thursday">
+		<h3>{{ resourcePlanner.Thursday.name }}</h3>
+		<p>{{ resourcePlanner.Thursday.plans }}</p>
+	</div>
+	<div class="day friday">
+		<h3>{{ resourcePlanner.Friday.name }}</h3>
+		<p>{{ resourcePlanner.Friday.plans }}</p>
+	</div>
+	<div class="day saturday">
+		<h3>{{ resourcePlanner.Saturday.name }}</h3>
+		<p>{{ resourcePlanner.Saturday.plans }}</p>
+	</div>
+	<div class="day sunday">
+		<h3>{{ resourcePlanner.Sunday.name }}</h3>
+		<p>{{ resourcePlanner.Sunday.plans }}</p>
+	</div>
+</div>

@@ -23,6 +23,9 @@ import { PortfolioComponent } from './html/portfolio/portfolio.component';
 import { ImportStoryComponent } from './import/import.story.component';
 import { ImportStoryService } from './import/import.story.service';
 import { WeatherService } from './html/sidebar/weather.service';
+import { ResourcePlannerComponent } from './html/resource-planner/resource-planner.component';
+import { PlannerComponent } from './planner/planner.component';
+import { PlannerService } from './planner/planner.service';
 
 @NgModule({
 	declarations: [
@@ -37,7 +40,9 @@ import { WeatherService } from './html/sidebar/weather.service';
 		ContactComponent,
 		PageNotFoundComponent,
 		PortfolioComponent,
-		ImportStoryComponent
+		ImportStoryComponent,
+		ResourcePlannerComponent,
+		PlannerComponent
 	],
 	imports: [
 		BrowserModule,
@@ -53,7 +58,8 @@ import { WeatherService } from './html/sidebar/weather.service';
 		DataStorageService,
 		WeatherService,
 		ContactService,
-		ImportStoryService
+		ImportStoryService,
+		PlannerService
 	],
 	bootstrap: [
 		AppComponent
@@ -69,7 +75,7 @@ export class AppModule {
 	constructor() {
 
 		// I'm sorry I had to do it!
-		this.url = (isDevMode) ? "http://api.portchris.portchris.co.uk/" : "https://api.portchris.co.uk/";
+		this.url = (isDevMode) ? "http://api.portchris.localhost/" : "https://api.portchris.co.uk/";
 	}
 
 	ngOnInit() {

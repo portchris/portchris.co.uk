@@ -239,9 +239,9 @@ First you have to install [angular-cli](https://github.com/angular/angular-cli).
 ```
 ./npm.sh install
 ```
-- After `npm install` again run this command to install `bootstrap, tether and jquery`
+- (Optional) After `npm install` again run this command to install `bootstrap, tether and jquery`
 ```
-./npm.sh install bootstrap@next
+./npm.sh install --no-save bootstrap@next
 ```
 - Download [laravel-api](https://github.com/eliyas5044/laravel-api), which I've used as a RESTful api.
 - Run your `angular` app by this command
