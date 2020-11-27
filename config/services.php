@@ -35,4 +35,9 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'toggl' => [
+        'workspace' => env('TOGGL_WORKSPACE'),
+        'token' => env('TOGGL_TOKEN'),
+    ],
+
 ];

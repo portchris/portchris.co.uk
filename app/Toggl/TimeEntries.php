@@ -3,26 +3,35 @@
 namespace App\Toggl;
 
 use Illuminate\Http\Request;
+use App\Toggl\JiraHelper;
+use App\Http\Controllers\TogglController;
 
 class TimeEntries
 {
-    /** @var  ApiHelper */
+    /** 
+     * @var  ApiHelper 
+     */
     protected $oApiHelper;
 
-    /** @var  \App\Toggl\JiraHelper  */
+    /** 
+     * @var  JiraHelper  
+     */
     protected $oJiraHelper;
 
-    /** @var  Request */
+    /** 
+     * @var  Request 
+     */
     protected $oRequest;
 
-    /** @var \App\Http\Controllers\TogglController */
+    /** 
+     * @var TogglController 
+     */
     protected $oTogglController;
 
-    public function setTogglController(\App\Http\Controllers\TogglController $oToggleController)
-    {
-        $this->oTogglController = $oToggleController;
-    }
-
+    /**
+     * @param ApiHelper $oHelper
+     * @param Request $oRequest
+     */
     public function __construct(
         ApiHelper $oHelper,
         Request $oRequest
@@ -31,6 +40,19 @@ class TimeEntries
         $this->oRequest = $oRequest;
     }
 
+    /**
+     * @param TogglController $oTogglController
+     */
+    public function setTogglController(
+        TogglController $oTogglController
+    ) {
+        $this->oTogglController = $oTogglController;
+    }
+
+    /**
+     * @param string $vTicket
+     * @return bool
+     */
     public function isTicket($vTicket)
     {
         return ((strpos($vTicket, '#') === 0
@@ -38,6 +60,9 @@ class TimeEntries
             || strpos($vTicket, '-')));
     }
 
+    /**
+     * @return string|bool
+     */
     public function getStartDate()
     {
         static $vStartDate;
@@ -67,6 +92,9 @@ class TimeEntries
         return $vStartDate;
     }
 
+    /**
+     * @return string|bool
+     */
     public function getEndDate()
     {
         static $vEndDate;
@@ -92,6 +120,12 @@ class TimeEntries
         return $vEndDate;
     }
 
+    /**
+     * @param string $vStartDate, 
+     * @param string $vEndDate
+     * @param bool $bDisableCache
+     * @return array
+     */
     public function getTimeEntries($vStartDate, $vEndDate, $bDisableCache)
     {
         $bCacheStatus = $this->oApiHelper->getCacheStatus();
@@ -105,53 +139,60 @@ class TimeEntries
         return $aTimeEntries;
     }
 
-    // public function fixColon($aTimeEntries)
-    // {
-    //     $aMissingTicket = [];
-    //     $aMissingColon = [];
-    //     $timeAgo = new \Westsworld\TimeAgo();
-    //     foreach ($aTimeEntries as $aEntry) {
-    //         $vDescription = $aEntry['description'];
-    //         $aParts = explode(" ", $vDescription);
-    //         $vTicketNumber = $aParts[0];
-    //         $vDate = $aEntry['start'];
-    //         $iDiff = time() - strtotime($vDate);
-    //         $fDays = $iDiff / (24 * 60 * 60);
-    //         $vWeekDay = date('D', strtotime($vDate));
-    //         if ($fDays > 6) {
-    //             $vAgo =  $timeAgo->inWords($vDate);
-    //             $vDate = "$vWeekDay $vAgo";
-    //         }
-    //         //no ticket number yet
-    //         if (!strpos($vTicketNumber, '-')) {
-    //             $aMissingTicket[] = $vDescription  . ' > ' . $vDate;
-    //             continue;
-    //         }
-    //         if (!strpos($vTicketNumber, ':')) {
-    //             $aMissingColon[] = $vDescription . ' > ' . $vDate;
-    //             $aParts[0] = $vTicketNumber . ':';
-    //             $aUpdatedTask = $aEntry;
+    /**
+     * @param array $aTimeEntries
+     */
+    public function fixColon($aTimeEntries)
+    {
+        $aMissingTicket = [];
+        $aMissingColon = [];
+        $timeAgo = new \Westsworld\TimeAgo();
+        foreach ($aTimeEntries as $aEntry) {
+            $vDescription = $aEntry['description'];
+            $aParts = explode(" ", $vDescription);
+            $vTicketNumber = $aParts[0];
+            $vDate = $aEntry['start'];
+            $iDiff = time() - strtotime($vDate);
+            $fDays = $iDiff / (24 * 60 * 60);
+            $vWeekDay = date('D', strtotime($vDate));
+            if ($fDays > 6) {
+                $vAgo =  $timeAgo->inWords($vDate);
+                $vDate = "$vWeekDay $vAgo";
+            }
 
-    //             $aUpdatedTask['description'] = implode(' ', $aParts);
-    //             //                $this->oApiHelper->updateEntry($aUpdatedTask);
-    //         }
-    //     }
-    //     if (!function_exists('d')) {
-    //         function d($var)
-    //         {
-    //             var_dump($var);
-    //         }
-    //     }
-    //     $aMissingColon ? !d($aMissingColon) : !d('no missing colon');
-    //     $aMissingColon = $aMissingColon ?: 'no missing colon';
-    //     $aMissingTicket = $aMissingTicket ?: 'no missing ticket number';
-    //     !d($aMissingTicket);
-    //     !d($aMissingColon);
-    //     //        $this->oApiHelper->setCacheEnable(false);
-    //     //        $this->getTimeEntries();
-    //     //        $this->oApiHelper->setCacheEnable(true);
-    // }
+            // No ticket number yet
+            if (!strpos($vTicketNumber, '-')) {
+                $aMissingTicket[] = $vDescription  . ' > ' . $vDate;
+                continue;
+            }
+            if (!strpos($vTicketNumber, ':')) {
+                $aMissingColon[] = $vDescription . ' > ' . $vDate;
+                $aParts[0] = $vTicketNumber . ':';
+                $aUpdatedTask = $aEntry;
 
+                $aUpdatedTask['description'] = implode(' ', $aParts);
+                //      $this->oApiHelper->updateEntry($aUpdatedTask);
+            }
+        }
+        if (!function_exists('d')) {
+            function d($var)
+            {
+                var_dump($var);
+            }
+        }
+        $aMissingColon ? !d($aMissingColon) : !d('no missing colon');
+        $aMissingColon = $aMissingColon ?: 'no missing colon';
+        $aMissingTicket = $aMissingTicket ?: 'no missing ticket number';
+        !d($aMissingTicket);
+        !d($aMissingColon);
+        //        $this->oApiHelper->setCacheEnable(false);
+        //        $this->getTimeEntries();
+        //        $this->oApiHelper->setCacheEnable(true);
+    }
+
+    /**
+     * @return array
+     */
     public function getEntriesByProject()
     {
         $aTimeEntries = $this->oApiHelper->getTimeEntries($this->getStartDate(), $this->getEndDate());
@@ -204,11 +245,17 @@ class TimeEntries
         return $aReturn;
     }
 
+    /**
+     * @return array
+     */
     public function getProjects()
     {
         return $this->oApiHelper->getProjects();
     }
 
+    /**
+     * @return JiraHelper
+     */
     protected function getJiraHelper()
     {
         if (!$this->oJiraHelper) {
@@ -217,6 +264,10 @@ class TimeEntries
         return $this->oJiraHelper;
     }
 
+    /**
+     * @param array $aEntries
+     * @return array $aReturn
+     */
     protected function mergeNonProjects($aEntries)
     {
         $aReturn = ['misc' => []];
@@ -239,7 +290,8 @@ class TimeEntries
                 }
             }
         }
-        //put misc at the end
+
+        // Put misc at the end
         if (isset($aReturn['misc'])) {
             $aMisc = $aReturn['misc'];
             unset($aReturn['misc']);
@@ -248,30 +300,37 @@ class TimeEntries
         return $aReturn;
     }
 
+    /**
+     * @param string $vDescription
+     * @return array $aMeta
+     */
     protected function getMetaInfo($vDescription)
     {
         $aMeta = [];
         $aParts = explode(' ', $vDescription);
         $aParts = array_map('trim', $aParts);
         $aParts = array_filter($aParts);
-        //re-index keys
+
+        // Re-index keys
         $aKeys = range(0, count($aParts) - 1);
         $aParts = array_combine($aKeys, $aParts);
         $aMeta['ticket'] = $aMeta['project'] = strtolower($aParts[0]) ?: 'no_project';
         if (count($aParts) > 2) {
             array_splice($aParts, 2);
         }
-        //remove # from ticket number
+        // Remove # from ticket number
         foreach ($aParts as $vPart) {
             if ($this->isTicket($vPart)) {
                 $aMeta['ticket'] = $vPart;
                 break;
             }
         }
+
         $vDescription = trim($vDescription);
         $vProject = trim($aMeta['project']);
         if ($vProject) {
-            //remove project prefix from ticket description
+
+            // Remove project prefix from ticket description
             if (stripos($vDescription, $vProject) === 0) {
                 $aMeta['jira_entry'] = trim(substr($vDescription, strlen($vProject)));
             }
@@ -279,11 +338,20 @@ class TimeEntries
         return $aMeta;
     }
 
+    /**
+     * @param float $fSeconds
+     * @return float
+     */
     protected function secondsToHours($fSeconds)
     {
         return round($fSeconds / 60 / 60, 2);
     }
 
+    /**
+     * @param float $fHours
+     * @param bool $bPadding
+     * @return string
+     */
     public function getJiraTime($fHours, $bPadding)
     {
         $iHour = floor($fHours);

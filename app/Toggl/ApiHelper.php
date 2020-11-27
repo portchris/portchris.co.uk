@@ -2,31 +2,39 @@
 
 namespace App\Toggl;
 
+use Illuminate\Http\Request;
 use App\Toggl\ClientProxy;
-use Illuminate\Support\Facades\Cache;
+use Ixudra\Toggl\TogglService;
 
 class ApiHelper
 {
     /** @var string */
     protected $key;
 
+    /** @var bool */
     protected $bEnableCache;
 
     /** @var  ClientProxy */
     protected $oClientProxy;
 
-    /** @var \Illuminate\Http\Request */
+    /** @var Request */
     protected $oRequest;
 
-    public function __construct(ClientProxy $oClientProxy, $vTogglApiKey)
-    {
+    /**
+     * @param ClientProxy $oClientProxy
+     * @param string $vTogglApiKey
+     */
+    public function __construct(
+        ClientProxy $oClientProxy,
+        $vTogglApiKey
+    ) {
         $this->key = $vTogglApiKey;
         $this->oClientProxy = $oClientProxy;
     }
 
     public function resetClient()
     {
-        $this->oClient = new \MorningTrain\TogglApi\TogglApi($this->key);
+        $this->oClient = new TogglService(null, $this->key);
     }
 
     public function getProjects()
@@ -35,6 +43,10 @@ class ApiHelper
         return $aProjects;
     }
 
+    /**
+     * @param string $vStartDate
+     * @param string $vEndDate
+     */
     public function getTimeEntries($vStartDate, $vEndDate)
     {
         $aParam = [];

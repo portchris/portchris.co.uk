@@ -2,26 +2,54 @@
 
 namespace App\Http\Controllers;
 
-use App\Toggl;
+use App\Toggl\Toggl;
+use App\Toggl\ClientProxy;
+use App\Toggl\ToolHelper;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 
 class TogglController extends Controller
 {
     /**
+     * @var ClientProxy
+     */
+    protected $clientProxy;
+
+    /**
+     * @var ToolHelper
+     */
+    protected $toolHelper;
+
+    /**
+     * @var Toggl
+     */
+    protected $toggl;
+
+    /**
      * Display a listing of the resource.
-     *
+     * 
+     * @param Request $request
      * @return JsonResponse
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        return response()->json(Toggl::timer());
+        $this->toolHelper = new ToolHelper($request);
+        $this->clientProxy = new ClientProxy($request, $this->toolHelper);
+        $this->toggl = new Toggl($this->clientProxy);
+        return response()->json(
+            $this->toggl->getTimeEntries(
+                date("r", strtotime('last week')),
+                date('r')
+            )
+        );
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Request $request
+     * @return Response
      */
     public function create()
     {
@@ -31,8 +59,8 @@ class TogglController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(Request $request)
     {
@@ -43,9 +71,9 @@ class TogglController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Toggl  $toggl
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
-    public function show(Toggl $toggl)
+    public function show(Request $request)
     {
         //
     }
@@ -53,10 +81,10 @@ class TogglController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  \App\Toggl  $toggl
-     * @return \Illuminate\Http\Response
+     * @param  Request $request
+     * @return Response
      */
-    public function edit(Toggl $toggl)
+    public function edit(Request $request)
     {
         //
     }
@@ -64,11 +92,10 @@ class TogglController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Toggl  $toggl
-     * @return \Illuminate\Http\Response
+     * @param  Request $request
+     * @return Response
      */
-    public function update(Request $request, Toggl $toggl)
+    public function update(Request $request)
     {
         //
     }
@@ -76,10 +103,10 @@ class TogglController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  \App\Toggl  $toggl
-     * @return \Illuminate\Http\Response
+     * @param  Request $request
+     * @return Response
      */
-    public function destroy(Toggl $toggl)
+    public function destroy(Request $request)
     {
         //
     }

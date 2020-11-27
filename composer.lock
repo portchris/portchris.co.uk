@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a4a2a6262c8a5eea92d4f742b795b61c",
+    "content-hash": "d46ab283d8910e28da31800f2876d863",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -915,6 +915,126 @@
             "time": "2020-09-30T07:37:11+00:00"
         },
         {
+            "name": "ixudra/curl",
+            "version": "6.21.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ixudra/curl.git",
+                "reference": "796bd307ca35c66a3f6a47b559f8ccad9f06e93f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ixudra/curl/zipball/796bd307ca35c66a3f6a47b559f8ccad9f06e93f",
+                "reference": "796bd307ca35c66a3f6a47b559f8ccad9f06e93f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "illuminate/support": ">=4.0",
+                "php": ">=5.4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ixudra\\Curl\\CurlServiceProvider"
+                    ],
+                    "aliases": {
+                        "Curl": "Ixudra\\Curl\\Facades\\Curl"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ixudra\\Curl\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Oris",
+                    "email": "jan.oris@ixudra.be"
+                }
+            ],
+            "description": "Custom PHP Curl library for the Laravel framework - developed by Ixudra",
+            "homepage": "http://ixudra.be",
+            "keywords": [
+                "Ixudra",
+                "curl",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/ixudra/curl/issues",
+                "source": "https://github.com/ixudra/curl/tree/6.21.0"
+            },
+            "time": "2020-09-22T12:50:01+00:00"
+        },
+        {
+            "name": "ixudra/toggl",
+            "version": "0.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ixudra/toggl.git",
+                "reference": "d633a22765c326bed21d26f1cc88add7814a815f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ixudra/toggl/zipball/d633a22765c326bed21d26f1cc88add7814a815f",
+                "reference": "d633a22765c326bed21d26f1cc88add7814a815f",
+                "shasum": ""
+            },
+            "require": {
+                "ixudra/curl": "~6.0",
+                "nesbot/carbon": ">=1.19",
+                "php": ">=5.6.0"
+            },
+            "suggest": {
+                "illuminate/support": "Support for laravel using the TogglServiceProvider"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Ixudra\\Toggl\\TogglServiceProvider"
+                    ],
+                    "aliases": {
+                        "Toggl": "Ixudra\\Toggl\\Facades\\Toggl"
+                    }
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Ixudra\\Toggl\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Oris",
+                    "email": "jan.oris@gmail.com"
+                }
+            ],
+            "description": "Custom PHP library to connect with the Toggl API - developed by Ixudra",
+            "homepage": "https://ixudra.be",
+            "keywords": [
+                "Ixudra",
+                "api",
+                "laravel",
+                "toggl"
+            ],
+            "support": {
+                "issues": "https://github.com/ixudra/toggl/issues",
+                "source": "https://github.com/ixudra/toggl/tree/0.12.0"
+            },
+            "time": "2020-10-11T07:34:34+00:00"
+        },
+        {
             "name": "jakub-onderka/php-console-color",
             "version": "v0.2",
             "source": {
@@ -1003,6 +1123,58 @@
             "description": "Highlight PHP code in terminal",
             "abandoned": "php-parallel-lint/php-console-highlighter",
             "time": "2018-09-29T18:48:56+00:00"
+        },
+        {
+            "name": "jimmiw/php-time-ago",
+            "version": "3.2.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jimmiw/php-time-ago.git",
+                "reference": "d1f083c3945fd454384aa751f270e6fcde1a1368"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jimmiw/php-time-ago/zipball/d1f083c3945fd454384aa751f270e6fcde1a1368",
+                "reference": "d1f083c3945fd454384aa751f270e6fcde1a1368",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "require-dev": {
+                "phpmd/phpmd": "@stable",
+                "phpunit/phpunit": "^6",
+                "squizlabs/php_codesniffer": "^3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Westsworld\\": "src/Westsworld/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jimmi Westerberg",
+                    "homepage": "http://www.westsworld.dk",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Simple module, that displays the date in a \"time ago\" format",
+            "homepage": "https://github.com/jimmiw/php-time-ago",
+            "keywords": [
+                "distance of time",
+                "time ago",
+                "time ago in words"
+            ],
+            "support": {
+                "issues": "https://github.com/jimmiw/php-time-ago/issues",
+                "source": "https://github.com/jimmiw/php-time-ago/tree/3.2.1"
+            },
+            "time": "2020-10-20T21:58:10+00:00"
         },
         {
             "name": "laravel/framework",
@@ -1678,58 +1850,6 @@
             "time": "2020-07-23T08:41:23+00:00"
         },
         {
-            "name": "morningtrain/toggl-api",
-            "version": "v1.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Morning-Train/toggl-api.git",
-                "reference": "231f9bdb7637652e447829bdee694f205b4b106c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Morning-Train/toggl-api/zipball/231f9bdb7637652e447829bdee694f205b4b106c",
-                "reference": "231f9bdb7637652e447829bdee694f205b4b106c",
-                "shasum": ""
-            },
-            "require": {
-                "guzzlehttp/guzzle": "^6.3"
-            },
-            "require-dev": {
-                "escapestudios/symfony2-coding-standard": "2.*",
-                "squizlabs/php_codesniffer": "2.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "MorningTrain\\TogglApi\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "GNU General Public License v3.0"
-            ],
-            "authors": [
-                {
-                    "name": "Bjarne Bonde",
-                    "email": "bb@morningtain.dk",
-                    "homepage": "http://morningtrain.dk/",
-                    "role": "Developer"
-                }
-            ],
-            "description": "A complete native php wrapper for the Toggl API",
-            "homepage": "http://morningtrain.dk/",
-            "keywords": [
-                "api",
-                "php",
-                "toggl"
-            ],
-            "support": {
-                "issues": "https://github.com/Morning-Train/toggl-api/issues",
-                "source": "https://github.com/Morning-Train/toggl-api/tree/v1.0.4"
-            },
-            "time": "2019-03-04T07:37:07+00:00"
-        },
-        {
             "name": "namshi/cuzzle",
             "version": "2.0.3",
             "source": {
@@ -2091,6 +2211,11 @@
                 "pseudorandom",
                 "random"
             ],
+            "support": {
+                "email": "info@paragonie.com",
+                "issues": "https://github.com/paragonie/random_compat/issues",
+                "source": "https://github.com/paragonie/random_compat"
+            },
             "time": "2018-07-02T15:55:56+00:00"
         },
         {
@@ -3934,6 +4059,9 @@
                 "portable",
                 "shim"
             ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-intl-idn/tree/v1.20.0"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -4015,6 +4143,9 @@
                 "portable",
                 "shim"
             ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-intl-normalizer/tree/v1.20.0"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -4092,6 +4223,9 @@
                 "portable",
                 "shim"
             ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-mbstring/tree/v1.20.0"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",
@@ -4230,6 +4364,9 @@
                 "portable",
                 "shim"
             ],
+            "support": {
+                "source": "https://github.com/symfony/polyfill-php72/tree/v1.20.0"
+            },
             "funding": [
                 {
                     "url": "https://symfony.com/sponsor",

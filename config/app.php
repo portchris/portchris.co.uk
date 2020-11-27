@@ -184,6 +184,7 @@ return [
         Collective\Html\HtmlServiceProvider::class,
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         PulkitJalan\Google\GoogleServiceProvider::class,
+        Ixudra\Toggl\TogglServiceProvider::class,
 
         /*
          * Laravel
@@ -240,7 +241,8 @@ return [
         'Form' => Collective\Html\FormFacade::class,
         'JWTAuth' => Tymon\JWTAuth\Facades\JWTAuth::class,
         'JWTFactory' => Tymon\JWTAuth\Facades\JWTFactory::class,
-        'Google' => PulkitJalan\Google\Facades\Google::class
+        'Google' => PulkitJalan\Google\Facades\Google::class,
+        'Toggl' => Ixudra\Toggl\Facades\Toggl::class
     ],
 
 ];
