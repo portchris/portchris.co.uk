@@ -18,7 +18,7 @@ export class PageNotFoundComponent implements OnInit, OnChanges, OnDestroy {
 	/**
 	* Refernce to a child canvas element
 	*/
-	@ViewChild('canvas', { static: false }) private canvas: ElementRef;
+	@ViewChild('canvas') private canvas: ElementRef;
 
 	router: any;
 	sub: any;

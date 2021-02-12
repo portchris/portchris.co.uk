@@ -19,9 +19,9 @@ export class SidebarComponent implements OnInit, OnChanges {
 	/**
 	* Refernce to a child element
 	*/
-	@ViewChild('weatherPanel', { static: false }) private weatherPanel: ElementRef;
-	@ViewChild('helpPanel', { static: false }) private helpPanel: ElementRef;
-	@ViewChild('cvPanel', { static: false }) private cvPanel: ElementRef;
+	@ViewChild('weatherPanel') private weatherPanel: ElementRef;
+	@ViewChild('helpPanel') private helpPanel: ElementRef;
+	@ViewChild('cvPanel') private cvPanel: ElementRef;
 
 	router: any;
 	sub: any;

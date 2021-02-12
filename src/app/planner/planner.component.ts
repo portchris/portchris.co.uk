@@ -32,7 +32,7 @@ export class PlannerComponent implements OnInit, OnDestroy {
 	/**
 	 * Refernce to a child element
 	 */
-	@ViewChild('shadow', { static: false }) private shadowBox: ElementRef;
+	@ViewChild('shadow') private shadowBox: ElementRef;
 
 	/**
 	   * Scheduled planner for the week

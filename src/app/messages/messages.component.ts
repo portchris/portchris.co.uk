@@ -120,10 +120,10 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 	/**
 	* Refernce to a child element
 	*/
-	@ViewChild('scrollable', { static: false }) private scrollContainer: ElementRef;
-	@ViewChild('searchFauxInput', { static: false }) private searchFauxInput: ElementRef;
-	@ViewChild('searchBox', { static: false }) private searchBox: ElementRef;
-	@ViewChild('shadow', { static: false }) private shadowBox: ElementRef;
+	@ViewChild('scrollable') private scrollContainer: ElementRef;
+	@ViewChild('searchFauxInput') private searchFauxInput: ElementRef;
+	@ViewChild('searchBox') private searchBox: ElementRef;
+	@ViewChild('shadow') private shadowBox: ElementRef;
 
 	/**
 	* Message stream

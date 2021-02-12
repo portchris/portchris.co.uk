@@ -15,7 +15,7 @@ import { slideInOutAnimation } from '../../animations/slideinout.animation';
 })
 export class ResourcePlannerComponent implements AfterViewInit, OnChanges, OnDestroy {
 
-    @ViewChild("googleSheetsComponent", { static: false }) planner: Planner;
+    @ViewChild("googleSheetsComponent") planner: Planner;
 
     storage: any;
     router: any;

@@ -16,7 +16,7 @@ import { slideInOutAnimation } from '../../animations/slideinout.animation';
 })
 export class HomeComponent implements AfterViewInit, OnChanges, OnDestroy {
 
-	@ViewChild("childComponent", { static: false }) messages: MessagesComponent;
+	@ViewChild("childComponent") messages: MessagesComponent;
 
 	storage: any;
 	router: any;
