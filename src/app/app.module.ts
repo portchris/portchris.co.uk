@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Directive } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Http, HttpModule, JsonpModule } from '@angular/http';
 import { RouterModule } from '@angular/router';
@@ -27,6 +27,7 @@ import { ResourcePlannerComponent } from './html/resource-planner/resource-plann
 import { PlannerComponent } from './planner/planner.component';
 import { PlannerService } from './planner/planner.service';
 
+@Directive()
 @NgModule({
 	declarations: [
 		AppComponent,
