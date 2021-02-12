@@ -7,7 +7,7 @@
 * tslint:disable:no-unused-variable 
 */
 
-import { TestBed, async, inject } from '@angular/core/testing';
+import { TestBed, inject, waitForAsync } from '@angular/core/testing';
 import { MessagesService } from './messages.service';
 
 describe('MessagesService', () => {
