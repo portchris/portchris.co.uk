@@ -181,27 +181,27 @@ As you walk upstairs, you notice the sudden drop in temperature. Photos of emplo
 													*label backend
 													"Well I am currently marketing myself as a full stack developer, part of the reason I do this because I like back and front-end equally."
 													*choice
-													#Ask: Okay then, what about back-end do you like specifically?	
-														"Specifically I have knowledge in: many frameworks/platforms, HTTP Request methods with a decent understanding of the security around it, PHP5 + 7 languages, doing semi-complex logical calculations using the MVC, MVVM, MVW Object Oriented & CRUD methodologies/patterns, Relational and Non-Relational Database Management Systems including semi-complex SQL querying, sessions, cookies, creating RESTful APIs with authentication such as JSON Web Tokens (JWT), webserver configuration with both Apache and Nginx, version control and aspects of testing using PHPUnit.
-														*choice
-															#Say: There must be areas in back-end you are not so competent in.
-																"Oh of course ${name}, I'd be lying if I said I was a master. The more you learn the more you realise you don't know. There are areas which I am still exploring such as: event-driven asynchronous multi-threaded server-side development, enhancing our unit testing/end-to-end/automated testing skills, continuous integration, big data management, enhancing my non-relational database knowledge and of course the security around all of this".
-																*choice
-																	#State: Are there areas that you dislike?
-																		"Yeah of course ${name}, web development is so vast that you cannot cover all tools, platforms etc, don't even ask me about Microsoft IIS! I'm also not the greatest fan of the various types of caches"	
-																		*choice
-																			#Ask: What's wrong with Microsoft IIS?
-																				"It's not that I dislike it so much, but I have little experience in it"
-																				*finish
-																			#Ask: What's wrong with caching?
-																				"I understand it reduces overall network traffic and latency, but just the sheer number of caches available for web and the overuse of them makes debugging a pain sometimes. Take Magento 2 for example, Application Cache spread over: Layout, Configuration, Output, DDL, Config, Reflection, Translations, Integrations, Web services, Notifications and then on top of that you have FPC such as Varnish, Script caching such as Opcache, DNS, Browser, Proxy, Gateway, Distributed for DBs and CDNs... Caching man!"
-																				*finish
-															#Ask: Very nice, how about your front-end skills?
-																"Of course ${name}"
-																*goto frontend
-															#Ask: Very nice how about your sys-admin skills?
-																"Of course ${name}"
-																*goto sysadmin
+														#Ask: Okay then, what about back-end do you like specifically?	
+															"Specifically I have knowledge in: many frameworks/platforms, HTTP Request methods with a decent understanding of the security around it, PHP 7 + 8 languages, doing semi-complex logical calculations using the MVC, MVVM, MVW Object Oriented & CRUD methodologies/patterns, Relational and Non-Relational Database Management Systems including semi-complex SQL querying, sessions, cookies, creating RESTful APIs with authentication such as JSON Web Tokens (JWT), webserver configuration with both Apache and Nginx, version control and aspects of testing using PHPUnit.
+															*choice
+																#Say: There must be areas in back-end you are not so competent in.
+																	"Oh of course ${name}, I'd be lying if I said I was a master. The more you learn the more you realise you don't know. There are areas which I am still exploring such as: event-driven asynchronous multi-threaded server-side development, enhancing our unit testing/end-to-end/automated testing skills, continuous integration, big data management, enhancing my non-relational database knowledge and of course the security around all of this".
+																	*choice
+																		#State: Are there areas that you dislike?
+																			"Yeah of course ${name}, web development is so vast that you cannot cover all tools, platforms etc, don't even ask me about Microsoft IIS! I'm also not the greatest fan of the various types of caches"	
+																			*choice
+																				#Ask: What's wrong with Microsoft IIS?
+																					"It's not that I dislike it so much, but I have little experience in it"
+																					*finish
+																				#Ask: What's wrong with caching?
+																					"I understand it reduces overall network traffic and latency, but just the sheer number of caches available for web and the overuse of them makes debugging a pain sometimes. Take Magento 2 for example, Application Cache spread over: Layout, Configuration, Output, DDL, Config, Reflection, Translations, Integrations, Web services, Notifications and then on top of that you have FPC such as Varnish, Script caching such as Opcache, DNS, Browser, Proxy, Gateway, Distributed for DBs and CDNs... Caching man!"
+																					*finish
+																#Ask: Very nice, how about your front-end skills?
+																	"Of course ${name}"
+																	*goto frontend
+																#Ask: Very nice how about your sys-admin skills?
+																	"Of course ${name}"
+																	*goto sysadmin
 											#Ask: Model-View-Whatever?
 												"Something coined by Angular JS to be honest. It's basically the ability to support multiple paradigms of your  choice".
 												*choice

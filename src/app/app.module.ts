@@ -27,7 +27,7 @@ import { ResourcePlannerComponent } from './html/resource-planner/resource-plann
 import { PlannerComponent } from './planner/planner.component';
 import { PlannerService } from './planner/planner.service';
 
-@Directive()
+// @Directive()
 @NgModule({
 	declarations: [
 		AppComponent,
@@ -46,6 +46,7 @@ import { PlannerService } from './planner/planner.service';
 		PlannerComponent
 	],
 	imports: [
+		RouterModule,
 		BrowserModule,
 		ReactiveFormsModule,
 		FormsModule,
@@ -53,6 +54,21 @@ import { PlannerService } from './planner/planner.service';
 		JsonpModule,
 		AppRoutingModule,
 		BrowserAnimationsModule
+	],
+	exports: [
+	  MessagesComponent,
+	  UserComponent,
+	  ParticlesComponent,
+	  HeaderComponent,
+	  SidebarComponent,
+	  HomeComponent,
+	  ColumnLayoutComponent,
+	  ContactComponent,
+	  PageNotFoundComponent,
+	  PortfolioComponent,
+	  ImportStoryComponent,
+	  ResourcePlannerComponent,
+	  PlannerComponent
 	],
 	providers: [
 		MessagesService,
@@ -69,10 +85,10 @@ import { PlannerService } from './planner/planner.service';
 		CUSTOM_ELEMENTS_SCHEMA
 	]
 })
-export class AppModule { 
-	
+export class AppModule {
+
 	url: string;
-	
+
 	constructor() {
 
 		// I'm sorry I had to do it!

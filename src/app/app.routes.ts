@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { ModuleWithProviders } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
+import { BrowserModule } from '@angular/platform-browser';
+import { FormsModule } from '@angular/forms';
 import { HomeComponent } from './html/home/home.component';
 import { ContactComponent } from './html/contact/contact.component';
 import { PageNotFoundComponent } from './html/page-not-found/page-not-found.component';
@@ -47,16 +49,22 @@ const Router: Routes = [
 				path: "import/:id",
 				component: ImportStoryComponent
 			},
-			{ 
-				path: '**', 
+			{
+				path: '**',
 				component: PageNotFoundComponent
 			}
 		]
 	}
 ];
-const AppRoutes: ModuleWithProviders = RouterModule.forRoot(Router, { relativeLinkResolution: 'legacy' });
+// const AppRoutes: ModuleWithProviders = RouterModule.forRoot(Router, { relativeLinkResolution: 'legacy' });
 @NgModule({
-  imports: [ AppRoutes ],
-  exports: [ RouterModule ]
+	imports: [
+		BrowserModule,
+		RouterModule.forRoot(Router),
+		FormsModule
+	],
+	exports: [
+		RouterModule
+	]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
