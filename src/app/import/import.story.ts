@@ -6,4 +6,10 @@
 
 export class ImportStory {
 	
+    public info: string;
+
+    public constructor(data: any) {
+        
+        this.info = data;
+    }
 }

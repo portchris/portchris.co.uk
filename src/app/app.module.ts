@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA, Directive } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Http, HttpModule, JsonpModule } from '@angular/http';
+import { HttpClientModule, HttpClientJsonpModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { isDevMode } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -50,8 +50,8 @@ import { PlannerService } from './planner/planner.service';
 		BrowserModule,
 		ReactiveFormsModule,
 		FormsModule,
-		HttpModule,
-		JsonpModule,
+		HttpClientModule,
+		HttpClientJsonpModule,
 		AppRoutingModule,
 		BrowserAnimationsModule
 	],

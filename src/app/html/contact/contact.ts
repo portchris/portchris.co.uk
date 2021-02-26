@@ -5,8 +5,17 @@
 */
 
 export class Contact {
+
 	public name: string;
 	public email: string;
 	public message: string;
 	public leaveBlank: string;
+
+	public constructor(data: any) {
+
+		this.name = data.name;
+		this.email = data.email;
+		this.message = data.message;
+		this.leaveBlank = data.leaveBlank;
+	}
 }

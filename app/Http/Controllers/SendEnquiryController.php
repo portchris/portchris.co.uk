@@ -48,7 +48,7 @@ class SendEnquiryController extends Controller
 
 		$code = 200;
 		$r = [];
-		$data = (array) $request->all();
+		$data = $request->json()->all();
 		$fields = $this->serialize($data);
 		try {
 			$request = $this->sendEnquiry($data);

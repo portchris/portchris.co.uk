@@ -1,11 +1,4 @@
-/**
-* Unit test for the messages component
-*
-* @author 	Chris Rogers
-* @since 	2017-05-14
-*
-* tslint:disable:no-unused-variable 
-*/
+/* eslint-disable , , , , , ,  */
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';

@@ -37,6 +37,7 @@ export class SidebarComponent implements OnInit, OnChanges {
 	*/
 	constructor(private route: ActivatedRoute, private weatherService: WeatherService, private messagesService: MessagesService) {
 
+		this.weatherService = weatherService;
 		this.router = route;
 		this.help = [];
 	}
@@ -49,6 +50,7 @@ export class SidebarComponent implements OnInit, OnChanges {
 		this.createHelpList();
 		this.messagesService.getAdminUser().subscribe(
 			(success) => {
+				console.log(success);
 				this.adminUser = success;
 				if (this.adminUser && this.adminUser.lat && this.adminUser.lng) {
 					this.weatherService.getWeatherByCoordinates(this.adminUser.lat, this.adminUser.lng).subscribe(

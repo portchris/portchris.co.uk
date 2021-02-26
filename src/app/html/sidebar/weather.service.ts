@@ -10,8 +10,8 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, Jsonp } from '@angular/http';
-import { AppModule as App } from '../../app.module';
+import { HttpClient, HttpResponse, HttpHeaders, HttpClientJsonpModule } from '@angular/common/http';
+import { AppUrl as App } from '../../app.url';
 import { Weather } from './weather';
 import { DataStorageService } from '../../app.storage.service';
 import { map, catchError } from 'rxjs/operators';
@@ -25,9 +25,11 @@ export class WeatherService {
 	private static readonly API_KEY: string = "5eeb97790d4f6cf008d3613ef077098f";
 	private static readonly GOOGLE_API_KEY: string = "AIzaSyDNBoqalASIHil1YXDFpYvMrsGgB--26Yc";
 
-	constructor(private _http: Http, private _jsonp: Jsonp, private storage: DataStorageService) {
+	constructor(private _http: HttpClient, private _jsonp: HttpClientJsonpModule, private storage: DataStorageService) {
 
 		this.uri = "https://api.openweathermap.org/data/2.5/weather?callback=JSONP_CALLBACK&APPID=" + WeatherService.API_KEY + "&units=metric";
+		this._http = _http;
+		this._jsonp = _jsonp;
 	}
 
 	/**
@@ -36,12 +38,16 @@ export class WeatherService {
 	* @param 	float 	lng
 	* @return 	JSON
 	*/
-	public getWeatherByCoordinates(lat, lng): Observable<Weather[]> {
+	public getWeatherByCoordinates(lat, lng): Observable<any> {
 
 		let u = this.uri + "&lat=" + lat + "&lon=" + lng;
-		let h = new Headers();
-		h.append('Content-Type', 'application/javascript');
-		return this._jsonp.get(u, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		return this._http.jsonp(u, 'jsonpWeatherByCoordinates').pipe(map(res => res), catchError(this.handleError));
+	}
+
+	public jsonpWeatherByCoordinates(data): Weather {
+
+		console.log(data);
+		return new Weather(data);
 	}
 
 	/**
@@ -50,17 +56,16 @@ export class WeatherService {
 	* @param 	float 	lng
 	* @return 	JSON
 	*/
-	public getTimezoneByCoordinates(lat, lng): Observable<Weather[]> {
+	public getTimezoneByCoordinates(lat, lng): Observable<any> {
 
 		let uri = new App().url + 'api/timezone';
 		let creds = JSON.stringify({
 			lat: lat,
 			lng: lng
 		});
-		let h = new Headers();
+		let h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		let req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, creds, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
@@ -84,12 +89,12 @@ export class WeatherService {
 		this.storage.setItem('weatherData', JSON.stringify(data));
 	}
 
-	private handleError(error: Response | any) {
+	private handleError(error: HttpResponse<any> | any) {
 
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
-		if (error instanceof Response) {
-			const body = error.json() || '';
+		if (error instanceof HttpResponse) {
+			const body = error.body || '';
 			const err = body.error || JSON.stringify(body);
 			errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
 		} else {

@@ -8,32 +8,35 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
-import { AppModule as App } from '../app.module';
+import { AppUrl as App } from '../app.url';
 import { Planner } from './planner';
 import { DataStorageService } from '../app.storage.service';
 
 @Injectable()
 export class PlannerService {
 
-	uri: string;
-	token: string;
+	public uri: string;
+	public token: string;
+	public storage: DataStorageService;
+	private _http: HttpClient;
 
-	public constructor(private _http: Http, public storage: DataStorageService) {
+	public constructor(_http: HttpClient, storage: DataStorageService) {
 
 		this.uri = new App().url + 'api/sheets';
+		this.storage = storage;
 		this.token = "";
+		this._http = _http;
 	}
 
 	/**
 	 * Get all the messages from users stream
 	 * @return 	Response 	req
 	 */
-	public getPlanner(): Observable<Planner[]> {
+	public getPlanner(): Observable<any> {
 
-		const req = this._http.get(this.uri).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.get(this.uri).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
@@ -58,13 +61,13 @@ export class PlannerService {
 	 * Custom error handler
 	 * @param 	Response | any 	error
 	 */
-	private handleError(error: Response | any) {
+	private handleError(error: HttpResponse<any> | any) {
 
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
-		const body = error.json() || '';
+		const body = error.body || '';
 		const err = body.error || JSON.stringify(body);
-		if (error instanceof Response) {
+		if (error instanceof HttpResponse) {
 			errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
 		} else {
 			errMsg = error.message ? error.message : error.toString();

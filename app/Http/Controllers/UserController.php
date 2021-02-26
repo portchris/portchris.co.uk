@@ -66,15 +66,15 @@ class UserController extends Controller
 		$msg = $code = "";
 		try {
 			$user = new User;
-			$user->firstname = $request->firstname;
-			$user->lastname = $request->lastname;
-			$user->name = $request->name;
-			$user->email = $request->email;
-			$user->username = $request->username;
-			$user->password = $request->password; // Password should already be hashed with $this->hashPassword
-			$user->lat = $request->lat;
-			$user->lng = $request->lng;
-			$user->stage = $request->stage;
+			$user->firstname = $request->json('firstname');
+			$user->lastname = $request->json('lastname');
+			$user->name = $request->json('name');
+			$user->email = $request->json('email');
+			$user->username = $request->json('username');
+			$user->password = $request->json('password'); // Password should already be hashed with $this->hashPassword
+			$user->lat = $request->json('lat');
+			$user->lng = $request->json('lng');
+			$user->stage = $request->json('stage');
 			$user->conversation = "";
 			$user->save();
 			$user = User::find($user->id);
@@ -127,7 +127,7 @@ class UserController extends Controller
 	public function hashPassword(Request $request)
 	{
 		$user = new User();
-		$p = ["password" => $user->setPasswordAttribute($request->input("password"))];
+		$p = ["password" => $user->setPasswordAttribute($request->json("password"))];
 		return response()->json($p);
 	}
 
@@ -148,7 +148,7 @@ class UserController extends Controller
 			$msg = __("Done! Successfully signed out of our guestbook.");
 		}
 		return response()->json(Messages::create([
-			'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : $msg,
+			'content' => (strlen((string) $request->json("message")) > 0) ? $request->json("message") : $msg,
 			'type' => Messages::TYPES['User'],
 			'key' => Messages::KEY_TYPE_ANSWER,
 			'name' => 'Log out',
@@ -168,12 +168,12 @@ class UserController extends Controller
 
 		$msg = "Cannot reset, your name does not appear in the visitors guestbook!";
 		$r = $this->error($msg);
-		$userId = $request->input("user_id");
+		$userId = $request->json("user_id");
 		if ($userId && (int) $userId > 0 && is_numeric($userId)) {
 			User::where("id", $userId)->update(["stage" => 1]);
 			$msg = "Okay, you've been signed out of our guestbook and your progress has been reset back to stage 1.";
 			$r = response()->json(Messages::create([
-				'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : __($msg),
+				'content' => (strlen((string) $request->json("message")) > 0) ? $request->json("message") : __($msg),
 				'type' => Messages::TYPES['User'],
 				'key' => Messages::KEY_TYPE_ANSWER,
 				'name' => __('Reset'),
@@ -196,14 +196,14 @@ class UserController extends Controller
 
 		$msg = "Cannot remove you, your name does not appear in the visitors guestbook!";
 		$r = $this->error($msg);
-		$userId = $request->input("user_id");
+		$userId = $request->json("user_id");
 		if ($userId && (int) $userId > 0 && is_numeric($userId)) {
 			try {
 				$deleted = User::where("id", $userId)->delete();
 				if ($deleted) {
 					$msg = "Okay, we have removed your name from the guestbook. As if we never met... :(";
 					$r = response()->json(Messages::create([
-						'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : __($msg),
+						'content' => (strlen((string) $request->json("message")) > 0) ? $request->json("message") : __($msg),
 						'type' => Messages::TYPES['User'],
 						'key' => Messages::KEY_TYPE_ANSWER,
 						'name' => __('Reset'),
@@ -216,7 +216,7 @@ class UserController extends Controller
 				}
 			} catch (Exception $e) {
 				$r = response()->json(Messages::create([
-					'content' => (strlen((string) $request->input("message")) > 0) ? $request->input("message") : __($msg),
+					'content' => (strlen((string) $request->json("message")) > 0) ? $request->json("message") : __($msg),
 					'type' => Messages::TYPES['User'],
 					'key' => Messages::KEY_TYPE_ERROR,
 					'name' => __('Reset'),
@@ -460,43 +460,31 @@ class UserController extends Controller
 		// $cookie = false;
 		$msg = $key = $title = $name = $code = $stage = $type = $method = "";
 		try {
-			$claims = $request->all();
-			// if (!isset($claims["firstname"]) || !isset($claims["lastname"]) || !isset($claims["name"])) {
-			// 	$claims["firstname"] = (isset($claims["username"])) ? $claims["username"] : __("my friend");
-			// 	$claims["lastname"] = "";
-			// 	$claims["name"] = $claims["firstname"];
-			// }
-			// if (!isset($claims["lat"]) || !isset($claims["lng"]) || !isset($claims["stage"])) {
-			// 	$claims["lat"] = 0;
-			// 	$claims["lng"] = 0;
-			// 	$claims["stage"] = 0;
-			// }
-			$payload = $this->createJWTPayload(
-				$claims,
-				$claims["username"],
-				time(),
-				strtotime("+1 day"),
-				time(),
-				Route::current()->getName()
-			);
-			// $token = $this->quickRandom() . time();
-			// $user = new User;
-			// $user->firstname = $request->username;
-			// $user->lastname = "";
-			// $user->name = $request->username;
-			// $user->email = sprintf("dev-%s@portchris.co.uk", $t);
-			// $user->username = $claims["username"] + $t;
-			// $user->password = $claims["password"] + $t;
-			// $user->lat = 0;
-			// $user->lng = 0;
-			// $user->stage = 0;
-			// $user->conversation = "";
-			// $user->save();
-			// $user = User::find($user->id);
-			// $token = JWTAuth::fromUser($user);
-			// $user = auth()->setToken($token)->user();
-			// $name = $request->username;
-			$token = JWTAuth::encode($payload);
+			$name = $request->json('username');
+			$claims = $request->json('password');
+			$user = new User;
+			$user->firstname = $name;
+			$user->lastname = "";
+			$user->name = $name;
+			$user->email = "null@null.com";
+			$user->username = $name;
+			$user->password = $claims;
+			$user->lat = 0;
+			$user->lng = 0;
+			$user->stage = 0;
+			$user->conversation = "";
+			$token = JWTAuth::fromUser($user);
+			// $payload = $this->createJWTPayload(
+			// 	$claims,
+			// 	$name,
+			// 	time(),
+			// 	strtotime("+1 day"),
+			// 	time(),
+			// 	Route::current()->getName()
+			// );
+			// $token = JWTAuth::encode($payload);
+			// JWTAuth::parseToken();
+			// $token = JWTAuth::getToken()->get();
 
 			if (!$token) {
 				$msg = __("Could not create guest record please try again");
@@ -513,7 +501,7 @@ class UserController extends Controller
 					throw new \Exception("Error: could not find next question.");
 				}
 				$id = $q->id;
-				$msg = sprintf(__("Okay %s! Now let's begin. %s%sNote: If you ever get stuck, you can refer to the \"Helper Commands\" box - you can type any of those commands in at any point."), $claims["username"], $q->content, PHP_EOL . PHP_EOL);
+				$msg = sprintf(__("Okay %s! Now let's begin. %s%sNote: If you ever get stuck, you can refer to the \"Helper Commands\" box - you can type any of those commands in at any point."), $name, $q->content, PHP_EOL . PHP_EOL);
 				$code = 200;
 				$name = "success";
 				$title = $token;

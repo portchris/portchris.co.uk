@@ -422,7 +422,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 			const msg = this.createMessageTemplate();
 			const weather = this.weatherService.getWeatherData();
 			if (typeof weather !== "undefined" && weather !== null && weather.time != null) {
-				msg.message = (weather.time.dark) ? "Hello! " : "Hello! ";
+				msg.message = (weather.time.dark) ? "Good evening! " : "Good morning! ";
 			} else {
 				msg.message = "Hello!";
 			}
@@ -612,12 +612,12 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 	*/
 	private getMessagesSuccess(message, delay = true) {
 
-		const m = message[message.length - 1];
+		const m = (message instanceof Array) ? message[message.length - 1] : message;
 		if (m) {
 			this.typing = (m.key === "user") ? false : true;
 			this.talkForm.disable();
 			const fnc = () => {
-				this.messages = this.messages.concat(m);
+				this.messages.push(m);
 				this.user.id = m.user_id;
 				this.user.stage = m.stage;
 				this.page.id = m.page_id;
@@ -889,7 +889,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 	*/
 	private createMessageTemplate() {
 
-		const m: any = {
+		const m = {
 			message: "",
 			answer: {
 				name: "",
@@ -905,7 +905,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 				id: this.user.id,
 				stage: 1,
 			}
-		}
+		};
 		return m;
 	}
 
@@ -1113,6 +1113,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 	*/
 	private registerAccount() {
 
+		console.log(this.user);
 		if (this.user != null && this.user.email != null && this.user.password != null) {
 			const data = this.talkForm.value;
 			const params = {
@@ -1155,7 +1156,7 @@ export class MessagesComponent implements OnInit, AfterViewChecked, OnDestroy {
 				}
 			);
 		} else {
-			this.getMessages();
+			this.toSaveOrNotToSave();
 		}
 	}
 

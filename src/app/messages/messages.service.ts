@@ -8,32 +8,37 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
 import { map, catchError } from 'rxjs/operators';
-import { AppModule as App } from '../app.module';
+import { AppUrl as App } from '../app.url';
 import { Messages } from './messages';
 import { DataStorageService } from '../app.storage.service';
 
 @Injectable()
 export class MessagesService {
 
-	uri: string;
-	token: string;
+	public uri: string;
+	public token: string;
+	public storage: DataStorageService;
+	private _http: HttpClient;
 
-	public constructor(private _http: Http, public storage: DataStorageService) {
+	public constructor(_http: HttpClient, storage: DataStorageService) {
 
-		this.uri = new App().url + 'api/message';
+		this.uri = new App().url + 'api/message'; // Causes circular dependency
 		this.token = "";
+		this.storage = storage;
+		this._http = _http;
 	}
 
 	/**
 	* Get all the messages from users stream
 	* @return 	Response 	req
 	*/
-	public getMessages(): Observable<Messages[]> {
+	public getMessages(): Observable<any> {
 
-		const req = this._http.get(this.uri).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		let h = new HttpHeaders();
+		h.append('Content-Type', 'application/json');
+		return this._http.get(this.uri, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
@@ -41,17 +46,12 @@ export class MessagesService {
 	* @param 	object 	data
 	* @param 	Response 	req
 	*/
-	public getResponse(data): Observable<Messages[]> {
+	public getResponse(data): Observable<any> {
 
 		const d = JSON.stringify(data);
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(
-			this.uri + "?token=" + this.getToken(),
-			d,
-			{ headers: h }
-		).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(this.uri + "?token=" + this.getToken(), d, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
@@ -59,14 +59,13 @@ export class MessagesService {
 	* @param 	object 	data
 	* @return 	JSON 		req
 	*/
-	public authenticate(data) {
+	public authenticate(data): Observable<any> {
 
 		const uri = new App().url + 'api/user/identify';
 		const creds = JSON.stringify(data);
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, creds, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
@@ -74,23 +73,22 @@ export class MessagesService {
 	* @param 	object 	data
 	* @return 	JSON 		req
 	*/
-	public login(userId) {
+	public login(userId): Observable<any> {
 
 		const uri = new App().url + 'api/user/' + userId + "?token=" + this.getToken();
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.get(uri, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
-	public createUserAccount(data) {
+	public createUserAccount(data): Observable<any> {
 
 		const uri = new App().url + 'api/user';
 		const creds = JSON.stringify(data);
-		const h = new Headers();
+		const h = new HttpHeaders();
+		console.log(creds);
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, creds, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
@@ -98,81 +96,82 @@ export class MessagesService {
 	* @param 	JSON 	username
 	* @return 	JSON 	req
 	*/
-	public createGuestAccount(username) {
+	public createGuestAccount(username): Observable<any> {
 
 		const uri = new App().url + 'api/user/guest';
 		const creds = JSON.stringify(username);
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(uri, creds, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, creds, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
 	* Destroy the JWT token client and server side.
 	* @return 	JSON 	req
 	*/
-	public logOut(data): Observable<Messages[]> {
+	public logOut(data): Observable<any> {
 
 		const uri = new App().url + 'api/user/logout';
 		const d = JSON.stringify(data);
-		const h = new Headers();
+		const h = new HttpHeaders();
 		this.token = "";
 		this.storeUserInfo({
 			user: null,
 			token: null
 		});
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, d, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
 	* Destroy the JWT token client and server side and set the users progress back to stage 0.
 	* @return 	JSON 	req
 	*/
-	public reset(data): Observable<Messages[]> {
+	public reset(data): Observable<any> {
 
 		const uri = new App().url + 'api/user/reset';
 		const d = JSON.stringify(data);
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, d, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
 	* Destroy the JWT token client and server side. Remove the user from our records.
 	* @return 	JSON 	req
 	*/
-	public remove(data): Observable<Messages[]> {
+	public remove(data): Observable<any> {
 
 		const uri = new App().url + 'api/user/remove';
 		const d = JSON.stringify(data);
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, d, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
 	* Manually create a message without API and return it through observable
 	*/
-	public createMessage(data) {
+	public createMessage(data): Promise<any> {
 
 		return new Promise((resolve, reject) => {
 			if (data != null && data.answer != null && data.page != null && data.user != null) {
-				const msg = [{
-					name: data.answer.name,
-					title: data.answer.title,
-					key: data.answer.key,
-					stage: data.answer.stage,
-					type: data.answer.type,
-					method: data.answer.method,
-					page_id: data.page.id,
-					user_id: data.user.id,
-					content: data.message
-				}];
+				const msg =
+					{
+						answer: data.answer,
+						page: data.page,
+						user: data.user,
+						name: data.answer.name,
+						title: data.answer.title,
+						key: data.answer.key,
+						stage: data.answer.stage,
+						type: data.answer.type,
+						method: data.answer.method,
+						page_id: data.page.id,
+						user_id: data.user.id,
+						content: data.message
+					}
+				;
 				resolve(msg);
 			} else {
 				reject(new Error("Please provide the data in the correct format"));
@@ -185,27 +184,25 @@ export class MessagesService {
 	* @param 	string 	password 	un-hashed password
 	* @return 	string 	req 	hashed password JSON 
 	*/
-	public hashPassword(password) {
+	public hashPassword(password): Observable<any> {
 
 		const uri = new App().url + 'api/user/password';
 		const d = JSON.stringify({ password: password });
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.post(uri, d, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.post(uri, d, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
 	/**
 	* Get the portchris user (me)
 	* @return 	the admin user information
 	*/
-	public getAdminUser() {
+	public getAdminUser(): Observable<any> {
 
 		const uri = new App().url + 'api/adminuser';
-		const h = new Headers();
+		const h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		const req = this._http.get(uri, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
-		return req;
+		return this._http.get(uri, { headers: h }).pipe(map((res) => res), catchError(this.handleError));
 	}
 
 	/**
@@ -256,13 +253,13 @@ export class MessagesService {
 	* Custom error handler
 	* @param 	Response | any 	error
 	*/
-	private handleError(error: Response | any) {
+	private handleError(error: HttpResponse<any> | any) {
 
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
-		const body = error.json() || '';
+		const body = error.body || '';
 		const err = body.error || JSON.stringify(body);
-		if (error instanceof Response) {
+		if (error instanceof HttpResponse) {
 			errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
 		} else {
 			errMsg = error.message ? error.message : error.toString();

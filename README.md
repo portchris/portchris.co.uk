@@ -4,7 +4,7 @@
 
 ### Setup
 [Clone the laradock repo](https://laradock.io/getting-started) and structure like so:
-```
+```bash
 + laradock
 + portchris.co.uk
 ``` 
@@ -14,16 +14,16 @@ Custom docker-compose.portchris.yml will need copying from portchris.co.uk to la
 ### Variables
 
 On top of the usual [laradock .env sample](https://github.com/laradock/laradock/blob/master/env-example) AND the [Laravel .env.sample](https://github.com/laravel/laravel/blob/master/.env.example), I have made the following additions / alterations:
-```
+```env
 ###########################################################
 #################### porthris.co.uk #######################
 ###########################################################
 
-WEBROOT=/var/www/portchris.co.uk
+WEBROOT=/var/www/portchris.co.uk # Path inside container
 DOCKER_COMPOSE_SERVICES="workspace php-fpm php-worker nginx mysql redis redis-cluster redis-webui docker-in-docker docker-registry docker-web-ui"
 DOCKER_COMPOSE_PATH="../laradock/"
 DOCKER_COMPOSE_FILE="docker-compose.portchris.co.uk.yml"
-NGINX_VIRTUAL_ROOT=/var/www/portchris.co.uk/public
+NGINX_VIRTUAL_ROOT=/home/www/portchris.co.uk/public # Path outside container
 NGINX_VIRTUAL_HOST=my.domain.com,api.my.domain.com
 NGINX_VIRTUAL_PORT=8082
 NGINX_VIRTUAL_PROTO=http
@@ -108,14 +108,14 @@ Portchris adds to and uses the default laradock nginx configurations, I have man
 In the laradock container `../laradock/nginx/sites` (typically) we to add config for both the frontend and backend:
 
 Angular JS App (frontend) - portchris.co.uk.app.conf:
-```
+```ngnix
 server {
 
     listen <MY_NGINX_VIRTUAL_PORT_ENV_VAR>;
     listen [::]:<MY_NGINX_VIRTUAL_PORT_ENV_VAR>;
 
-    server_name portchris.portchris.co.uk;
-    root /var/www/portchris.co.uk/dist;
+    server_name portchris.localhost;
+    root /var/www/portchris.co.uk/dist; # Path inside container
     index index.html index.htm;
 
     location / {
@@ -133,7 +133,7 @@ server {
 ```
 
 Laravel (backend) - portchris.co.uk.laravel.conf
-```
+```nginx
 server {
 
     listen <MY_NGINX_VIRTUAL_PORT_ENV_VAR>;
@@ -145,8 +145,8 @@ server {
     # ssl_certificate /etc/nginx/ssl/default.crt;
     # ssl_certificate_key /etc/nginx/ssl/default.key;
 
-    server_name api.portchris.portchris.co.uk;
-    root /var/www/portchris.co.uk/public;
+    server_name api.portchris.localhost;
+    root /var/www/portchris.co.uk/public; # Path inside container
     index index.php index.html index.htm;
 
     location / {
@@ -188,29 +188,31 @@ server {
 
 ### Setup
 Install dependencies
-```
+```bash
 ./composer.sh install
 ```
 
 Create app key, store this in .env:
-```
+```bash
 ./laravel.sh key:generate
 ```
 
 Create the JSON Web Token for the API
-```
+```bash
 ./laravel.sh vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider" 
 ./laravel.sh jwt:generate
 ```
 
 Seed the DB with the basic table
-```
-./laravel.sh db:seed
+```bash
+./shell.sh
+php artisan migrate
+php artisan migrate:refresh --seed
 ```
 
 Import your story. Portchris conforms to the [ChoiceScript JS format](https://choicescriptdev.fandom.com/wiki/Script), So please refer to this structure for your stories. I have the following stories by default (in order):
 
-```
+```bash
 ./storage/story/startup.txt
 ./storage/story/manager.txt
 ./storage/story/ending.txt
@@ -218,10 +220,17 @@ Import your story. Portchris conforms to the [ChoiceScript JS format](https://ch
 `startup` is the ChoiceScript definition for the beginning of the story, all stories should begin with this chapter
 
 They are imported into Laravel using a custom command like so:
+```bash
+./shell.sh
+php artisan portchris:story:import startup
+php artisan portchris:story:import manager
+php artisan portchris:story:import ending
 ```
-./laravel.sh portchris:story:import startup
-./laravel.sh portchris:story:import manager
-./laravel.sh portchris:story:import ending
+
+Clear application cache:
+```bash
+./shell.sh
+php artisan cache:clear
 ```
 
 ## Front-end Development
@@ -236,24 +245,27 @@ First you have to install [angular-cli](https://github.com/angular/angular-cli).
 #### angular-laravel
 - First clone via `git bash` or download.
 - Go to your root folder and run this command
-```
+```bash
 ./npm.sh install
 ```
 - (Optional) After `npm install` again run this command to install `bootstrap, tether and jquery`
-```
+```bash
 ./npm.sh install --no-save bootstrap@next
 ```
 - Download [laravel-api](https://github.com/eliyas5044/laravel-api), which I've used as a RESTful api.
 - Run your `angular` app by this command
-```
+```bash
 ./npm.sh start
 ```
 
 ## Deployment
 
-```
+```bash
 ./shell.sh
 ng build --prod
 ```
+
+(Optional)
+Create an admin user account in order to get local weather service.
 
 Enjoy!

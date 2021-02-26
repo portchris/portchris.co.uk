@@ -5,5 +5,14 @@
 */
 
 export class Weather {
-	
+
+    public weather: any;
+
+    public constructor(data: any) {
+
+        if (data.hasOwnProperty("weather") && data.hasOwnProperty("name") && data.hasOwnProperty("main")) {
+            this.weather = data.weather;
+            this.weather.main.temp = Math.floor(this.weather.main.temp);
+        }
+    }
 }

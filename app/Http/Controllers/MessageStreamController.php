@@ -101,7 +101,7 @@ class MessageStreamController extends Controller
 	{
 
 		$return = $this->error("Could not submit answer");
-		$data = (array) $request->all();
+		$data = $request->json()->all();
 
 		// Respond to users message
 		$return = $this->doRespond($data);

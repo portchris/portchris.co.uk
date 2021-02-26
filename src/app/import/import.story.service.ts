@@ -8,8 +8,8 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers } from '@angular/http';
-import { AppModule as App } from '../app.module';
+import { HttpClient, HttpResponse, HttpHeaders } from '@angular/common/http';
+import { AppUrl as App } from '../app.url';
 import { ImportStory } from './import.story';
 import { DataStorageService } from '../app.storage.service';
 import { map, catchError } from 'rxjs/operators';
@@ -17,30 +17,34 @@ import { map, catchError } from 'rxjs/operators';
 @Injectable()
 export class ImportStoryService {
 
-	uri: string;
+	public uri: string;
+	private _http: HttpClient; 
+	private storage: DataStorageService;
 
-	constructor(private _http: Http, private storage: DataStorageService) {
+	constructor(_http: HttpClient, storage: DataStorageService) {
 
 		this.uri = new App().url + "import";
+		this.storage = storage;
+		this._http = _http;
 	}
 
 	/**
 	* Import story
 	* @param 	string 	id		scene ID
 	*/
-	public import(id): Observable<ImportStory[]> {
+	public import(id: string): Observable<any> {
 
-		let h = new Headers();
+		let h = new HttpHeaders();
 		h.append('Content-Type', 'application/json');
-		return this._http.get(this.uri + "/" + id, { headers: h }).pipe(map(res => res.json()), catchError(this.handleError));
+		return this._http.get(this.uri + "/" + id, { headers: h }).pipe(map(res => res), catchError(this.handleError));
 	}
 
-	private handleError(error: Response | any) {
+	private handleError(error: HttpResponse<any> | any) {
 
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
-		if (error instanceof Response) {
-			const body = error.json() || '';
+		if (error instanceof HttpResponse) {
+			const body = error.body || '';
 			const err = body.error || JSON.stringify(body);
 			errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
 		} else {

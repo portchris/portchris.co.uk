@@ -8,32 +8,34 @@
 
 import { throwError as observableThrowError, Observable } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { Http, Response } from '@angular/http';
-import { AppModule as App } from '../app.module';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { AppUrl as App } from '../app.url';
 import { User } from './user';
 import { map, catchError } from 'rxjs/operators';
 
 @Injectable()
 export class UserService {
 
-	uri: string;
+	public uri: string;
+	private _http: HttpClient;
 
-	constructor(private _http: Http) {
+	constructor(_http: HttpClient) {
 
 		this.uri = new App().url + 'api/user';
+		this._http = _http;
 	}
 
 	identifyUser(): Observable<User[]> {
 
-		return this._http.get(this.uri + '/identify').pipe(map(res => res.json()), catchError(this.handleError));
+		return this._http.get(this.uri + '/identify').pipe(map(res => [new User(res)]), catchError(this.handleError));
 	}
 
-	private handleError(error: Response | any) {
+	private handleError(error: HttpResponse<any> | any) {
 
 		// Might use a remote logging infrastructure for live environment
 		let errMsg: string;
-		if (error instanceof Response) {
-			const body = error.json() || '';
+		if (error instanceof HttpResponse) {
+			const body = error.body || '';
 			const err = body.error || JSON.stringify(body);
 			errMsg = `${error.status} - ${error.statusText || ''} ${err}`;
 		} else {

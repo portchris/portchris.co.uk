@@ -7,13 +7,13 @@
 */
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
-use App\Http\Requests\Request;
+// use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Validation\ValidationException;
 use App\ContentMeta as Messages;
 
-class StoreMessageRequest extends FormRequest
+class StoreMessageRequest extends Request
 {
 	/**
 	* Determine if the user is authorized to make this request. Currently all users can create messages

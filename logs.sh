@@ -7,7 +7,7 @@ if [ -f ./.env ]; then
 	. ./.env
 	set +a
 	cd $DOCKER_COMPOSE_PATH	
-	docker-compose -f $DOCKER_COMPOSE_FILE logs -f $@
+	docker-compose -f $DOCKER_COMPOSE_FILE logs --tail 100 -f $@
 else
 	echo "Please create an .env file"
 fi

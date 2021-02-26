@@ -107,19 +107,10 @@ export class PlannerComponent implements OnInit, OnDestroy {
 	 * Observable / promise success method
 	 * @param 	{Object} 	plans
 	 */
-	private getPlannerSuccess(plans) {
+	private getPlannerSuccess(plans: Planner) {
 
-		if (plans.data != null && plans.success) {
-			this.resourcePlanner = new Planner();
-			for (let i in this.days) {
-				if (this.days[i] in plans.data && plans.data[this.days[i]] != null) {
-					this.resourcePlanner[this.days[i]] = {
-						name: this.days[i],
-						active: (this.today === this.days[i]) ? true : false,
-						plans: plans.data[this.days[i]]
-					};
-				}
-			}
+		if (plans.resourcePlanner != null && plans.success) {
+			this.resourcePlanner = plans.resourcePlanner;
 			this.success = true;
 		} else {
 			this.getPlannerFail(
