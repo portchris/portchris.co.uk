@@ -40,13 +40,16 @@
 	max-width: 55px;
 }
 #linkedin-contact:hover {
-	background-color: #4875B4; 
+	background-color: #4875B4;
+}
+#contact-me .icon#twitter-contact {
+	padding: 5px;
 }
 #twitter-contact:hover {
-	background-color: #00ACED; 
+	background-color: #000;
 }
 #facebook-contact:hover {
-	background-color: #3B5998; 
+	background-color: #3B5998;
 }
 #email-contact {
 	border: 5px solid #FFF;

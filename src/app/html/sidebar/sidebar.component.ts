@@ -19,7 +19,7 @@ export class SidebarComponent implements OnInit, OnChanges {
 	/**
 	* Refernce to a child element
 	*/
-	@ViewChild('weatherPanel') private weatherPanel: ElementRef;
+	// @ViewChild('weatherPanel') private weatherPanel: ElementRef;
 	@ViewChild('helpPanel') private helpPanel: ElementRef;
 	@ViewChild('cvPanel') private cvPanel: ElementRef;
 
@@ -31,7 +31,7 @@ export class SidebarComponent implements OnInit, OnChanges {
 	adminUser: any;
 
 	/**
-	* Must pass in the data object for the columns to work. 
+	* Must pass in the data object for the columns to work.
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/
@@ -50,31 +50,30 @@ export class SidebarComponent implements OnInit, OnChanges {
 		this.createHelpList();
 		this.messagesService.getAdminUser().subscribe(
 			(success) => {
-				console.log(success);
 				this.adminUser = success;
-				if (this.adminUser && this.adminUser.lat && this.adminUser.lng) {
-					this.weatherService.getWeatherByCoordinates(this.adminUser.lat, this.adminUser.lng).subscribe(
-						(w) => {
-							if (w.hasOwnProperty("weather") && w.hasOwnProperty("name") && w.hasOwnProperty("main")) {
-								this.weatherService.getTimezoneByCoordinates(this.adminUser.lat, this.adminUser.lng).subscribe(
-									(t) => {
-										this.displayWeatherPanel(w, t);
-									},
-									(error) => {
-										this.hideWeatherPanel();
-										console.error(error);
-									}
-								);
-							}
-						},
-						(error) => {
-							this.hideWeatherPanel();
-							console.error(error);
-						}
-					);
-				} else {
-					this.hideWeatherPanel();
-				}
+				// if (this.adminUser && this.adminUser.lat && this.adminUser.lng) {
+				// 	this.weatherService.getWeatherByCoordinates(this.adminUser.lat, this.adminUser.lng).subscribe(
+				// 		(w) => {
+				// 			if (w.hasOwnProperty("weather") && w.hasOwnProperty("name") && w.hasOwnProperty("main")) {
+				// 				this.weatherService.getTimezoneByCoordinates(this.adminUser.lat, this.adminUser.lng).subscribe(
+				// 					(t) => {
+				// 						this.displayWeatherPanel(w, t);
+				// 					},
+				// 					(error) => {
+				// 						this.hideWeatherPanel();
+				// 						console.error(error);
+				// 					}
+				// 				);
+				// 			}
+				// 		},
+				// 		(error) => {
+				// 			this.hideWeatherPanel();
+				// 			console.error(error);
+				// 		}
+				// 	);
+				// } else {
+				// 	this.hideWeatherPanel();
+				// }
 			},
 			(error) => {
 				console.error(error);
@@ -85,10 +84,10 @@ export class SidebarComponent implements OnInit, OnChanges {
 	/**
 	* In case the weather info breaks, hide the panel
 	*/
-	private hideWeatherPanel() {
+	// private hideWeatherPanel() {
 
-		this.weatherPanel.nativeElement.classList.add("hidden");
-	}
+	// 	this.weatherPanel.nativeElement.classList.add("hidden");
+	// }
 
 	/**
 	* Set the weather object for the weather panel to display results

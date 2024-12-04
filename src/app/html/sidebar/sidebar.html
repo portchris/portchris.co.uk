@@ -1,48 +1,4 @@
 <div id="sidebar" class="d-flex flex-column">
-	<div #weatherPanel id="situation" class="box show p-2">
-		<div class="panel-icon">
-			<svg class="icon">
-				<use xlink:href="#maps-and-flags" />
-			</svg>
-		</div>
-		<h6>My Location:</h6>
-		<div class="weather" *ngIf="weather">
-			<div class="row">
-				<div class="col-6">
-					<span class="temp">{{ weather.main.temp }}&nbsp;&#8451;</span>
-				</div>
-				<div class="col-6">
-					<svg class="icon">
-						<use [attr.xlink:href]="weather.icon" />
-					</svg>
-				</div>
-			</div>
-			<div class="row">
-				<div class="col-12">
-					<div class="ticker-wrap">
-						<div class="ticker">
-							<div class="ticker__item">
-								<span *ngIf="!timezone.dark;then daytime else nighttime"></span>
-								<ng-template #daytime>
-									<svg class="icon">
-										<use xlink:href="#sun" />
-									</svg>
-								</ng-template>
-								<ng-template #nighttime>
-									<svg class="icon">
-										<use xlink:href="#half-moon" />
-									</svg>
-								</ng-template>
-								<span>{{ timezone.time }}</span>
-								<span>{{ weather.name }}</span>
-								<span>{{ timezone.timezone }}</span>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
 	<div #cvPanel id="cv" class="box p-2">
 		<div class="panel-icon">
 			<svg class="icon">
@@ -75,10 +31,10 @@
 	<div id="connect-twitter" class="box p-2">
 		<div class="panel-icon">
 			<svg id="twitter-contact" class="icon">
-				<use xlink:href="#twitter-logo-on-black-background"></use>
+				<use xlink:href="#x-logo-on-black-background"></use>
 			</svg>
 		</div>
-		<h6>Connect Via Twitter:</h6>
+		<h6>Connect Via X:</h6>
 		<a href="https://twitter.com/PortChris" target="_blank" title="Visit my Twitter profile" class="dropdown-indicator">
 			<img src="../../../assets/images/share.svg" class="svg-invert" alt="Connect Via Twitter" />
 		</a>

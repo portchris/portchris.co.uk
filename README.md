@@ -7,9 +7,9 @@
 ```bash
 + laradock
 + portchris.co.uk
-``` 
+```
 
-Custom docker-compose.portchris.yml will need copying from portchris.co.uk to laradock directory 
+Custom docker-compose.portchris.yml will need copying from portchris.co.uk to laradock directory
 
 ### Variables
 
@@ -184,7 +184,7 @@ server {
 - `npm.sh` - Runs Node Package Manager inside workspace container
 - `mysql.sh` - Shell into the MySQL container and login to the database
 
-## Laravel 
+## Laravel
 
 ### Setup
 Install dependencies
@@ -199,7 +199,7 @@ Create app key, store this in .env:
 
 Create the JSON Web Token for the API
 ```bash
-./laravel.sh vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider" 
+./laravel.sh vendor:publish --provider="Tymon\JWTAuth\Providers\LaravelServiceProvider"
 ./laravel.sh jwt:generate
 ```
 
@@ -209,6 +209,7 @@ Seed the DB with the basic table
 php artisan migrate
 php artisan migrate:refresh --seed
 ```
+**Alternatively: You may wish to import the DB from production**
 
 Import your story. Portchris conforms to the [ChoiceScript JS format](https://choicescriptdev.fandom.com/wiki/Script), So please refer to this structure for your stories. I have the following stories by default (in order):
 
@@ -246,11 +247,11 @@ First you have to install [angular-cli](https://github.com/angular/angular-cli).
 - First clone via `git bash` or download.
 - Go to your root folder and run this command
 ```bash
-./npm.sh install
+./npm.sh ci --force
 ```
 - (Optional) After `npm install` again run this command to install `bootstrap, tether and jquery`
 ```bash
-./npm.sh install --no-save bootstrap@next
+./npm.sh ci --no-save bootstrap@next
 ```
 - Download [laravel-api](https://github.com/eliyas5044/laravel-api), which I've used as a RESTful api.
 - Run your `angular` app by this command

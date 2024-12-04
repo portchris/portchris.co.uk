@@ -12,7 +12,7 @@
 }
 #sidebar .box.show {
 	height: auto;
-	overflow-y: visible; 
+	overflow-y: visible;
 }
 .dropdown-indicator {
 	transition: 0.2s 100ms ease-in-out;
@@ -46,7 +46,7 @@
 	font-size: 120%;
 } */
 #help .dropdown-indicator {
-	transform: rotate(180deg);	
+	transform: rotate(180deg);
 }
 #sidebar .box.show .dropdown-indicator {
 	transform: rotate(0deg);
@@ -119,4 +119,8 @@
 	-webkit-filter: invert(0); /* safari 6.0 - 9.0 */
 	filter: invert(0);
 	transition: 0.2s 100ms ease-in-out;
+}
+#connect-adobe img {
+	max-width: 100%;
+	max-height: 52px;
 }

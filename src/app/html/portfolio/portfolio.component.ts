@@ -19,7 +19,7 @@ export class PortfolioComponent implements OnInit, OnChanges, OnDestroy {
 	sub: any;
 
 	/**
-	* Must pass in the data object for the columns to work. 
+	* Must pass in the data object for the columns to work.
 	* Accepts columns.class, columns.content
 	* @param  ActivatedRoute   route
 	*/

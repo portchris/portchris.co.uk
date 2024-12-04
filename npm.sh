@@ -7,7 +7,7 @@ if [ -f ./.env ]; then
 	. ./.env
 	set +a
 	cd $DOCKER_COMPOSE_PATH
-	docker-compose -f $DOCKER_COMPOSE_FILE exec --user laradock workspace npm $@ --prefix $WEBROOT  
+	docker-compose -f $DOCKER_COMPOSE_FILE exec --user laradock workspace npm $@ --prefix $WEBROOT
 else
 	echo "Please create an .env file"
 fi
